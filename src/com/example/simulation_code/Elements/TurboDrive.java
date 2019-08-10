@@ -1,4 +1,4 @@
-package com.example.simulation_code;
+package com.example.simulation_code.Elements;
 
 import com.hummeling.if97.IF97;
 
@@ -30,6 +30,7 @@ public class TurboDrive extends Elements {
                         condenserPressure,
                         waterSteam.specificEntropyPH(superheater.getPressureOfHeatedMedium(), superheater.getEnthalpyOfHeatedMedium())));
         this.turbinePower = feedPump.getEnthalpyIncrease() * feedwaterFlow / 1000 / mechanicalEfficiency;
+        this.steamConsumption = turbinePower * 1000 / (inletEnthalpy - outletEnthalpy);
     }
 
     public TurboDrive(String name,
@@ -44,7 +45,7 @@ public class TurboDrive extends Elements {
         this.mechanicalEfficiency = mechanicalEfficiency;
         this.relativeInternalEfficiency = relativeInternalEfficiency;
         this.condenserPressure = condenserPressure;
-        Parameters parameters = turbineCylinder.parametersInSelection(selectionNumber);
+        TurbineCylinders.Parameters parameters = turbineCylinder.parametersInSelection(selectionNumber);
         this.inletEnthalpy = parameters.getEnthalpy();
         IF97 waterSteam = new IF97(IF97.UnitSystem.DEFAULT);
         this.outletEnthalpy =
@@ -52,6 +53,11 @@ public class TurboDrive extends Elements {
                         condenserPressure,
                         waterSteam.specificEntropyPH(parameters.getPressure(), parameters.getEnthalpy())));
         this.turbinePower = feedPump.getEnthalpyIncrease() * feedwaterFlow / 1000 / mechanicalEfficiency;
+        this.steamConsumption = turbinePower * 1000 / (inletEnthalpy - outletEnthalpy);
+    }
+
+    public double getSteamConsumption() {
+        return steamConsumption;
     }
 
     public void describeTurboDrive() {
@@ -62,6 +68,7 @@ public class TurboDrive extends Elements {
         System.out.println("Мощность ТП: " + turbinePower + " ,МВт");
         System.out.println("Энтальпия на входе: " + inletEnthalpy + " ,кДж/кг");
         System.out.println("Энтальпия на выходе: " + outletEnthalpy + " ,кДж/кг");
+        System.out.println("Расход пара через ТП: " + steamConsumption + " ,кг/c");
         System.out.println("-----------------------------------------------------------------------------------------");
         System.out.println();
     }

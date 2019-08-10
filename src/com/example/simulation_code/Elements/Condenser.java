@@ -1,4 +1,4 @@
-package com.example.simulation_code;
+package com.example.simulation_code.Elements;
 
 import com.hummeling.if97.IF97;
 
@@ -7,10 +7,12 @@ public class Condenser extends Elements {
     private double pressureOfHeatingSteam;                      // Давление греющего пара на входе в конденсатор
     private double temperatureOfHeatingSteam;                   // Температура греющего пара на входе в конденсатор
     private double enthalpyOfHeatingSteam;                      // Энтальпия греющего пара на входе в конденсатор
+    private double consumptionOfHeatingSteam;
     //-----------------------------Характеристики дренажа пара----------------------------------------------------------
     private double pressureOfSteamDrain;                        // Давление дренажа пара на выходе из конденсатора
     private double temperatureOfSteamDrain;                     // Температура дренажа пара на выходе из конденсатора
     private double enthalpyOfSteamDrain;                        // Энтальпия дренажа пара на выходе из конденсатора
+    private double consumptionOfSteamDrain;
 
     public Condenser(String name, TurbineCylinders turbineCylinder) {
         super(name);
@@ -35,6 +37,22 @@ public class Condenser extends Elements {
 
     public double getEnthalpyOfSteamDrain() {
         return enthalpyOfSteamDrain;
+    }
+
+    public double getConsumptionOfHeatingSteam() {
+        return consumptionOfHeatingSteam;
+    }
+
+    public void setConsumptionOfHeatingSteam(double consumptionOfHeatingSteam) {
+        this.consumptionOfHeatingSteam = consumptionOfHeatingSteam;
+    }
+
+    public double getConsumptionOfSteamDrain() {
+        return consumptionOfSteamDrain;
+    }
+
+    public void setConsumptionOfSteamDrain(double consumptionOfSteamDrain) {
+        this.consumptionOfSteamDrain = consumptionOfSteamDrain;
     }
 
     public void describeCondenser() {

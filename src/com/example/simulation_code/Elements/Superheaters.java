@@ -1,4 +1,4 @@
-package com.example.simulation_code;
+package com.example.simulation_code.Elements;
 
 import com.hummeling.if97.IF97;
 
@@ -14,14 +14,17 @@ public class Superheaters extends Elements {
     private double pressureOfHeatingSteam;                      // Давление греющего пара на входе в подогреватель
     private double temperatureOfHeatingSteam;                   // Температура греющего пара на входе в подогреватель
     private double enthalpyOfHeatingSteam;                      // Энтальпия греющего пара на входе в подогреватель
+    private double consumptionOfHeatingSteam;                      // Расход греющего пара на входе в подогреватель
     //-----------------------------Характеристики дренажа пара----------------------------------------------------------
     private double pressureOfSteamDrain;                        // Давление дренажа пара на выходе из подогревателя
     private double temperatureOfSteamDrain;                     // Температура дренажа пара на выходе из подогревателя
     private double enthalpyOfSteamDrain;                        // Энтальпия дренажа пара на выходе из подогревателя
+    private double consumptionOfSteamDrain;                        // Расход дренажа пара на выходе из подогревателя
     //-----------------------------Характеристики обогреваемой среды на выходе------------------------------------------
     private double pressureOfHeatedMedium;                      // Давление обогреваемой среды на выходе из подогревателя
     private double temperatureOfHeatedMedium;                   // Температура обогреваемой среды на выходе из подогревателя
     private double enthalpyOfHeatedMedium;                      // Энтальпия обогреваемой среды на выходе из подогревателя
+    private double consumptionOfHeatedMedium;                      // Расход обогреваемой среды на выходе из подогревателя
 
     public Superheaters(String name,
                         double hydraulicResistanceFromSelectionToHeater,
@@ -90,6 +93,30 @@ public class Superheaters extends Elements {
 
     public double getEnthalpyOfHeatedMedium() {
         return enthalpyOfHeatedMedium;
+    }
+
+    public double getConsumptionOfHeatingSteam() {
+        return consumptionOfHeatingSteam;
+    }
+
+    public void setConsumptionOfHeatingSteam(double consumptionOfHeatingSteam) {
+        this.consumptionOfHeatingSteam = consumptionOfHeatingSteam;
+    }
+
+    public double getConsumptionOfSteamDrain() {
+        return consumptionOfSteamDrain;
+    }
+
+    public void setConsumptionOfSteamDrain(double consumptionOfSteamDrain) {
+        this.consumptionOfSteamDrain = consumptionOfSteamDrain;
+    }
+
+    public double getConsumptionOfHeatedMedium() {
+        return consumptionOfHeatedMedium;
+    }
+
+    public void setConsumptionOfHeatedMedium(double consumptionOfHeatedMedium) {
+        this.consumptionOfHeatedMedium = consumptionOfHeatedMedium;
     }
 
     public void describeSuperheater() {

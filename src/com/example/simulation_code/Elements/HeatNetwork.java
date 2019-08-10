@@ -1,4 +1,4 @@
-package com.example.simulation_code;
+package com.example.simulation_code.Elements;
 
 import com.hummeling.if97.IF97;
 
@@ -10,6 +10,7 @@ public class HeatNetwork extends Elements {
     private double outletPressure;              // Давление на выходе из ТС
     private double outletEnthalpy;              // Энтальпия на выходе из ТС
     private double thermalPowerOfHeatNetwork;    // Тепловая мощность тепловой сети
+    private double networkWaterConsumption;      // Расход сетевой воды
 
     public HeatNetwork(String name, double inletPressure, double inletTemperature, double outletPressure, double outletTemperature, double thermalPowerOfHeatNetwork) {
         super(name);
@@ -21,6 +22,7 @@ public class HeatNetwork extends Elements {
         this.inletPressure = inletPressure;
         this.inletTemperature = inletTemperature;
         this.inletEnthalpy = waterSteam.specificEnthalpyPT(inletPressure, inletTemperature + 273.15);
+        this.networkWaterConsumption = thermalPowerOfHeatNetwork * 1000 / (inletEnthalpy - outletEnthalpy);
     }
 
     public double getOutletTemperature() {
@@ -42,6 +44,7 @@ public class HeatNetwork extends Elements {
         System.out.println("Давление: " + outletPressure + " ,МПа");
         System.out.println("Температура: " + outletTemperature + " ,℃");
         System.out.println("Энтальпия: " + outletEnthalpy + " ,кДж/кг");
+        System.out.println("Расход сетевой воды: " + networkWaterConsumption + " ,кг/c");
         System.out.println("-----------------------------------------------------------------------------------------");
         System.out.println();
     }

@@ -74,6 +74,16 @@ public class Graph {
 
     }
 
+    public Matrices dfsAndMatrixCompilation() {
+        return null;
+        //....
+    }
+
+
+
+
+
+
     private int getAdjUnvisitedVertex(int v) {
         for (int j = 0; j < nVerts; j++) {
             if (adjMat.get(SUPERHEATED_STEAM)[v][j] == -1 && !vertexList.get(j).wasVisited) {

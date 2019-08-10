@@ -1,18 +1,19 @@
 package com.example.simulation_code;
 
-import org.apache.commons.math3.analysis.function.StepFunction;
+import com.example.simulation_code.Elements.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
-    public List<Elements> run() throws FileNotFoundException {
-        List<Elements> elementsList = new ArrayList<>();
+    public Map<String, Elements> initializationOfElements() throws FileNotFoundException {
+        Map<String, Elements> elementsMap = new HashMap<>();
         Scanner scanner = new Scanner(new File("G:\\Vitaly\\Program Files\\IntelliJ IDEA\\IntelliJ IDEA Community Edition 2019.1.3\\IdeaProjects\\SimulationCode\\src\\com\\example\\simulation_code\\input.txt"));
+        //--------------------------ПГ
+        SteamGenerator pg = new SteamGenerator("ПГ", 1790);
+        elementsMap.put(pg.NAME, pg);
+
         //--------------------------ЦСД
         TurbineCylinders csd = new TurbineCylinders(scanner.next(), Integer.parseInt(scanner.next()));
         csd.addSelection(Integer.parseInt(scanner.next()), Double.parseDouble(scanner.next()), Double.parseDouble(scanner.next()));
@@ -21,7 +22,7 @@ public class Main {
         csd.addSelection(Integer.parseInt(scanner.next()), Double.parseDouble(scanner.next()), Double.parseDouble(scanner.next()));
         csd.addSelection(Integer.parseInt(scanner.next()), Double.parseDouble(scanner.next()), Double.parseDouble(scanner.next()));
 
-        elementsList.add(csd);
+        elementsMap.put(csd.NAME, csd);
         //-----------------------Сепаратор
         Separator separator = new Separator(scanner.next(),
                 Double.parseDouble(scanner.next()),
@@ -29,7 +30,7 @@ public class Main {
                 csd);
         //separator.describeSeparator();
 
-        elementsList.add(separator);
+        elementsMap.put(separator.NAME, separator);
         //-----------------------ПП1
         Superheaters pp1 = new Superheaters(
                 scanner.next(),
@@ -42,7 +43,7 @@ public class Main {
                 separator);
         //pp1.describeSuperheater();
 
-        elementsList.add(pp1);
+        elementsMap.put(pp1.NAME, pp1);
         //-----------------------ПП2
         Superheaters pp2 = new Superheaters(
                 scanner.next(),
@@ -55,7 +56,7 @@ public class Main {
                 pp1);
         //pp2.describeSuperheater();
 
-        elementsList.add(pp2);
+        elementsMap.put(pp2.NAME, pp2);
         //--------------------------ЦНД
         TurbineCylinders cnd = new TurbineCylinders(scanner.next(), Integer.parseInt(scanner.next()));
         cnd.addSelection(Integer.parseInt(scanner.next()), Double.parseDouble(scanner.next()), Double.parseDouble(scanner.next()));
@@ -65,17 +66,17 @@ public class Main {
         cnd.addSelection(Integer.parseInt(scanner.next()), Double.parseDouble(scanner.next()), Double.parseDouble(scanner.next()));
         cnd.addSelection(Integer.parseInt(scanner.next()), Double.parseDouble(scanner.next()), Double.parseDouble(scanner.next()));
 
-        elementsList.add(cnd);
+        elementsMap.put(cnd.NAME, cnd);
         //-------------------------Конденсатор
         Condenser condenser = new Condenser(scanner.next(), cnd);
         //condenser.describeCondenser();
 
-        elementsList.add(condenser);
+        elementsMap.put(condenser.NAME, condenser);
         //-------------------------Конденсатный насос
         Pumps kn = new Pumps(scanner.next(), Double.parseDouble(scanner.next()), Double.parseDouble(scanner.next()), condenser);
         //kn.describePump();
 
-        elementsList.add(kn);
+        elementsMap.put(kn.NAME, kn);
         //-------------------------ПНД1
         Heaters pnd1 = new Heaters(
                 scanner.next(),
@@ -89,7 +90,7 @@ public class Main {
         );
         //pnd1.describeHeater();
 
-        elementsList.add(pnd1);
+        elementsMap.put(pnd1.NAME, pnd1);
         //-------------------------ПНД2
         Heaters pnd2 = new Heaters(
                 scanner.next(),
@@ -103,7 +104,7 @@ public class Main {
         );
         //pnd2.describeHeater();
 
-        elementsList.add(pnd2);
+        elementsMap.put(pnd2.NAME, pnd2);
         //------------------------ПНД3
         Heaters pnd3 = new Heaters(
                 scanner.next(),
@@ -117,7 +118,7 @@ public class Main {
         );
         //pnd3.describeHeater();
 
-        elementsList.add(pnd3);
+        elementsMap.put(pnd3.NAME, pnd3);
         //------------------------ПНД4
         Heaters pnd4 = new Heaters(
                 scanner.next(),
@@ -131,7 +132,7 @@ public class Main {
         );
         //pnd4.describeHeater();
 
-        elementsList.add(pnd4);
+        elementsMap.put(pnd4.NAME, pnd4);
         //-----------------------Деаэратор
         Heaters d = new Heaters(
                 scanner.next(),
@@ -142,12 +143,12 @@ public class Main {
         );
         //d.describeHeater();
 
-        elementsList.add(d);
+        elementsMap.put(d.NAME, d);
         //-----------------------ПН
         Pumps pn = new Pumps(scanner.next(), Double.parseDouble(scanner.next()), Double.parseDouble(scanner.next()), d);
         //pn.describePump();
 
-        elementsList.add(pn);
+        elementsMap.put(pn.NAME, pn);
         //-----------------------ПВД5
         Heaters pvd5 = new Heaters(
                 scanner.next(),
@@ -161,7 +162,7 @@ public class Main {
         );
         //pvd5.describeHeater();
 
-        elementsList.add(pvd5);
+        elementsMap.put(pvd5.NAME, pvd5);
         //-----------------------ПВД6
         Heaters pvd6 = new Heaters(
                 scanner.next(),
@@ -175,7 +176,7 @@ public class Main {
         );
         //pvd6.describeHeater();
 
-        elementsList.add(pvd6);
+        elementsMap.put(pvd6.NAME, pvd6);
         //-----------------------ПВД7
         Heaters pvd7 = new Heaters(
                 scanner.next(),
@@ -189,7 +190,7 @@ public class Main {
         );
         //pvd7.describeHeater();
 
-        elementsList.add(pvd7);
+        elementsMap.put(pvd7.NAME, pvd7);
         //----------------------ТС
         HeatNetwork ts = new HeatNetwork(
                 scanner.next(),
@@ -201,7 +202,7 @@ public class Main {
         );
         ts.describeHeatNetwork();
 
-        elementsList.add(ts);
+        elementsMap.put(ts.NAME, ts);
         //----------------------Т1
         Heaters t1 = new Heaters(
                 scanner.next(),
@@ -215,7 +216,7 @@ public class Main {
         );
         t1.describeHeater();
 
-        elementsList.add(t1);
+        elementsMap.put(t1.NAME, t1);
         //----------------------Т2
         Heaters t2 = new Heaters(
                 scanner.next(),
@@ -229,7 +230,7 @@ public class Main {
         );
         t2.describeHeater();
 
-        elementsList.add(t2);
+        elementsMap.put(t2.NAME, t2);
         //----------------------Т3
         Heaters t3 = new Heaters(
                 scanner.next(),
@@ -243,7 +244,7 @@ public class Main {
         );
         t3.describeHeater();
 
-        elementsList.add(t3);
+        elementsMap.put(t3.NAME, t3);
         //---------------------ТП
         TurboDrive turboDrive = new TurboDrive(
                 scanner.next(),
@@ -252,42 +253,45 @@ public class Main {
                 Double.parseDouble(scanner.next()),
                 Double.parseDouble(scanner.next()),
                 pn,
-                pp2
+                cnd,
+                0
         );
 
         turboDrive.describeTurboDrive();
 
-        elementsList.add(turboDrive);
+        elementsMap.put(turboDrive.NAME, turboDrive);
         //-------------------------------------------
-        System.out.println("Количество элементов " + elementsList.size());
-        return elementsList;
+        System.out.println("Количество элементов " + elementsMap.size());
+        return elementsMap;
 
     }
 
-    public void runGraph(List<Elements> elementsList) {
+    public void runGraph(Map<String, Elements> elementsMap) {
         Graph theGraph = new Graph();
-        Vertex csd = new Vertex(elementsList.get(0));
-        Vertex separator = new Vertex(elementsList.get(1));
-        Vertex pp1 = new Vertex(elementsList.get(2));
-        Vertex pp2 = new Vertex(elementsList.get(3));
-        Vertex cnd = new Vertex(elementsList.get(4));
-        Vertex condenser = new Vertex(elementsList.get(5));
-        Vertex kn = new Vertex(elementsList.get(6));
-        Vertex pnd1 = new Vertex(elementsList.get(7));
-        Vertex pnd2 = new Vertex(elementsList.get(8));
-        Vertex pnd3 = new Vertex(elementsList.get(9));
-        Vertex pnd4 = new Vertex(elementsList.get(10));
-        Vertex d = new Vertex(elementsList.get(11));
-        Vertex pn = new Vertex(elementsList.get(12));
-        Vertex pvd5 = new Vertex(elementsList.get(13));
-        Vertex pvd6 = new Vertex(elementsList.get(14));
-        Vertex pvd7 = new Vertex(elementsList.get(15));
-        Vertex ts = new Vertex(elementsList.get(16));
-        Vertex t1 = new Vertex(elementsList.get(17));
-        Vertex t2 = new Vertex(elementsList.get(18));
-        Vertex t3 = new Vertex(elementsList.get(19));
-        Vertex turboDrive = new Vertex(elementsList.get(20));
+        Vertex pg = new Vertex(elementsMap.get("ПГ"));
+        Vertex csd = new Vertex(elementsMap.get("ЦСД"));
+        Vertex separator = new Vertex(elementsMap.get("Сепаратор"));
+        Vertex pp1 = new Vertex(elementsMap.get("ПП1"));
+        Vertex pp2 = new Vertex(elementsMap.get("ПП2"));
+        Vertex cnd = new Vertex(elementsMap.get("ЦНД"));
+        Vertex condenser = new Vertex(elementsMap.get("Конденсатор"));
+        Vertex kn = new Vertex(elementsMap.get("КНI"));
+        Vertex pnd1 = new Vertex(elementsMap.get("ПНД1"));
+        Vertex pnd2 = new Vertex(elementsMap.get("ПНД2"));
+        Vertex pnd3 = new Vertex(elementsMap.get("ПНД3"));
+        Vertex pnd4 = new Vertex(elementsMap.get("ПНД4"));
+        Vertex d = new Vertex(elementsMap.get("Деаэратор"));
+        Vertex pn = new Vertex(elementsMap.get("ПН"));
+        Vertex pvd5 = new Vertex(elementsMap.get("ПВД5"));
+        Vertex pvd6 = new Vertex(elementsMap.get("ПВД6"));
+        Vertex pvd7 = new Vertex(elementsMap.get("ПВД7"));
+        Vertex ts = new Vertex(elementsMap.get("Теплосеть"));
+        Vertex t1 = new Vertex(elementsMap.get("Т1"));
+        Vertex t2 = new Vertex(elementsMap.get("Т2"));
+        Vertex t3 = new Vertex(elementsMap.get("Т3"));
+        Vertex turboDrive = new Vertex(elementsMap.get("ТП"));
 
+        theGraph.addVertex(pg);
         theGraph.addVertex(csd);
         theGraph.addVertex(separator);
         theGraph.addVertex(pp1);
@@ -313,12 +317,15 @@ public class Main {
         /*for (Elements element: elementsList) {
             theGraph.addVertex(new Vertex(element));
         }*/
+        theGraph.addEdge(Graph.HEATING_STEAM, pg, csd);
+        theGraph.addEdge(Graph.FEED_WATER, pvd7, pg);
 
-        theGraph.addEdge(Graph.SUPERHEATED_STEAM, csd, separator);
+        theGraph.addEdge(Graph.HEATING_STEAM, csd, separator);
         theGraph.addEdge(Graph.HEATING_STEAM, csd, pp2);
         theGraph.addEdge(Graph.HEATING_STEAM, csd, pp1);
         theGraph.addEdge(Graph.HEATING_STEAM, csd, pvd7);
         theGraph.addEdge(Graph.HEATING_STEAM, csd, pvd6);
+
         theGraph.addEdge(Graph.HEATING_STEAM, csd, pvd5);
         theGraph.addEdge(Graph.HEATING_STEAM, csd, d);
 
@@ -398,8 +405,8 @@ public class Main {
 
     public static void main(String[] args) throws FileNotFoundException {
         long startTime = System.currentTimeMillis();
-        List<Elements> elementsArrayList = new Main().run();
-        new Main().runGraph(elementsArrayList);
+        Map<String, Elements> elementsMap = new Main().initializationOfElements();
+        new Main().runGraph(elementsMap);
         long finishTime = System.currentTimeMillis();
         System.out.println((finishTime - startTime) + " ms");
     }

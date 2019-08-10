@@ -1,4 +1,4 @@
-package com.example.simulation_code;
+package com.example.simulation_code.Elements;
 
 import com.hummeling.if97.IF97;
 
