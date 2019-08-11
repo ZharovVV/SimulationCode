@@ -1,32 +1,42 @@
 package com.example.simulation_code.Elements;
 
+import com.example.simulation_code.HelperСlasses.Consumptions;
+import com.example.simulation_code.HelperСlasses.Equation;
 import com.hummeling.if97.IF97;
 
 public class Superheaters extends Elements {
     //-----------------------------Характеристики подогревателя---------------------------------------------------------
+    private int heaterNumber;                                   // Номер подогревателя по ходу пара
     private boolean isSurfaceHeater;                            // Подогреватель поверхностного типа? false, если тип подогревателя смешивающий
     private int selectionNumber;                                // Номер отбора
     private double hydraulicResistanceFromSelectionToHeater;    // Гидравлическое сопротивление от отбора до подогревателя
     private double hydraulicResistanceInHeater;                 // Гидравлическое сопротивление в подогревателе
     private double underheatingOfSteamDrain;                    // Недогрев дренажа (температурный напор между обогреваемой средой на входе и дренажом на выходе)
     private double underheatingOfHeatedMedium;                  // Недогрев обогреваемой среды на выходе до температуры в подогревателе
+    private double coefficient;                                           // Коэффициент, учитывающий тепловые потери
+
     //-----------------------------Характеристики греющего пара---------------------------------------------------------
     private double pressureOfHeatingSteam;                      // Давление греющего пара на входе в подогреватель
     private double temperatureOfHeatingSteam;                   // Температура греющего пара на входе в подогреватель
     private double enthalpyOfHeatingSteam;                      // Энтальпия греющего пара на входе в подогреватель
-    private double consumptionOfHeatingSteam;                      // Расход греющего пара на входе в подогреватель
+    private Consumptions consumptionOfHeatingSteam = new Consumptions();                      // Расход греющего пара на входе в подогреватель
     //-----------------------------Характеристики дренажа пара----------------------------------------------------------
     private double pressureOfSteamDrain;                        // Давление дренажа пара на выходе из подогревателя
     private double temperatureOfSteamDrain;                     // Температура дренажа пара на выходе из подогревателя
     private double enthalpyOfSteamDrain;                        // Энтальпия дренажа пара на выходе из подогревателя
-    private double consumptionOfSteamDrain;                        // Расход дренажа пара на выходе из подогревателя
+    private Consumptions consumptionOfSteamDrain = new Consumptions();                        // Расход дренажа пара на выходе из подогревателя
     //-----------------------------Характеристики обогреваемой среды на выходе------------------------------------------
     private double pressureOfHeatedMedium;                      // Давление обогреваемой среды на выходе из подогревателя
     private double temperatureOfHeatedMedium;                   // Температура обогреваемой среды на выходе из подогревателя
     private double enthalpyOfHeatedMedium;                      // Энтальпия обогреваемой среды на выходе из подогревателя
-    private double consumptionOfHeatedMedium;                      // Расход обогреваемой среды на выходе из подогревателя
+    private Consumptions consumptionOfHeatedMedium = new Consumptions();                      // Расход обогреваемой среды на выходе из подогревателя
+
+    private Equation materialBalanceEquationOnSteamDrainLine = new Equation();
+    private Equation materialBalanceEquationOnHeatedMediumLine = new Equation();
+    private Equation heatBalanceEquation = new Equation();
 
     public Superheaters(String name,
+                        int heaterNumber,
                         double hydraulicResistanceFromSelectionToHeater,
                         double hydraulicResistanceInHeater,
                         double underheatingOfSteamDrain,
@@ -81,6 +91,7 @@ public class Superheaters extends Elements {
 
         this.temperatureOfHeatedMedium = temperatureOfHeatingSteam - underheatingOfHeatedMedium;
         this.enthalpyOfHeatedMedium = waterSteam.specificEnthalpyPT(pressureOfHeatedMedium, temperatureOfHeatedMedium + 273.15);
+        this.coefficient = 1 - heaterNumber / 1000;
     }
 
     public double getPressureOfHeatedMedium() {
@@ -95,28 +106,40 @@ public class Superheaters extends Elements {
         return enthalpyOfHeatedMedium;
     }
 
-    public double getConsumptionOfHeatingSteam() {
+    public double getEnthalpyOfHeatingSteam() {
+        return enthalpyOfHeatingSteam;
+    }
+
+    public double getEnthalpyOfSteamDrain() {
+        return enthalpyOfSteamDrain;
+    }
+
+    public double getCoefficient() {
+        return coefficient;
+    }
+
+    public Consumptions getConsumptionOfHeatingSteam() {
         return consumptionOfHeatingSteam;
     }
 
-    public void setConsumptionOfHeatingSteam(double consumptionOfHeatingSteam) {
-        this.consumptionOfHeatingSteam = consumptionOfHeatingSteam;
-    }
-
-    public double getConsumptionOfSteamDrain() {
+    public Consumptions getConsumptionOfSteamDrain() {
         return consumptionOfSteamDrain;
     }
 
-    public void setConsumptionOfSteamDrain(double consumptionOfSteamDrain) {
-        this.consumptionOfSteamDrain = consumptionOfSteamDrain;
-    }
-
-    public double getConsumptionOfHeatedMedium() {
+    public Consumptions getConsumptionOfHeatedMedium() {
         return consumptionOfHeatedMedium;
     }
 
-    public void setConsumptionOfHeatedMedium(double consumptionOfHeatedMedium) {
-        this.consumptionOfHeatedMedium = consumptionOfHeatedMedium;
+    public Equation getMaterialBalanceEquationOnSteamDrainLine() {
+        return materialBalanceEquationOnSteamDrainLine;
+    }
+
+    public Equation getMaterialBalanceEquationOnHeatedMediumLine() {
+        return materialBalanceEquationOnHeatedMediumLine;
+    }
+
+    public Equation getHeatBalanceEquation() {
+        return heatBalanceEquation;
     }
 
     public void describeSuperheater() {

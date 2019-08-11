@@ -1,5 +1,7 @@
 package com.example.simulation_code.Elements;
 
+import com.example.simulation_code.HelperСlasses.Consumptions;
+import com.example.simulation_code.HelperСlasses.Equation;
 import com.hummeling.if97.IF97;
 
 public class Condenser extends Elements {
@@ -7,12 +9,14 @@ public class Condenser extends Elements {
     private double pressureOfHeatingSteam;                      // Давление греющего пара на входе в конденсатор
     private double temperatureOfHeatingSteam;                   // Температура греющего пара на входе в конденсатор
     private double enthalpyOfHeatingSteam;                      // Энтальпия греющего пара на входе в конденсатор
-    private double consumptionOfHeatingSteam;
+    private Consumptions consumptionOfHeatingSteam = new Consumptions();
     //-----------------------------Характеристики дренажа пара----------------------------------------------------------
     private double pressureOfSteamDrain;                        // Давление дренажа пара на выходе из конденсатора
     private double temperatureOfSteamDrain;                     // Температура дренажа пара на выходе из конденсатора
     private double enthalpyOfSteamDrain;                        // Энтальпия дренажа пара на выходе из конденсатора
-    private double consumptionOfSteamDrain;
+    private Consumptions consumptionOfSteamDrain = new Consumptions();
+
+    private Equation materialBalanceEquation = new Equation();
 
     public Condenser(String name, TurbineCylinders turbineCylinder) {
         super(name);
@@ -39,20 +43,12 @@ public class Condenser extends Elements {
         return enthalpyOfSteamDrain;
     }
 
-    public double getConsumptionOfHeatingSteam() {
+    public Consumptions getConsumptionOfHeatingSteam() {
         return consumptionOfHeatingSteam;
     }
 
-    public void setConsumptionOfHeatingSteam(double consumptionOfHeatingSteam) {
-        this.consumptionOfHeatingSteam = consumptionOfHeatingSteam;
-    }
-
-    public double getConsumptionOfSteamDrain() {
+    public Consumptions getConsumptionOfSteamDrain() {
         return consumptionOfSteamDrain;
-    }
-
-    public void setConsumptionOfSteamDrain(double consumptionOfSteamDrain) {
-        this.consumptionOfSteamDrain = consumptionOfSteamDrain;
     }
 
     public void describeCondenser() {
@@ -68,5 +64,9 @@ public class Condenser extends Elements {
         System.out.println("Энтальпия: " + enthalpyOfSteamDrain + " ,кДж/кг");
         System.out.println("-----------------------------------------------------------------------------------------");
         System.out.println();
+    }
+
+    public Equation getMaterialBalanceEquation() {
+        return materialBalanceEquation;
     }
 }

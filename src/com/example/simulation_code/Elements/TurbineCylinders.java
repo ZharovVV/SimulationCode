@@ -1,5 +1,6 @@
 package com.example.simulation_code.Elements;
 
+import com.example.simulation_code.HelperСlasses.Equation;
 import com.hummeling.if97.IF97;
 
 import java.util.ArrayList;
@@ -9,6 +10,8 @@ public class TurbineCylinders extends Elements {
     private ArrayList<Parameters> listOfParametersInSelections;                             // Список параметров отбора, включая параметры на входе и выходе из цилиндра
     private double inletSteamConsumption;
     private double outletSteamConsumption;
+
+    private Equation materialBalanceEquation = new Equation();
 
     public TurbineCylinders(String name, int numberOfSelections) {
         super(name);
@@ -59,20 +62,8 @@ public class TurbineCylinders extends Elements {
         System.out.println();
     }
 
-    public double getInletSteamConsumption() {
-        return inletSteamConsumption;
-    }
-
-    public void setInletSteamConsumption(double inletSteamConsumption) {
-        this.inletSteamConsumption = inletSteamConsumption;
-    }
-
-    public double getOutletSteamConsumption() {
-        return outletSteamConsumption;
-    }
-
-    public void setOutletSteamConsumption(double outletSteamConsumption) {
-        this.outletSteamConsumption = outletSteamConsumption;
+    public Equation getMaterialBalanceEquation() {
+        return materialBalanceEquation;
     }
 
     public static class Parameters {

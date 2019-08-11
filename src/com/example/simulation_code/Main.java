@@ -28,12 +28,13 @@ public class Main {
                 Double.parseDouble(scanner.next()),
                 Double.parseDouble(scanner.next()),
                 csd);
-        //separator.describeSeparator();
+        /*separator.describeSeparator();*/
 
         elementsMap.put(separator.NAME, separator);
         //-----------------------ПП1
         Superheaters pp1 = new Superheaters(
                 scanner.next(),
+                Integer.parseInt(scanner.next()),
                 Double.parseDouble(scanner.next()),
                 Double.parseDouble(scanner.next()),
                 Double.parseDouble(scanner.next()),
@@ -41,12 +42,13 @@ public class Main {
                 Integer.parseInt(scanner.next()),
                 csd,
                 separator);
-        //pp1.describeSuperheater();
+        pp1.describeSuperheater();
 
         elementsMap.put(pp1.NAME, pp1);
         //-----------------------ПП2
         Superheaters pp2 = new Superheaters(
                 scanner.next(),
+                Integer.parseInt(scanner.next()),
                 Double.parseDouble(scanner.next()),
                 Double.parseDouble(scanner.next()),
                 Double.parseDouble(scanner.next()),
@@ -54,7 +56,7 @@ public class Main {
                 Integer.parseInt(scanner.next()),
                 csd,
                 pp1);
-        //pp2.describeSuperheater();
+        pp2.describeSuperheater();
 
         elementsMap.put(pp2.NAME, pp2);
         //--------------------------ЦНД
@@ -200,7 +202,7 @@ public class Main {
                 Double.parseDouble(scanner.next()),
                 Double.parseDouble(scanner.next())
         );
-        ts.describeHeatNetwork();
+        //ts.describeHeatNetwork();
 
         elementsMap.put(ts.NAME, ts);
         //----------------------Т1
@@ -214,7 +216,7 @@ public class Main {
                 cnd,
                 ts
         );
-        t1.describeHeater();
+        //t1.describeHeater();
 
         elementsMap.put(t1.NAME, t1);
         //----------------------Т2
@@ -228,7 +230,7 @@ public class Main {
                 cnd,
                 t1
         );
-        t2.describeHeater();
+        //t2.describeHeater();
 
         elementsMap.put(t2.NAME, t2);
         //----------------------Т3
@@ -242,7 +244,7 @@ public class Main {
                 cnd,
                 t2
         );
-        t3.describeHeater();
+        //t3.describeHeater();
 
         elementsMap.put(t3.NAME, t3);
         //---------------------ТП
@@ -257,7 +259,7 @@ public class Main {
                 0
         );
 
-        turboDrive.describeTurboDrive();
+        //turboDrive.describeTurboDrive();
 
         elementsMap.put(turboDrive.NAME, turboDrive);
         //-------------------------------------------
@@ -337,9 +339,9 @@ public class Main {
 
 
         theGraph.addEdge(Graph.SUPERHEATED_STEAM, pp2, cnd);
-        theGraph.addEdge(Graph.SUPERHEATED_STEAM, pp2, turboDrive);
         theGraph.addEdge(Graph.STEAM_DRAIN, pp2, pvd7);
 
+        theGraph.addEdge(Graph.HEATING_STEAM, cnd, turboDrive);
         theGraph.addEdge(Graph.HEATING_STEAM, cnd, condenser);
         theGraph.addEdge(Graph.HEATING_STEAM, cnd, pnd4);
         theGraph.addEdge(Graph.HEATING_STEAM, cnd, pnd3);
@@ -389,6 +391,9 @@ public class Main {
         theGraph.addEdge(Graph.STEAM_DRAIN, turboDrive, condenser);
 
         theGraph.dfs();
+        Matrices matrices = theGraph.dfsAndMatrixCompilation();
+        matrices.describeMatrices();
+
 
         /*Map<Integer,int[][]> map = theGraph.getAdjMat();
         for (Map.Entry<Integer, int[][]> entry : map.entrySet()) {

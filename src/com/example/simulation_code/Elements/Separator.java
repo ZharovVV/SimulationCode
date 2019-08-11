@@ -1,5 +1,7 @@
 package com.example.simulation_code.Elements;
 
+import com.example.simulation_code.HelperСlasses.Consumptions;
+import com.example.simulation_code.HelperСlasses.Equation;
 import com.hummeling.if97.IF97;
 
 public class Separator extends Elements {
@@ -10,17 +12,20 @@ public class Separator extends Elements {
     private double pressureOfHeatingSteam;                      // Давление греющего пара на входе в сепаратор
     private double temperatureOfHeatingSteam;                   // Температура греющего пара на входе в сепаратор
     private double enthalpyOfHeatingSteam;                      // Энтальпия греющего пара на входе в сепаратор
-    private double consumptionOfHeatingSteam;
+    private Consumptions consumptionOfHeatingSteam = new Consumptions();
     //-----------------------------Характеристики дренажа пара----------------------------------------------------------
     private double pressureOfSteamDrain;                        // Давление дренажа пара на выходе из сепаратора
     private double temperatureOfSteamDrain;                     // Температура дренажа пара на выходе из сепаратора
     private double enthalpyOfSteamDrain;                        // Энтальпия дренажа пара на выходе из сепаратора
-    private double consumptionOfSteamDrain;                       // Расход дренажа пара на выходе из сепаратора
+    private Consumptions consumptionOfSteamDrain = new Consumptions();                       // Расход дренажа пара на выходе из сепаратора
     //-----------------------------Характеристики обогреваемой среды на выходе------------------------------------------
     private double pressureOfHeatedMedium;                      // Давление сепарируемой среды на выходе из сепаратора
     private double temperatureOfHeatedMedium;                   // Температура сепарируемой среды на выходе из сепаратора
     private double enthalpyOfHeatedMedium;                      // Энтальпия сепарируемой среды на выходе из сепаратора
-    private double consumptionOfHeatedMedium;
+    private Consumptions consumptionOfHeatedMedium = new Consumptions();
+
+    private Equation materialBalanceEquation = new Equation();
+    private Equation heatBalanceEquation = new Equation();
 
     public Separator(String name, double hydraulicResistanceFromCylinderToSeparator, double outletDegreeOfDryness, TurbineCylinders turbineCylinder) {
         super(name);
@@ -47,28 +52,36 @@ public class Separator extends Elements {
         return temperatureOfHeatedMedium;
     }
 
-    public double getConsumptionOfHeatingSteam() {
+    public double getEnthalpyOfHeatingSteam() {
+        return enthalpyOfHeatingSteam;
+    }
+
+    public double getEnthalpyOfSteamDrain() {
+        return enthalpyOfSteamDrain;
+    }
+
+    public double getEnthalpyOfHeatedMedium() {
+        return enthalpyOfHeatedMedium;
+    }
+
+    public Consumptions getConsumptionOfHeatingSteam() {
         return consumptionOfHeatingSteam;
     }
 
-    public void setConsumptionOfHeatingSteam(double consumptionOfHeatingSteam) {
-        this.consumptionOfHeatingSteam = consumptionOfHeatingSteam;
-    }
-
-    public double getConsumptionOfSteamDrain() {
+    public Consumptions getConsumptionOfSteamDrain() {
         return consumptionOfSteamDrain;
     }
 
-    public void setConsumptionOfSteamDrain(double consumptionOfSteamDrain) {
-        this.consumptionOfSteamDrain = consumptionOfSteamDrain;
-    }
-
-    public double getConsumptionOfHeatedMedium() {
+    public Consumptions getConsumptionOfHeatedMedium() {
         return consumptionOfHeatedMedium;
     }
 
-    public void setConsumptionOfHeatedMedium(double consumptionOfHeatedMedium) {
-        this.consumptionOfHeatedMedium = consumptionOfHeatedMedium;
+    public Equation getMaterialBalanceEquation() {
+        return materialBalanceEquation;
+    }
+
+    public Equation getHeatBalanceEquation() {
+        return heatBalanceEquation;
     }
 
     public void describeSeparator(){
