@@ -33,8 +33,17 @@ public class HeatNetwork extends Elements {
         return outletPressure;
     }
 
-    public void describeHeatNetwork() {
-        System.out.println("Параметры " + NAME + " :");
+    public double getOutletEnthalpy() {
+        return outletEnthalpy;
+    }
+
+    public double getNetworkWaterConsumption() {
+        return networkWaterConsumption;
+    }
+
+    @Override
+    public void describe() {
+        super.describe();
         System.out.println("Параметры на входе в ТС:");
         System.out.println("Давление: " + inletPressure + " ,МПа");
         System.out.println("Температура: " + inletTemperature + " ,℃");

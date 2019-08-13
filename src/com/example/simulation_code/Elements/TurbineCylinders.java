@@ -1,15 +1,21 @@
 package com.example.simulation_code.Elements;
 
-import com.example.simulation_code.HelperСlasses.Equation;
+import com.example.simulation_code.Graph;
+import com.example.simulation_code.HelperСlassesAndInterfaces.Consumptions;
+import com.example.simulation_code.HelperСlassesAndInterfaces.Equation;
+import com.example.simulation_code.HelperСlassesAndInterfaces.MatrixCompilation;
+import com.example.simulation_code.Matrices;
+import com.example.simulation_code.Vertex;
 import com.hummeling.if97.IF97;
 
 import java.util.ArrayList;
+import java.util.Map;
 
-public class TurbineCylinders extends Elements {
+import static com.example.simulation_code.Graph.*;
+
+public class TurbineCylinders extends Elements implements MatrixCompilation {
     public final int NUMBER_OF_SELECTIONS;                                                  // Число отборов в турбине
     private ArrayList<Parameters> listOfParametersInSelections;                             // Список параметров отбора, включая параметры на входе и выходе из цилиндра
-    private double inletSteamConsumption;
-    private double outletSteamConsumption;
 
     private Equation materialBalanceEquation = new Equation();
 
@@ -31,8 +37,9 @@ public class TurbineCylinders extends Elements {
         return listOfParametersInSelections.get(selectionNumber);
     }
 
-    public void describeTurbineCylinder() {
-        System.out.println("Параметры " + NAME + " :");
+    @Override
+    public void describe() {
+        super.describe();
         for (Parameters parameters : listOfParametersInSelections) {
             int i = listOfParametersInSelections.indexOf(parameters);
             if (i == 0) {
@@ -64,6 +71,113 @@ public class TurbineCylinders extends Elements {
 
     public Equation getMaterialBalanceEquation() {
         return materialBalanceEquation;
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Override
+    public void matrixCompilation(int v, Matrices matrices, Graph theGraph) {
+        //--------------------------Инициализация-----------------------------------------------------------------------
+        int nVerts = theGraph.getnVerts();
+        Map<Integer, int[][]> adjMat = theGraph.getAdjMat();
+        ArrayList<Vertex> vertexList = theGraph.getVertexList();
+
+        double[][] coefficientMatrix = matrices.coefficientMatrix;
+        double[] freeMemoryMatrix = matrices.freeMemoryMatrix;
+        ArrayList<Consumptions> listOfConsumptions = matrices.getListOfColumnsOfConsumptions();
+
+        // Получение номера строки в матрицах для цилиндра турбины
+        int indexOfListOfEquation = matrices.getListOfLinesOfEquations().indexOf(this.getMaterialBalanceEquation());
+        //--------------------------------------------------------------------------------------------------------------
+
+        for (int j = 0; j < nVerts; j++) {
+            int relations = adjMat.get(SUPERHEATED_STEAM)[v][j];
+
+            if (relations == -1 || relations == 1) {
+                Elements element = vertexList.get(j).element;
+                if (element.getClass() == SteamGenerator.class) {
+                    SteamGenerator steamGenerator = (SteamGenerator) element;
+                    freeMemoryMatrix[indexOfListOfEquation] = (-1) * relations * steamGenerator.getSteamСonsumption();
+                }
+
+                if (element.getClass() == Superheaters.class) {
+                    Superheaters superheater = (Superheaters) element;
+                    // Получение номера столбца
+                    int indexOfListConsumption = listOfConsumptions.indexOf(superheater.getConsumptionOfHeatingSteam());
+                    coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
+                }
+
+                if (element.getClass() == Heaters.class) {
+                    Heaters heater = (Heaters) element;
+                    // Получение номера столбца
+                    int indexOfListConsumption = listOfConsumptions.indexOf(heater.getConsumptionOfHeatingSteam());
+                    coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
+                }
+
+                if (element.getClass() == Separator.class) {
+                    Separator separator = (Separator) element;
+                    // Получение номера столбца
+                    int indexOfListConsumption = listOfConsumptions.indexOf(separator.getConsumptionOfHeatingSteam());
+                    coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
+                }
+
+                if (element.getClass() == Condenser.class) {
+                    Condenser condenser = (Condenser) element;
+                    // Получение номера столбца
+                    int indexOfListConsumption = listOfConsumptions.indexOf(condenser.getConsumptionOfHeatingSteam());
+                    coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
+                }
+
+                if (element.getClass() == TurboDrive.class) {
+                    TurboDrive turboDrive = (TurboDrive) element;
+                    freeMemoryMatrix[indexOfListOfEquation] = (-1) * relations * turboDrive.getSteamConsumption();
+                }
+            }
+        }
+
+        for (int j = 0; j < nVerts; j++) {
+            int relations = adjMat.get(HEATING_STEAM)[v][j];
+
+            if (relations == -1 || relations == 1) {
+                Elements element = vertexList.get(j).element;
+                if (element.getClass() == SteamGenerator.class) {
+                    SteamGenerator steamGenerator = (SteamGenerator) element;
+                    freeMemoryMatrix[indexOfListOfEquation] = (-1) * relations * steamGenerator.getSteamСonsumption();
+                }
+
+                if (element.getClass() == Superheaters.class) {
+                    Superheaters superheater = (Superheaters) element;
+                    // Получение номера столбца
+                    int indexOfListConsumption = listOfConsumptions.indexOf(superheater.getConsumptionOfHeatingSteam());
+                    coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
+                }
+
+                if (element.getClass() == Heaters.class) {
+                    Heaters heater = (Heaters) element;
+                    // Получение номера столбца
+                    int indexOfListConsumption = listOfConsumptions.indexOf(heater.getConsumptionOfHeatingSteam());
+                    coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
+                }
+
+                if (element.getClass() == Separator.class) {
+                    Separator separator = (Separator) element;
+                    // Получение номера столбца
+                    int indexOfListConsumption = listOfConsumptions.indexOf(separator.getConsumptionOfHeatingSteam());
+                    coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
+                }
+
+                if (element.getClass() == Condenser.class) {
+                    Condenser condenser = (Condenser) element;
+                    // Получение номера столбца
+                    int indexOfListConsumption = listOfConsumptions.indexOf(condenser.getConsumptionOfHeatingSteam());
+                    coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
+                }
+
+                if (element.getClass() == TurboDrive.class) {
+                    TurboDrive turboDrive = (TurboDrive) element;
+                    freeMemoryMatrix[indexOfListOfEquation] = (-1) * relations * turboDrive.getSteamConsumption();
+                }
+            }
+        }
     }
 
     public static class Parameters {

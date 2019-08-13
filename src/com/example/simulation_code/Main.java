@@ -42,8 +42,8 @@ public class Main {
                 Integer.parseInt(scanner.next()),
                 csd,
                 separator);
-        pp1.describeSuperheater();
-
+        /*pp1.describe();
+*/
         elementsMap.put(pp1.NAME, pp1);
         //-----------------------ПП2
         Superheaters pp2 = new Superheaters(
@@ -56,7 +56,7 @@ public class Main {
                 Integer.parseInt(scanner.next()),
                 csd,
                 pp1);
-        pp2.describeSuperheater();
+        /*pp2.describe();*/
 
         elementsMap.put(pp2.NAME, pp2);
         //--------------------------ЦНД
@@ -392,6 +392,12 @@ public class Main {
 
         theGraph.dfs();
         Matrices matrices = theGraph.dfsAndMatrixCompilation();
+        matrices.describeMatrices();
+
+        matrices.solvingSystemAndSettingConsumption();
+        for (Map.Entry<String, Elements> entry : elementsMap.entrySet()) {
+            entry.getValue().describe();
+        }
         matrices.describeMatrices();
 
 

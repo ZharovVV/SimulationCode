@@ -11,4 +11,11 @@ public class SteamGenerator extends Elements{
     public double getSteamСonsumption() {
         return steamСonsumption;
     }
+
+    @Override
+    public void describe() {
+        super.describe();
+        System.out.println("Расход пара через ПГ: " + steamСonsumption + " ,кг/с");
+        System.out.println();
+    }
 }

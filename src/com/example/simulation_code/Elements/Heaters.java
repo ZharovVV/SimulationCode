@@ -1,10 +1,19 @@
 package com.example.simulation_code.Elements;
 
-import com.example.simulation_code.HelperСlasses.Consumptions;
-import com.example.simulation_code.HelperСlasses.Equation;
+import com.example.simulation_code.Graph;
+import com.example.simulation_code.HelperСlassesAndInterfaces.Consumptions;
+import com.example.simulation_code.HelperСlassesAndInterfaces.Equation;
+import com.example.simulation_code.HelperСlassesAndInterfaces.MatrixCompilation;
+import com.example.simulation_code.Matrices;
+import com.example.simulation_code.Vertex;
 import com.hummeling.if97.IF97;
 
-public class Heaters extends Elements {
+import java.util.ArrayList;
+import java.util.Map;
+
+import static com.example.simulation_code.Graph.*;
+
+public class Heaters extends Elements implements MatrixCompilation {
     //-----------------------------Характеристики подогревателя---------------------------------------------------------
     private int heaterNumber;                                   // Номер подогревателя по ходу воды
     private boolean isSurfaceHeater;                            // Подогреватель поверхностного типа? false, если тип подогревателя смешивающий
@@ -34,7 +43,6 @@ public class Heaters extends Elements {
     private Equation materialBalanceEquationOnSteamDrainLine = new Equation();
     private Equation materialBalanceEquationOnHeatedMediumLine = new Equation();
     private Equation heatBalanceEquation = new Equation();
-
 
 
     //-----------------------------Конструктор для поверхностного подогревателя-----------------------------------------
@@ -187,8 +195,265 @@ public class Heaters extends Elements {
         return heatBalanceEquation;
     }
 
-    public void describeHeater() {
-        System.out.println("Параметры в " + NAME + " :");
+    @SuppressWarnings("ConstantConditions")
+    @Override
+    public void matrixCompilation(int v, Matrices matrices, Graph theGraph) {
+        //--------------------------Инициализация-----------------------------------------------------------------------
+        int nVerts = theGraph.getnVerts();
+        Map<Integer, int[][]> adjMat = theGraph.getAdjMat();
+        ArrayList<Vertex> vertexList = theGraph.getVertexList();
+        double[][] coefficientMatrix = matrices.coefficientMatrix;
+        double[] freeMemoryMatrix = matrices.freeMemoryMatrix;
+        ArrayList<Consumptions> listOfConsumptions = matrices.getListOfColumnsOfConsumptions();
+
+        if (!isSurfaceHeater) {
+            //----------------------Продолжение инициализации для смешивающего подогревателя----------------------------
+            // Получение номера строки в матрице, в которую записывается уравнение материального баланса по линии обогреваемой среды для Подогревателя
+            int materialBalanceEquationOnHeatedMediumLine = matrices.getListOfLinesOfEquations().indexOf(this.getMaterialBalanceEquationOnHeatedMediumLine());
+            // Получение номера строки в матрице, в которую записывается уравнение теплового баланса для Подогревателя
+            int heatBalanceEquation = matrices.getListOfLinesOfEquations().indexOf(this.getHeatBalanceEquation());
+            //----------------------------------------------------------------------------------------------------------
+
+            //--------------------------------Связи с элементами по линии греющего пара---------------------------------
+            for (int j = 0; j < nVerts; j++) {
+                int relations = adjMat.get(HEATING_STEAM)[v][j];
+                // Номер столбца расхода греющего пара Подогревателя
+                int heaterIndexOfListConsumption = listOfConsumptions.indexOf(this.getConsumptionOfHeatingSteam());
+                if (relations == -1 || relations == 1) {
+                    Elements element = vertexList.get(j).element;
+
+                    if (element.getClass() == TurbineCylinders.class) {
+                        coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][heaterIndexOfListConsumption] = relations;
+                        coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatingSteam();
+                    }
+                }
+            }
+            //----------------------------------------------------------------------------------------------------------
+
+            //--------------------------------Связи с элементами по линии дренажа греющего пара-------------------------
+            for (int j = 0; j < nVerts; j++) {
+                int relations = adjMat.get(STEAM_DRAIN)[v][j];
+                if (relations == 1) {
+                    Elements element = vertexList.get(j).element;
+
+                    if (element.getClass() == Separator.class) {
+                        Separator separator = (Separator) element;
+                        // Номер столбца расхода дренажа греющего пара Сепаратора
+                        int indexOfListConsumption = listOfConsumptions.indexOf(separator.getConsumptionOfSteamDrain());
+                        coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][indexOfListConsumption] = relations;
+                        coefficientMatrix[heatBalanceEquation][indexOfListConsumption] = relations * separator.getEnthalpyOfSteamDrain();
+                    }
+
+                    if (element.getClass() == Superheaters.class) {
+                        Superheaters superheater = (Superheaters) element;
+                        // Номер столбца расхода дренажа греющего пара Пароперегревателя
+                        int indexOfListConsumption = listOfConsumptions.indexOf(superheater.getConsumptionOfSteamDrain());
+                        coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][indexOfListConsumption] = relations;
+                        coefficientMatrix[heatBalanceEquation][indexOfListConsumption] = relations * superheater.getEnthalpyOfSteamDrain();
+                    }
+
+                    if (element.getClass() == Heaters.class) {
+                        Heaters heater = (Heaters) element;
+                        // Номер столбца расхода дренажа греющего пара Подогревателя
+                        int indexOfListConsumption = listOfConsumptions.indexOf(heater.getConsumptionOfSteamDrain());
+                        coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][indexOfListConsumption] = relations;
+                        coefficientMatrix[heatBalanceEquation][indexOfListConsumption] = relations * heater.getEnthalpyOfSteamDrain();
+                    }
+                }
+            }
+            //----------------------------------------------------------------------------------------------------------
+
+            //--------------------------------Связи с элементами по линии питательной воды------------------------------
+            for (int j = 0; j < nVerts; j++) {
+                int relations = adjMat.get(FEED_WATER)[v][j];
+                // Номер столбца расхода обогреваемой среды Подогревателя
+                int heaterIndexOfListConsumption = listOfConsumptions.indexOf(this.getConsumptionOfHeatedMedium());
+                if (relations == 1 || relations == -1) {
+                    Elements element = vertexList.get(j).element;
+
+                    if (element.getClass() == Pumps.class) {
+                        if (relations == -1) {
+                            coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][heaterIndexOfListConsumption] = relations;
+                            coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatedMedium();
+                        } else {
+                            Pumps pump = (Pumps) element;
+                            // Номер столбца расхода воды Насоса
+                            int indexOfListConsumption = listOfConsumptions.indexOf(pump.getConsumptionOfWater());
+                            coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][indexOfListConsumption] = relations;
+                            coefficientMatrix[heatBalanceEquation][indexOfListConsumption] = relations * pump.getOutletEnthalpy();
+                        }
+                    }
+
+                    if (element.getClass() == Heaters.class) {
+                        if (relations == -1) {
+                            coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][heaterIndexOfListConsumption] = relations;
+                            coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatedMedium();
+                        } else {
+                            Heaters heater = (Heaters) element;
+                            // Номер столбца расхода обогреваемой среды Подогревателя
+                            int indexOfListConsumption = listOfConsumptions.indexOf(heater.getConsumptionOfHeatedMedium());
+                            coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][indexOfListConsumption] = relations;
+                            coefficientMatrix[heatBalanceEquation][indexOfListConsumption] = relations * heater.getEnthalpyOfHeatedMedium();
+                        }
+                    }
+                }
+            }
+            //----------------------------------------------------------------------------------------------------------
+
+
+        } else {
+            //----------------------Продолжение инициализации для поверхностного подогревателя--------------------------
+            // Получение номера строки в матрице, в которую записывается уравнение материального баланса по линии дренажа пара для Подогревателя
+            int materialBalanceEquationOnSteamDrainLine = matrices.getListOfLinesOfEquations().indexOf(this.getMaterialBalanceEquationOnSteamDrainLine());
+            // Получение номера строки в матрице, в которую записывается уравнение материального баланса по линии обогреваемой среды для Подогревателя
+            int materialBalanceEquationOnHeatedMediumLine = matrices.getListOfLinesOfEquations().indexOf(this.getMaterialBalanceEquationOnHeatedMediumLine());
+            // Получение номера строки в матрице, в которую записывается уравнение теплового баланса для Подогревателя
+            int heatBalanceEquation = matrices.getListOfLinesOfEquations().indexOf(this.getHeatBalanceEquation());
+            //----------------------------------------------------------------------------------------------------------
+
+            //--------------------------------Связи с элементами по линии греющего пара---------------------------------
+            for (int j = 0; j < nVerts; j++) {
+                int relations = adjMat.get(HEATING_STEAM)[v][j];
+                // Номер столбца расхода греющего пара Подогревателя
+                int heaterIndexOfListConsumption = listOfConsumptions.indexOf(this.getConsumptionOfHeatingSteam());
+                if (relations == -1 || relations == 1) {
+                    Elements element = vertexList.get(j).element;
+
+                    if (element.getClass() == TurbineCylinders.class) {
+                        coefficientMatrix[materialBalanceEquationOnSteamDrainLine][heaterIndexOfListConsumption] = relations;
+                        coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatingSteam();
+                    }
+                }
+            }
+            //----------------------------------------------------------------------------------------------------------
+
+            //--------------------------------Связи с элементами по линии дренажа греющего пара-------------------------
+            for (int j = 0; j < nVerts; j++) {
+                int relations = adjMat.get(STEAM_DRAIN)[v][j];
+                // Номер столбца расхода дренажа греющего пара Подогревателя
+                int heaterIndexOfListConsumption = listOfConsumptions.indexOf(this.getConsumptionOfSteamDrain());
+                if (relations == -1 || relations == 1) {
+                    Elements element = vertexList.get(j).element;
+
+                    if (element.getClass() == Separator.class) {
+                        Separator separator = (Separator) element;
+                        // Номер столбца расхода дренажа Сепаратора
+                        int indexOfListConsumption = listOfConsumptions.indexOf(separator.getConsumptionOfSteamDrain());
+                        coefficientMatrix[materialBalanceEquationOnSteamDrainLine][indexOfListConsumption] = relations;
+                        coefficientMatrix[heatBalanceEquation][indexOfListConsumption] = relations * separator.getEnthalpyOfSteamDrain() * this.coefficient;
+                    }
+
+                    if (element.getClass() == Superheaters.class) {
+                        Superheaters superheater = (Superheaters) element;
+                        // Номер столбца расхода дренажа Пароперегревателя
+                        int indexOfListConsumption = listOfConsumptions.indexOf(superheater.getConsumptionOfSteamDrain());
+                        coefficientMatrix[materialBalanceEquationOnSteamDrainLine][indexOfListConsumption] = relations;
+                        coefficientMatrix[heatBalanceEquation][indexOfListConsumption] = relations * superheater.getEnthalpyOfSteamDrain() * this.coefficient;
+                    }
+
+                    if (element.getClass() == Heaters.class) {
+                        if (relations == -1) {
+                            coefficientMatrix[materialBalanceEquationOnSteamDrainLine][heaterIndexOfListConsumption] = relations;
+                            coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfSteamDrain() * this.coefficient;
+                        } else {
+                            Heaters heater = (Heaters) element;
+                            // Номер столбца расхода дренажа другого подогревателя
+                            int indexOfListConsumption = listOfConsumptions.indexOf(heater.getConsumptionOfSteamDrain());
+                            coefficientMatrix[materialBalanceEquationOnSteamDrainLine][indexOfListConsumption] = relations;
+                            coefficientMatrix[heatBalanceEquation][indexOfListConsumption] = relations * heater.getEnthalpyOfSteamDrain() * this.coefficient;
+                        }
+                    }
+
+                    if (element.getClass() == Condenser.class) {
+                        coefficientMatrix[materialBalanceEquationOnSteamDrainLine][heaterIndexOfListConsumption] = relations;
+                        coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfSteamDrain() * this.coefficient;
+                    }
+                }
+            }
+            //----------------------------------------------------------------------------------------------------------
+
+            //--------------------------------Связи с элементами по линии питательной воды------------------------------
+            for (int j = 0; j < nVerts; j++) {
+                int relations = adjMat.get(FEED_WATER)[v][j];
+                // Номер столбца расхода обогреваемой среды Подогревателя
+                int heaterIndexOfListConsumption = listOfConsumptions.indexOf(this.getConsumptionOfHeatedMedium());
+                if (relations == -1 || relations == 1) {
+                    Elements element = vertexList.get(j).element;
+
+                    if (element.getClass() == Pumps.class) {
+                        if (relations == -1) {
+                            coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][heaterIndexOfListConsumption] = relations;
+                            coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatedMedium();
+                        } else {
+                            Pumps pump = (Pumps) element;
+                            int indexOfListConsumption = listOfConsumptions.indexOf(pump.getConsumptionOfWater());
+                            coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][indexOfListConsumption] = relations;
+                            coefficientMatrix[heatBalanceEquation][indexOfListConsumption] = relations * pump.getOutletEnthalpy();
+                        }
+                    }
+
+                    if (element.getClass() == Heaters.class) {
+                        if (relations == -1) {
+                            coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][heaterIndexOfListConsumption] = relations;
+                            coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatedMedium();
+                        } else {
+                            Heaters heater = (Heaters) element;
+                            int indexOfListConsumption = listOfConsumptions.indexOf(heater.getConsumptionOfHeatedMedium());
+                            coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][indexOfListConsumption] = relations;
+                            coefficientMatrix[heatBalanceEquation][indexOfListConsumption] = relations * heater.getEnthalpyOfHeatedMedium();
+                        }
+                    }
+
+                    if (element.getClass() == SteamGenerator.class) {
+                        coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][heaterIndexOfListConsumption] = relations;
+                        coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatedMedium();
+                    }
+                }
+            }
+            //----------------------------------------------------------------------------------------------------------
+
+            //--------------------------------Связи с элементами по линии сетевой воды----------------------------------
+            for (int j = 0; j < nVerts; j++) {
+                int relations = adjMat.get(NETWORK_WATER)[v][j];
+                // Номер столбца расхода обогреваемой среды Подогревателя
+                int heaterIndexOfListConsumption = listOfConsumptions.indexOf(this.getConsumptionOfHeatedMedium());
+                if (relations == -1 || relations == 1) {
+                    Elements element = vertexList.get(j).element;
+
+                    if (element.getClass() == Heaters.class) {
+                        if (relations == -1) {
+                            coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][heaterIndexOfListConsumption] = relations;
+                            coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatedMedium();
+                        } else {
+                            Heaters heater = (Heaters) element;
+                            // Номер столбца расхода обогреваемой среды другого подогревателя
+                            int indexOfListConsumption = listOfConsumptions.indexOf(heater.getConsumptionOfHeatedMedium());
+                            coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][indexOfListConsumption] = relations;
+                            coefficientMatrix[heatBalanceEquation][indexOfListConsumption] = relations * heater.getEnthalpyOfHeatedMedium();
+                        }
+                    }
+
+                    if (element.getClass() == HeatNetwork.class) {
+                        if (relations == -1) {
+                            coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][heaterIndexOfListConsumption] = relations;
+                            coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatedMedium();
+                        } else {
+                            HeatNetwork heatNetwork = (HeatNetwork) element;
+                            freeMemoryMatrix[materialBalanceEquationOnHeatedMediumLine] = ( -1)*relations * heatNetwork.getNetworkWaterConsumption();
+                            freeMemoryMatrix[heatBalanceEquation] = (-1) * relations * heatNetwork.getNetworkWaterConsumption()*heatNetwork.getOutletEnthalpy();
+                        }
+                    }
+                }
+            }
+            //----------------------------------------------------------------------------------------------------------
+
+
+        }
+    }
+
+    @Override
+    public void describe() {
+        super.describe();
         System.out.println("-----------------------------Характеристики подогревателя---------------------------------------------------------");
         System.out.println("Номер подогревателя по ходу воды: " + heaterNumber);
         System.out.print("Тип подогревателя: ");
@@ -205,14 +470,17 @@ public class Heaters extends Elements {
         System.out.println("Давление греющего пара на входе в подогреватель: " + pressureOfHeatingSteam + " ,МПа");
         System.out.println("Температура греющего пара на входе в подогреватель: " + temperatureOfHeatingSteam + " ,℃");
         System.out.println("Энтальпия греющего пара на входе в подогреватель: " + enthalpyOfHeatingSteam + " ,кДж/кг");
+        System.out.println("Расход греющего пара: " + consumptionOfHeatingSteam.consumptionValue + " ,кг/c");
         System.out.println("-----------------------------Характеристики дренажа пара----------------------------------------------------------");
         System.out.println("Давление дренажа пара на выходе из подогревателя: " + pressureOfSteamDrain + " ,МПа");
         System.out.println("Температура дренажа пара на выходе из подогревателя: " + temperatureOfSteamDrain + " ,℃");
         System.out.println("Энтальпия дренажа пара на выходе из подогревателя: " + enthalpyOfSteamDrain + " ,кДж/кг");
+        System.out.println("Расход дренажа пара на выходе из подогревателя: " + consumptionOfSteamDrain.consumptionValue + " ,кг/c");
         System.out.println("-----------------------------Характеристики обогреваемой среды на выходе------------------------------------------");
         System.out.println("Давление обогреваемой среды на выходе из подогревателя: " + pressureOfHeatedMedium + " ,МПа");
         System.out.println("Температура обогреваемой среды на выходе из подогревателя: " + temperatureOfHeatedMedium + " ,℃");
         System.out.println("Энтальпия обогреваемой среды на выходе из подогревателя: " + enthalpyOfHeatedMedium + " ,кДж/кг");
+        System.out.println("Расход обогреваемой среды на выходе из подогревателя: " + consumptionOfHeatedMedium.consumptionValue + " ,кг/c");
         System.out.println("------------------------------------------------------------------------------------------------------------------");
         System.out.println();
     }

@@ -1,4 +1,4 @@
-package com.example.simulation_code.HelperСlasses;
+package com.example.simulation_code.HelperСlassesAndInterfaces;
 
 
 public class Consumptions {

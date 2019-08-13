@@ -1,6 +1,8 @@
 package com.example.simulation_code.Elements;
 
-public class Elements {
+import com.example.simulation_code.HelperСlassesAndInterfaces.Describable;
+
+public class Elements implements Describable {
     public final String NAME;
 
     public Elements(String name) {
@@ -8,5 +10,9 @@ public class Elements {
     }
 
 
+    @Override
+    public void describe() {
+        System.out.println("Параметры " + NAME + " :");
+    }
 }
 

@@ -60,8 +60,9 @@ public class TurboDrive extends Elements {
         return steamConsumption;
     }
 
-    public void describeTurboDrive() {
-        System.out.println("Параметры " + NAME + " :");
+    @Override
+    public void describe() {
+        super.describe();
         System.out.println("Механический КПД Турбопривода: " + mechanicalEfficiency);
         System.out.println("Относительный внутренний КПД ТП: " + relativeInternalEfficiency);
         System.out.println("Давление в конденсаторе ТП: " + condenserPressure + " ,МПа");
