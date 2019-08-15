@@ -17,7 +17,7 @@ public class TurbineCylinders extends Elements implements MatrixCompilation {
     public final int NUMBER_OF_SELECTIONS;                                                  // Число отборов в турбине
     private ArrayList<Parameters> listOfParametersInSelections;                             // Список параметров отбора, включая параметры на входе и выходе из цилиндра
 
-    private Equation materialBalanceEquation = new Equation();
+    private Equation materialBalanceEquation = new Equation(this);
 
     public TurbineCylinders(String name, int numberOfSelections) {
         super(name);

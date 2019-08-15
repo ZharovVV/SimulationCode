@@ -40,9 +40,9 @@ public class Heaters extends Elements implements MatrixCompilation {
     private double enthalpyOfHeatedMedium;                      // Энтальпия обогреваемой среды на выходе из подогревателя
     private Consumptions consumptionOfHeatedMedium = new Consumptions();                      // Расход обогреваемой среды на выходе из подогревателя
 
-    private Equation materialBalanceEquationOnSteamDrainLine = new Equation();
-    private Equation materialBalanceEquationOnHeatedMediumLine = new Equation();
-    private Equation heatBalanceEquation = new Equation();
+    private Equation materialBalanceEquationOnSteamDrainLine = new Equation(this);
+    private Equation materialBalanceEquationOnHeatedMediumLine = new Equation(this);
+    private Equation heatBalanceEquation = new Equation(this);
 
 
     //-----------------------------Конструктор для поверхностного подогревателя-----------------------------------------

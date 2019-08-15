@@ -23,17 +23,11 @@ public class Graph {
     public Graph() {
         nVerts = 0;
         adjMat = new HashMap<>();
-        int[][] matrix = new int[MAX_VERTS][MAX_VERTS];
-        for (int i = 0; i < MAX_VERTS; i++) {
-            for (int j = 0; j < MAX_VERTS; j++) {
-                matrix[i][j] = 0;
-            }
-        }
-        adjMat.put(FEED_WATER, matrix);
-        adjMat.put(NETWORK_WATER, matrix);
-        adjMat.put(HEATING_STEAM, matrix);
-        adjMat.put(STEAM_DRAIN, matrix);
-        adjMat.put(SUPERHEATED_STEAM, matrix);
+        adjMat.put(FEED_WATER, new int[MAX_VERTS][MAX_VERTS]);
+        adjMat.put(NETWORK_WATER, new int[MAX_VERTS][MAX_VERTS]);
+        adjMat.put(HEATING_STEAM, new int[MAX_VERTS][MAX_VERTS]);
+        adjMat.put(STEAM_DRAIN, new int[MAX_VERTS][MAX_VERTS]);
+        adjMat.put(SUPERHEATED_STEAM, new int[MAX_VERTS][MAX_VERTS]);
         vertexList = new ArrayList<>();
         stack = new ArrayDeque<>();
     }
@@ -57,7 +51,6 @@ public class Graph {
 
     public void dfs() {
         vertexList.get(0).wasVisited = true;
-        displayVertex(0);
         stack.add(0);
 
         while (!stack.isEmpty()) {

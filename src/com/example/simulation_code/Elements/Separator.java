@@ -34,8 +34,8 @@ public class Separator extends Elements implements MatrixCompilation {
     private double enthalpyOfHeatedMedium;                      // Энтальпия сепарируемой среды на выходе из сепаратора
     private Consumptions consumptionOfHeatedMedium = new Consumptions();
 
-    private Equation materialBalanceEquation = new Equation();
-    private Equation heatBalanceEquation = new Equation();
+    private Equation materialBalanceEquation = new Equation(this);
+    private Equation heatBalanceEquation = new Equation(this);
 
     public Separator(String name, double hydraulicResistanceFromCylinderToSeparator, double outletDegreeOfDryness, TurbineCylinders turbineCylinder) {
         super(name);

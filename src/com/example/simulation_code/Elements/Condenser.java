@@ -26,7 +26,7 @@ public class Condenser extends Elements implements MatrixCompilation, Describabl
     private double enthalpyOfSteamDrain;                        // Энтальпия дренажа пара на выходе из конденсатора
     private Consumptions consumptionOfSteamDrain = new Consumptions();
 
-    private Equation materialBalanceEquation = new Equation();
+    private Equation materialBalanceEquation = new Equation(this);
 
     public Condenser(String name, TurbineCylinders turbineCylinder) {
         super(name);

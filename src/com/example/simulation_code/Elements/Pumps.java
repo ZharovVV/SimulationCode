@@ -27,7 +27,7 @@ public class Pumps extends Elements implements MatrixCompilation {
     private double outletEnthalpy;          // Энтальпия на выходе из насоса
 
     private Consumptions consumptionOfWater = new Consumptions();
-    private Equation materialBalanceEquation = new Equation();
+    private Equation materialBalanceEquation = new Equation(this);
 
     public Pumps(String name, double efficiency, double pumpHead, Elements previousElement) {
         super(name);

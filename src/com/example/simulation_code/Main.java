@@ -395,12 +395,11 @@ public class Main {
         matrices.describeMatrices();
 
         matrices.solvingSystemAndSettingConsumption();
-        for (Map.Entry<String, Elements> entry : elementsMap.entrySet()) {
-            entry.getValue().describe();
+
+        ArrayList<Vertex> vertexArrayList = theGraph.getVertexList();
+        for (Vertex vertex : vertexArrayList) {
+            vertex.element.describe();
         }
-        matrices.describeMatrices();
-
-
         /*Map<Integer,int[][]> map = theGraph.getAdjMat();
         for (Map.Entry<Integer, int[][]> entry : map.entrySet()) {
             System.out.println(entry.getKey());
