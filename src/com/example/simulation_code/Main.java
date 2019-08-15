@@ -11,7 +11,7 @@ public class Main {
         Map<String, Elements> elementsMap = new HashMap<>();
         Scanner scanner = new Scanner(new File("G:\\Vitaly\\Program Files\\IntelliJ IDEA\\IntelliJ IDEA Community Edition 2019.1.3\\IdeaProjects\\SimulationCode\\src\\com\\example\\simulation_code\\input.txt"));
         //--------------------------ПГ
-        SteamGenerator pg = new SteamGenerator("ПГ", 1790);
+        SteamGenerator pg = new SteamGenerator("ПГ", 1786.1);
         elementsMap.put(pg.NAME, pg);
 
         //--------------------------ЦСД
@@ -362,7 +362,7 @@ public class Main {
         theGraph.addEdge(Graph.STEAM_DRAIN, pnd2, pnd1);
 
         theGraph.addEdge(Graph.FEED_WATER, pnd3, pnd4);
-        theGraph.addEdge(Graph.STEAM_DRAIN, pnd3, condenser);
+        theGraph.addEdge(Graph.STEAM_DRAIN, pnd3, pnd2);
 
         theGraph.addEdge(Graph.FEED_WATER, pnd4, d);
         theGraph.addEdge(Graph.STEAM_DRAIN, pnd4, pnd3);
@@ -375,7 +375,7 @@ public class Main {
         theGraph.addEdge(Graph.STEAM_DRAIN, pvd5, pnd4);
 
         theGraph.addEdge(Graph.FEED_WATER, pvd6, pvd7);
-        theGraph.addEdge(Graph.STEAM_DRAIN, pvd6, pvd5);
+        /*theGraph.addEdge(Graph.STEAM_DRAIN, pvd6, pvd5);*/
         theGraph.addEdge(Graph.STEAM_DRAIN, pvd6, d);
 
         theGraph.addEdge(Graph.STEAM_DRAIN, pvd7, pvd6);

@@ -93,7 +93,7 @@ public class Pumps extends Elements implements MatrixCompilation {
         System.out.println("Давление: " + outletPressure + " ,МПа");
         System.out.println("Температура: " + outletTemperature + " ,℃");
         System.out.println("Энтальпия: " + outletEnthalpy + " ,кДж/кг");
-        System.out.println("Расход воды: " + consumptionOfWater.consumptionValue + " ,кДж/кг");
+        System.out.println("Расход воды: " + consumptionOfWater.consumptionValue + " ,кг/c");
         System.out.println("-----------------------------------------------------------------------------------------");
         System.out.println();
     }

@@ -102,7 +102,7 @@ public class TurbineCylinders extends Elements implements MatrixCompilation {
                 if (element.getClass() == Superheaters.class) {
                     Superheaters superheater = (Superheaters) element;
                     // Получение номера столбца
-                    int indexOfListConsumption = listOfConsumptions.indexOf(superheater.getConsumptionOfHeatingSteam());
+                    int indexOfListConsumption = listOfConsumptions.indexOf(superheater.getConsumptionOfHeatedMedium());
                     coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
                 }
 
@@ -114,17 +114,12 @@ public class TurbineCylinders extends Elements implements MatrixCompilation {
                 }
 
                 if (element.getClass() == Separator.class) {
-                    Separator separator = (Separator) element;
-                    // Получение номера столбца
-                    int indexOfListConsumption = listOfConsumptions.indexOf(separator.getConsumptionOfHeatingSteam());
-                    coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
-                }
-
-                if (element.getClass() == Condenser.class) {
-                    Condenser condenser = (Condenser) element;
-                    // Получение номера столбца
-                    int indexOfListConsumption = listOfConsumptions.indexOf(condenser.getConsumptionOfHeatingSteam());
-                    coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
+                    if (relations == -1) {
+                        Separator separator = (Separator) element;
+                        // Получение номера столбца
+                        int indexOfListConsumption = listOfConsumptions.indexOf(separator.getConsumptionOfHeatingSteam());
+                        coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
+                    }
                 }
 
                 if (element.getClass() == TurboDrive.class) {
@@ -192,11 +187,11 @@ public class TurbineCylinders extends Elements implements MatrixCompilation {
             if (temperatureOrDegreeOfDryness > 1) {
                 this.temperature = temperatureOrDegreeOfDryness;
                 this.degreeOfDryness = Double.NaN;
-                this.enthalpy = waterSteam.specificEnthalpyPT(pressure,temperatureOrDegreeOfDryness + 273.15);
+                this.enthalpy = waterSteam.specificEnthalpyPT(pressure, temperatureOrDegreeOfDryness + 273.15);
             } else {
                 this.temperature = Double.NaN;
                 this.degreeOfDryness = temperatureOrDegreeOfDryness;
-                this.enthalpy = waterSteam.specificEnthalpyPX(pressure,temperatureOrDegreeOfDryness);
+                this.enthalpy = waterSteam.specificEnthalpyPX(pressure, temperatureOrDegreeOfDryness);
             }
         }
 
