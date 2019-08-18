@@ -1,18 +1,18 @@
 package com.example.simulation_code.Elements;
 
-import com.example.simulation_code.Graph;
+import com.example.simulation_code.Graph.Graph;
 import com.example.simulation_code.HelperСlassesAndInterfaces.Consumptions;
 import com.example.simulation_code.HelperСlassesAndInterfaces.Describable;
 import com.example.simulation_code.HelperСlassesAndInterfaces.Equation;
 import com.example.simulation_code.HelperСlassesAndInterfaces.MatrixCompilation;
-import com.example.simulation_code.Matrices;
-import com.example.simulation_code.Vertex;
+import com.example.simulation_code.HelperСlassesAndInterfaces.Matrices;
+import com.example.simulation_code.Graph.Vertex;
 import com.hummeling.if97.IF97;
 
 import java.util.ArrayList;
 import java.util.Map;
 
-import static com.example.simulation_code.Graph.*;
+import static com.example.simulation_code.Graph.Graph.*;
 
 public class Condenser extends Elements implements MatrixCompilation, Describable {
     //-----------------------------Характеристики греющего пара---------------------------------------------------------

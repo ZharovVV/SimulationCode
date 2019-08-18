@@ -1,20 +1,19 @@
 package com.example.simulation_code.Elements;
 
-import com.example.simulation_code.Graph;
+import com.example.simulation_code.Graph.Graph;
 import com.example.simulation_code.HelperСlassesAndInterfaces.Consumptions;
 import com.example.simulation_code.HelperСlassesAndInterfaces.Equation;
 import com.example.simulation_code.HelperСlassesAndInterfaces.MatrixCompilation;
-import com.example.simulation_code.Matrices;
-import com.example.simulation_code.Vertex;
+import com.example.simulation_code.HelperСlassesAndInterfaces.Matrices;
+import com.example.simulation_code.Graph.Vertex;
 import com.hummeling.if97.IF97;
 
 import java.util.ArrayList;
 import java.util.Map;
 
-import static com.example.simulation_code.Graph.FEED_WATER;
+import static com.example.simulation_code.Graph.Graph.*;
 
 public class Pumps extends Elements implements MatrixCompilation {
-
     private double efficiency;              // КПД насоса
     private double pumpHead;                // Необходимый напор насоса
 
@@ -52,6 +51,27 @@ public class Pumps extends Elements implements MatrixCompilation {
         this.enthalpyIncrease =
                 pumpHead * waterSteam.specificVolumePT((inletPressure + outletPressure) / 2, inletTemperature + 273.15) * 1000 / efficiency;
         this.outletEnthalpy = inletEnthalpy + enthalpyIncrease;
+
+    }
+
+    // Конструктор для дренажного насоса
+    public Pumps(String name, boolean isDrainagePump, double efficiency, double pumpHead, Heaters previousHeaterOnSteamDrainLine) {
+        super(name);
+        if (isDrainagePump) {
+            this.efficiency = efficiency;
+            this.pumpHead = pumpHead;
+            this.inletTemperature = previousHeaterOnSteamDrainLine.getTemperatureOfSteamDrain();
+            this.inletPressure = previousHeaterOnSteamDrainLine.getPressureOfSteamDrain();
+            this.inletEnthalpy = previousHeaterOnSteamDrainLine.getEnthalpyOfSteamDrain();
+            this.outletTemperature = inletTemperature;
+            this.outletPressure = inletPressure + pumpHead;
+
+            IF97 waterSteam = new IF97(IF97.UnitSystem.DEFAULT);
+
+            this.enthalpyIncrease =
+                    pumpHead * waterSteam.specificVolumePT((inletPressure + outletPressure) / 2, inletTemperature + 273.15) * 1000 / efficiency;
+            this.outletEnthalpy = inletEnthalpy + enthalpyIncrease;
+        }
     }
 
     public double getOutletTemperature() {
@@ -135,6 +155,34 @@ public class Pumps extends Elements implements MatrixCompilation {
                         // Получение номера столбца расхода обогреваемой среды подогревателя
                         int indexOfListConsumption = listOfConsumptions.indexOf(heater.getConsumptionOfHeatedMedium());
                         coefficientMatrix[materialBalanceEquation][indexOfListConsumption] = relations;
+                    }
+                }
+            }
+        }
+        //--------------------------------------------------------------------------------------------------------------
+
+        //---------------------------------Связи с элементами по линии дренажа греющего пара----------------------------
+        for (int j = 0; j < nVerts; j++) {
+            int relations = adjMat.get(STEAM_DRAIN)[v][j];
+            // Получение номера столбца расхода воды в насосе
+            int pumpIndexOfListConsumption = listOfConsumptions.indexOf(this.getConsumptionOfWater());
+            if (relations == -1 || relations == 1) {
+                Elements element = vertexList.get(j).element;
+
+                if (element.getClass() == Heaters.class) {
+                    if (relations == -1) {
+                        coefficientMatrix[materialBalanceEquation][pumpIndexOfListConsumption] = relations;
+                    } else {
+                        Heaters heater = (Heaters) element;
+                        // Получение номера столбца расхода дренажа греющего пара подогревателя
+                        int indexOfListConsumption = listOfConsumptions.indexOf(heater.getConsumptionOfSteamDrain());
+                        coefficientMatrix[materialBalanceEquation][indexOfListConsumption] = relations;
+                    }
+                }
+
+                if (element.getClass() == MixingPoints.class) {
+                    if (relations == -1) {
+                        coefficientMatrix[materialBalanceEquation][pumpIndexOfListConsumption] = relations;
                     }
                 }
             }

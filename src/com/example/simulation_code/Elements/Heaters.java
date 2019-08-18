@@ -1,17 +1,17 @@
 package com.example.simulation_code.Elements;
 
-import com.example.simulation_code.Graph;
+import com.example.simulation_code.Graph.Graph;
 import com.example.simulation_code.HelperСlassesAndInterfaces.Consumptions;
 import com.example.simulation_code.HelperСlassesAndInterfaces.Equation;
 import com.example.simulation_code.HelperСlassesAndInterfaces.MatrixCompilation;
-import com.example.simulation_code.Matrices;
-import com.example.simulation_code.Vertex;
+import com.example.simulation_code.HelperСlassesAndInterfaces.Matrices;
+import com.example.simulation_code.Graph.Vertex;
 import com.hummeling.if97.IF97;
 
 import java.util.ArrayList;
 import java.util.Map;
 
-import static com.example.simulation_code.Graph.*;
+import static com.example.simulation_code.Graph.Graph.*;
 
 public class Heaters extends Elements implements MatrixCompilation {
     //-----------------------------Характеристики подогревателя---------------------------------------------------------
@@ -54,7 +54,7 @@ public class Heaters extends Elements implements MatrixCompilation {
             double underheatingOfHeatedMedium,
             int selectionNumber,
             TurbineCylinders turbineCylinder,                   // Цилиндр турбины
-            Elements previousElement                            // Предыдущий элемент по ходу воды
+            Elements previousElement                            // Предыдущий элемент по ходу воды, исключая точки смешения
     ) {
         super(name);
         this.heaterNumber = heaterNumber;
@@ -161,6 +161,14 @@ public class Heaters extends Elements implements MatrixCompilation {
 
     public double getEnthalpyOfSteamDrain() {
         return enthalpyOfSteamDrain;
+    }
+
+    public double getPressureOfSteamDrain() {
+        return pressureOfSteamDrain;
+    }
+
+    public double getTemperatureOfSteamDrain() {
+        return temperatureOfSteamDrain;
     }
 
     public double getCoefficient() {
@@ -368,6 +376,11 @@ public class Heaters extends Elements implements MatrixCompilation {
                         coefficientMatrix[materialBalanceEquationOnSteamDrainLine][heaterIndexOfListConsumption] = relations;
                         coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfSteamDrain() * this.coefficient;
                     }
+
+                    if (element.getClass() == Pumps.class) {
+                        coefficientMatrix[materialBalanceEquationOnSteamDrainLine][heaterIndexOfListConsumption] = relations;
+                        coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfSteamDrain() * this.coefficient;
+                    }
                 }
             }
             //----------------------------------------------------------------------------------------------------------
@@ -408,6 +421,18 @@ public class Heaters extends Elements implements MatrixCompilation {
                         coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][heaterIndexOfListConsumption] = relations;
                         coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatedMedium();
                     }
+
+                    if (element.getClass() == MixingPoints.class) {
+                        if (relations == -1) {
+                            coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][heaterIndexOfListConsumption] = relations;
+                            coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatedMedium();
+                        } else {
+                            MixingPoints mixingPoint = (MixingPoints) element;
+                            int indexOfListConsumption = listOfConsumptions.indexOf(mixingPoint.getConsumptionOfHeatedMedium());
+                            coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][indexOfListConsumption] = relations;
+                            coefficientMatrix[heatBalanceEquation][indexOfListConsumption] = relations * mixingPoint.getEnthalpyOfHeatedMedium();
+                        }
+                    }
                 }
             }
             //----------------------------------------------------------------------------------------------------------
@@ -439,8 +464,8 @@ public class Heaters extends Elements implements MatrixCompilation {
                             coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatedMedium();
                         } else {
                             HeatNetwork heatNetwork = (HeatNetwork) element;
-                            freeMemoryMatrix[materialBalanceEquationOnHeatedMediumLine] = ( -1)*relations * heatNetwork.getNetworkWaterConsumption();
-                            freeMemoryMatrix[heatBalanceEquation] = (-1) * relations * heatNetwork.getNetworkWaterConsumption()*heatNetwork.getOutletEnthalpy();
+                            freeMemoryMatrix[materialBalanceEquationOnHeatedMediumLine] = (-1) * relations * heatNetwork.getNetworkWaterConsumption();
+                            freeMemoryMatrix[heatBalanceEquation] = (-1) * relations * heatNetwork.getNetworkWaterConsumption() * heatNetwork.getOutletEnthalpy();
                         }
                     }
                 }

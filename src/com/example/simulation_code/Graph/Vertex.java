@@ -1,4 +1,4 @@
-package com.example.simulation_code;
+package com.example.simulation_code.Graph;
 
 import com.example.simulation_code.Elements.Elements;
 

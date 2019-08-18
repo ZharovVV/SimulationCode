@@ -1,6 +1,9 @@
 package com.example.simulation_code;
 
 import com.example.simulation_code.Elements.*;
+import com.example.simulation_code.Graph.Graph;
+import com.example.simulation_code.Graph.Vertex;
+import com.example.simulation_code.HelperСlassesAndInterfaces.Matrices;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -43,7 +46,7 @@ public class Main {
                 csd,
                 separator);
         /*pp1.describe();
-*/
+         */
         elementsMap.put(pp1.NAME, pp1);
         //-----------------------ПП2
         Superheaters pp2 = new Superheaters(
@@ -93,6 +96,13 @@ public class Main {
         //pnd1.describeHeater();
 
         elementsMap.put(pnd1.NAME, pnd1);
+
+        //-------------------------ДН1
+        Pumps dn1 = new Pumps("ДН1", true, 0.76, 2, pnd1);
+        elementsMap.put(dn1.NAME, dn1);
+        //-------------------------См1
+        MixingPoints sm1 = new MixingPoints("См1", pnd1);
+        elementsMap.put(sm1.NAME, sm1);
         //-------------------------ПНД2
         Heaters pnd2 = new Heaters(
                 scanner.next(),
@@ -121,6 +131,12 @@ public class Main {
         //pnd3.describeHeater();
 
         elementsMap.put(pnd3.NAME, pnd3);
+        //------------------------ДН2
+        Pumps dn2 = new Pumps("ДН2", true, 0.76, 1.5, pnd3);
+        elementsMap.put(dn2.NAME, dn2);
+        //------------------------См2
+        MixingPoints sm2 = new MixingPoints("См2", pnd3);
+        elementsMap.put(sm2.NAME, sm2);
         //------------------------ПНД4
         Heaters pnd4 = new Heaters(
                 scanner.next(),
@@ -279,8 +295,12 @@ public class Main {
         Vertex condenser = new Vertex(elementsMap.get("Конденсатор"));
         Vertex kn = new Vertex(elementsMap.get("КНI"));
         Vertex pnd1 = new Vertex(elementsMap.get("ПНД1"));
+        Vertex dn1 = new Vertex(elementsMap.get("ДН1"));
+        Vertex sm1 = new Vertex(elementsMap.get("См1"));
         Vertex pnd2 = new Vertex(elementsMap.get("ПНД2"));
         Vertex pnd3 = new Vertex(elementsMap.get("ПНД3"));
+        Vertex dn2 = new Vertex(elementsMap.get("ДН2"));
+        Vertex sm2 = new Vertex(elementsMap.get("См2"));
         Vertex pnd4 = new Vertex(elementsMap.get("ПНД4"));
         Vertex d = new Vertex(elementsMap.get("Деаэратор"));
         Vertex pn = new Vertex(elementsMap.get("ПН"));
@@ -302,8 +322,12 @@ public class Main {
         theGraph.addVertex(condenser);
         theGraph.addVertex(kn);
         theGraph.addVertex(pnd1);
+        theGraph.addVertex(dn1);
+        theGraph.addVertex(sm1);
         theGraph.addVertex(pnd2);
         theGraph.addVertex(pnd3);
+        theGraph.addVertex(dn2);
+        theGraph.addVertex(sm2);
         theGraph.addVertex(pnd4);
         theGraph.addVertex(d);
         theGraph.addVertex(pn);
@@ -355,14 +379,18 @@ public class Main {
 
         theGraph.addEdge(Graph.FEED_WATER, kn, pnd1);
 
-        theGraph.addEdge(Graph.FEED_WATER, pnd1, pnd2);
-        theGraph.addEdge(Graph.STEAM_DRAIN, pnd1, condenser);
+        theGraph.addEdge(Graph.FEED_WATER, pnd1, sm1);
+        theGraph.addEdge(Graph.FEED_WATER, sm1, pnd2);
+        theGraph.addEdge(Graph.STEAM_DRAIN, pnd1, dn1);
+        theGraph.addEdge(Graph.STEAM_DRAIN, dn1, sm1);
 
         theGraph.addEdge(Graph.FEED_WATER, pnd2, pnd3);
         theGraph.addEdge(Graph.STEAM_DRAIN, pnd2, pnd1);
 
-        theGraph.addEdge(Graph.FEED_WATER, pnd3, pnd4);
-        theGraph.addEdge(Graph.STEAM_DRAIN, pnd3, pnd2);
+        theGraph.addEdge(Graph.FEED_WATER, pnd3, sm2);
+        theGraph.addEdge(Graph.FEED_WATER, sm2, pnd4);
+        theGraph.addEdge(Graph.STEAM_DRAIN, pnd3, dn2);
+        theGraph.addEdge(Graph.STEAM_DRAIN, dn2, sm2);
 
         theGraph.addEdge(Graph.FEED_WATER, pnd4, d);
         theGraph.addEdge(Graph.STEAM_DRAIN, pnd4, pnd3);
@@ -390,13 +418,21 @@ public class Main {
 
         theGraph.addEdge(Graph.STEAM_DRAIN, turboDrive, condenser);
 
-        theGraph.dfs();
+        /*theGraph.dfs();*/
         Matrices matrices = theGraph.dfsAndMatrixCompilation();
-        matrices.describeMatrices();
+        /*matrices.describeMatrices();*/
+        ArrayList<Vertex> vertexArrayList = theGraph.getVertexList();
+
+
 
         matrices.solvingSystemAndSettingConsumption();
 
-        ArrayList<Vertex> vertexArrayList = theGraph.getVertexList();
+        matrices = theGraph.dfsAndMatrixCompilation();
+        matrices.solvingSystemAndSettingConsumption();
+
+        matrices = theGraph.dfsAndMatrixCompilation();
+        matrices.solvingSystemAndSettingConsumption();
+
         for (Vertex vertex : vertexArrayList) {
             vertex.element.describe();
         }
@@ -411,6 +447,7 @@ public class Main {
                 System.out.println();
             }
         }*/
+
     }
 
     public static void main(String[] args) throws FileNotFoundException {

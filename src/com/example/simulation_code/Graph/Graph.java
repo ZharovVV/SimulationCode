@@ -1,7 +1,7 @@
-package com.example.simulation_code;
+package com.example.simulation_code.Graph;
 
 import com.example.simulation_code.Elements.*;
-import com.example.simulation_code.HelperСlassesAndInterfaces.Consumptions;
+import com.example.simulation_code.HelperСlassesAndInterfaces.Matrices;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -51,6 +51,7 @@ public class Graph {
 
     public void dfs() {
         vertexList.get(0).wasVisited = true;
+        displayVertex(0);
         stack.add(0);
 
         while (!stack.isEmpty()) {
@@ -72,7 +73,6 @@ public class Graph {
     public Matrices dfsAndMatrixCompilation() {
         Matrices matrices = new Matrices(vertexList);
         vertexList.get(0).wasVisited = true;
-        displayVertex(0);
         stack.add(0);
 
         while (!stack.isEmpty()) {
@@ -118,6 +118,12 @@ public class Graph {
             }
         }
 
+        for (int j = 0; j < nVerts; j++) {
+            if (adjMat.get(STEAM_DRAIN)[v][j] == -1 && !vertexList.get(j).wasVisited) {
+                return j;
+            }
+        }
+
         return -3;
     }
 
@@ -152,6 +158,11 @@ public class Graph {
         if (element.getClass() == Heaters.class) {
             Heaters heater = (Heaters) element;
             heater.matrixCompilation(v, matrices, this);
+        }
+
+        if (element.getClass() == MixingPoints.class) {
+            MixingPoints mixingPoint = (MixingPoints) element;
+            mixingPoint.matrixCompilation(v, matrices, this);
         }
     }
 

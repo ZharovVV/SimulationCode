@@ -1,8 +1,7 @@
-package com.example.simulation_code;
+package com.example.simulation_code.HelperСlassesAndInterfaces;
 
 import com.example.simulation_code.Elements.*;
-import com.example.simulation_code.HelperСlassesAndInterfaces.Consumptions;
-import com.example.simulation_code.HelperСlassesAndInterfaces.Equation;
+import com.example.simulation_code.Graph.Vertex;
 import org.apache.commons.math3.linear.*;
 
 import java.util.ArrayList;
@@ -91,6 +90,14 @@ public class Matrices {
                 j = j + 1;
                 listOfColumnsOfConsumptions.add(pump.getConsumptionOfWater());
                 listOfLinesOfEquations.add(pump.getMaterialBalanceEquation());
+            }
+
+            if (element.getClass() == MixingPoints.class) {
+                MixingPoints mixingPoint = (MixingPoints) element;
+                i = i + 1;
+                j = j + 1;
+                listOfColumnsOfConsumptions.add(mixingPoint.getConsumptionOfHeatedMedium());
+                listOfLinesOfEquations.add(mixingPoint.getMaterialBalanceEquation());
             }
         }
         System.out.println("Число уравнений: " + i + " Число неизвестных: " + j);
