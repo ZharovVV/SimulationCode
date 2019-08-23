@@ -1,17 +1,17 @@
-package com.example.simulation_code.Elements;
+package com.example.thermal_circuit_simulation.Elements;
 
-import com.example.simulation_code.Graph.Graph;
-import com.example.simulation_code.HelperСlassesAndInterfaces.Consumptions;
-import com.example.simulation_code.HelperСlassesAndInterfaces.Equation;
-import com.example.simulation_code.HelperСlassesAndInterfaces.MatrixCompilation;
-import com.example.simulation_code.HelperСlassesAndInterfaces.Matrices;
-import com.example.simulation_code.Graph.Vertex;
+import com.example.thermal_circuit_simulation.Graph.Graph;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Consumptions;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Equation;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.MatrixCompilation;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Matrices;
+import com.example.thermal_circuit_simulation.Graph.Vertex;
 import com.hummeling.if97.IF97;
 
 import java.util.ArrayList;
 import java.util.Map;
 
-import static com.example.simulation_code.Graph.Graph.*;
+import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 
 public class Heaters extends Elements implements MatrixCompilation {
     //-----------------------------Характеристики подогревателя---------------------------------------------------------
@@ -139,6 +139,7 @@ public class Heaters extends Elements implements MatrixCompilation {
         this.pressureOfHeatedMedium = pressureInHeater;
         this.temperatureOfHeatedMedium = temperatureOfHeatingSteam;
         this.enthalpyOfHeatedMedium = waterSteam.specificEnthalpySaturatedLiquidP(pressureInHeater);
+        // TODO: 23.08.2019 Переделать конструктор для смешивающего подогревателя
 
     }
 
@@ -215,6 +216,7 @@ public class Heaters extends Elements implements MatrixCompilation {
         ArrayList<Consumptions> listOfConsumptions = matrices.getListOfColumnsOfConsumptions();
 
         if (!isSurfaceHeater) {
+            // TODO: 23.08.2019 Переделать метод для смешивающего подогревателя
             //----------------------Продолжение инициализации для смешивающего подогревателя----------------------------
             // Получение номера строки в матрице, в которую записывается уравнение материального баланса по линии обогреваемой среды для Подогревателя
             int materialBalanceEquationOnHeatedMediumLine = matrices.getListOfLinesOfEquations().indexOf(this.getMaterialBalanceEquationOnHeatedMediumLine());
@@ -372,6 +374,13 @@ public class Heaters extends Elements implements MatrixCompilation {
                         }
                     }
 
+                    if (element.getClass() == Deaerator.class) {
+                        if (relations == -1) {
+                            coefficientMatrix[materialBalanceEquationOnSteamDrainLine][heaterIndexOfListConsumption] = relations;
+                            coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfSteamDrain() * this.coefficient;
+                        }
+                    }
+
                     if (element.getClass() == Condenser.class) {
                         coefficientMatrix[materialBalanceEquationOnSteamDrainLine][heaterIndexOfListConsumption] = relations;
                         coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfSteamDrain() * this.coefficient;
@@ -414,6 +423,18 @@ public class Heaters extends Elements implements MatrixCompilation {
                             int indexOfListConsumption = listOfConsumptions.indexOf(heater.getConsumptionOfHeatedMedium());
                             coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][indexOfListConsumption] = relations;
                             coefficientMatrix[heatBalanceEquation][indexOfListConsumption] = relations * heater.getEnthalpyOfHeatedMedium();
+                        }
+                    }
+
+                    if (element.getClass() == Deaerator.class) {
+                        if (relations == -1) {
+                            coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][heaterIndexOfListConsumption] = relations;
+                            coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatedMedium();
+                        } else {
+                            Deaerator deaerator = (Deaerator) element;
+                            int indexOfListConsumption = listOfConsumptions.indexOf(deaerator.getConsumptionOfHeatedMedium());
+                            coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][indexOfListConsumption] = relations;
+                            coefficientMatrix[heatBalanceEquation][indexOfListConsumption] = relations * deaerator.getEnthalpyOfHeatedMedium();
                         }
                     }
 

@@ -1,17 +1,17 @@
-package com.example.simulation_code.Elements;
+package com.example.thermal_circuit_simulation.Elements;
 
-import com.example.simulation_code.Graph.Graph;
-import com.example.simulation_code.HelperСlassesAndInterfaces.Consumptions;
-import com.example.simulation_code.HelperСlassesAndInterfaces.Equation;
-import com.example.simulation_code.HelperСlassesAndInterfaces.MatrixCompilation;
-import com.example.simulation_code.HelperСlassesAndInterfaces.Matrices;
-import com.example.simulation_code.Graph.Vertex;
+import com.example.thermal_circuit_simulation.Graph.Graph;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Consumptions;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Equation;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.MatrixCompilation;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Matrices;
+import com.example.thermal_circuit_simulation.Graph.Vertex;
 import com.hummeling.if97.IF97;
 
 import java.util.ArrayList;
 import java.util.Map;
 
-import static com.example.simulation_code.Graph.Graph.*;
+import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 
 public class Pumps extends Elements implements MatrixCompilation {
     private double efficiency;              // КПД насоса
@@ -37,11 +37,16 @@ public class Pumps extends Elements implements MatrixCompilation {
             this.inletTemperature = previousHeater.getTemperatureOfHeatedMedium();
             this.inletPressure = previousHeater.getPressureOfHeatedMedium();
             this.inletEnthalpy = previousHeater.getEnthalpyOfHeatedMedium();
-        } else {                                                                    // Если предыдущий элемент - конденсатор
+        } else if (previousElement.getClass() == Condenser.class) {                                                                    // Если предыдущий элемент - конденсатор
             Condenser condenser = (Condenser) previousElement;
             this.inletTemperature = condenser.getTemperatureOfSteamDrain();
             this.inletPressure = condenser.getPressureOfSteamDrain();
             this.inletEnthalpy = condenser.getEnthalpyOfSteamDrain();
+        } else if (previousElement.getClass() == Deaerator.class) {
+            Deaerator deaerator = (Deaerator) previousElement;
+            this.inletTemperature = deaerator.getTemperatureOfHeatedMedium();
+            this.inletPressure = deaerator.getPressureOfHeatedMedium();
+            this.inletEnthalpy = deaerator.getEnthalpyOfHeatedMedium();
         }
         this.outletTemperature = inletTemperature;
         this.outletPressure = inletPressure + pumpHead;
@@ -154,6 +159,17 @@ public class Pumps extends Elements implements MatrixCompilation {
                         Heaters heater = (Heaters) element;
                         // Получение номера столбца расхода обогреваемой среды подогревателя
                         int indexOfListConsumption = listOfConsumptions.indexOf(heater.getConsumptionOfHeatedMedium());
+                        coefficientMatrix[materialBalanceEquation][indexOfListConsumption] = relations;
+                    }
+                }
+
+                if (element.getClass() == Deaerator.class) {
+                    if (relations == -1) {
+                        coefficientMatrix[materialBalanceEquation][pumpIndexOfListConsumption] = relations;
+                    } else {
+                        Deaerator deaerator = (Deaerator) element;
+                        // Получение номера столбца расхода обогреваемой среды подогревателя
+                        int indexOfListConsumption = listOfConsumptions.indexOf(deaerator.getConsumptionOfHeatedMedium());
                         coefficientMatrix[materialBalanceEquation][indexOfListConsumption] = relations;
                     }
                 }

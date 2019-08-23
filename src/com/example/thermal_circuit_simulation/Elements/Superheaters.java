@@ -1,17 +1,17 @@
-package com.example.simulation_code.Elements;
+package com.example.thermal_circuit_simulation.Elements;
 
-import com.example.simulation_code.Graph.Graph;
-import com.example.simulation_code.HelperСlassesAndInterfaces.Consumptions;
-import com.example.simulation_code.HelperСlassesAndInterfaces.Equation;
-import com.example.simulation_code.HelperСlassesAndInterfaces.MatrixCompilation;
-import com.example.simulation_code.HelperСlassesAndInterfaces.Matrices;
-import com.example.simulation_code.Graph.Vertex;
+import com.example.thermal_circuit_simulation.Graph.Graph;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Consumptions;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Equation;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.MatrixCompilation;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Matrices;
+import com.example.thermal_circuit_simulation.Graph.Vertex;
 import com.hummeling.if97.IF97;
 
 import java.util.ArrayList;
 import java.util.Map;
 
-import static com.example.simulation_code.Graph.Graph.*;
+import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 
 public class Superheaters extends Elements implements MatrixCompilation {
     //-----------------------------Характеристики подогревателя---------------------------------------------------------
@@ -235,6 +235,11 @@ public class Superheaters extends Elements implements MatrixCompilation {
                 Elements element = vertexList.get(j).element;
 
                 if (element.getClass() == Heaters.class) {
+                    coefficientMatrix[materialBalanceEquationOnSteamDrainLine][superheaterIndexOfListConsumption] = relations;
+                    coefficientMatrix[heatBalanceEquation][superheaterIndexOfListConsumption] = relations * this.getEnthalpyOfSteamDrain() * this.getCoefficient();
+                }
+
+                if (element.getClass() == Deaerator.class) {
                     coefficientMatrix[materialBalanceEquationOnSteamDrainLine][superheaterIndexOfListConsumption] = relations;
                     coefficientMatrix[heatBalanceEquation][superheaterIndexOfListConsumption] = relations * this.getEnthalpyOfSteamDrain() * this.getCoefficient();
                 }

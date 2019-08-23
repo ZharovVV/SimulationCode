@@ -1,7 +1,7 @@
-package com.example.simulation_code.HelperСlassesAndInterfaces;
+package com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces;
 
-import com.example.simulation_code.Elements.*;
-import com.example.simulation_code.Graph.Vertex;
+import com.example.thermal_circuit_simulation.Elements.*;
+import com.example.thermal_circuit_simulation.Graph.Vertex;
 import org.apache.commons.math3.linear.*;
 
 import java.util.ArrayList;
@@ -41,6 +41,16 @@ public class Matrices {
                     listOfLinesOfEquations.add(heater.getMaterialBalanceEquationOnHeatedMediumLine());
                     listOfLinesOfEquations.add(heater.getHeatBalanceEquation());
                 }
+            }
+
+            if (element.getClass() == Deaerator.class) {
+                Deaerator deaerator = (Deaerator) element;
+                i = i + 2;
+                j = j + 2;
+                listOfColumnsOfConsumptions.add(deaerator.getConsumptionOfHeatingSteam());
+                listOfColumnsOfConsumptions.add(deaerator.getConsumptionOfHeatedMedium());
+                listOfLinesOfEquations.add(deaerator.getMaterialBalanceEquationOnHeatedMediumLine());
+                listOfLinesOfEquations.add(deaerator.getHeatBalanceEquation());
             }
 
 

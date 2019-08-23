@@ -1,17 +1,17 @@
-package com.example.simulation_code.Elements;
+package com.example.thermal_circuit_simulation.Elements;
 
-import com.example.simulation_code.Graph.Graph;
-import com.example.simulation_code.HelperСlassesAndInterfaces.Consumptions;
-import com.example.simulation_code.HelperСlassesAndInterfaces.Equation;
-import com.example.simulation_code.HelperСlassesAndInterfaces.MatrixCompilation;
-import com.example.simulation_code.HelperСlassesAndInterfaces.Matrices;
-import com.example.simulation_code.Graph.Vertex;
+import com.example.thermal_circuit_simulation.Graph.Graph;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Consumptions;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Equation;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.MatrixCompilation;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Matrices;
+import com.example.thermal_circuit_simulation.Graph.Vertex;
 import com.hummeling.if97.IF97;
 
 import java.util.ArrayList;
 import java.util.Map;
 
-import static com.example.simulation_code.Graph.Graph.*;
+import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 
 public class TurbineCylinders extends Elements implements MatrixCompilation {
     public final int NUMBER_OF_SELECTIONS;                                                  // Число отборов в турбине
@@ -113,6 +113,13 @@ public class TurbineCylinders extends Elements implements MatrixCompilation {
                     coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
                 }
 
+                if (element.getClass() == Deaerator.class) {
+                    Deaerator deaerator = (Deaerator) element;
+                    // Получение номера столбца
+                    int indexOfListConsumption = listOfConsumptions.indexOf(deaerator.getConsumptionOfHeatingSteam());
+                    coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
+                }
+
                 if (element.getClass() == Separator.class) {
                     if (relations == -1) {
                         Separator separator = (Separator) element;
@@ -150,6 +157,13 @@ public class TurbineCylinders extends Elements implements MatrixCompilation {
                     Heaters heater = (Heaters) element;
                     // Получение номера столбца
                     int indexOfListConsumption = listOfConsumptions.indexOf(heater.getConsumptionOfHeatingSteam());
+                    coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
+                }
+
+                if (element.getClass() == Deaerator.class) {
+                    Deaerator deaerator = (Deaerator) element;
+                    // Получение номера столбца
+                    int indexOfListConsumption = listOfConsumptions.indexOf(deaerator.getConsumptionOfHeatingSteam());
                     coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
                 }
 

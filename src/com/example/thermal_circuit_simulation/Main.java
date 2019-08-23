@@ -1,9 +1,9 @@
-package com.example.simulation_code;
+package com.example.thermal_circuit_simulation;
 
-import com.example.simulation_code.Elements.*;
-import com.example.simulation_code.Graph.Graph;
-import com.example.simulation_code.Graph.Vertex;
-import com.example.simulation_code.HelperСlassesAndInterfaces.Matrices;
+import com.example.thermal_circuit_simulation.Elements.*;
+import com.example.thermal_circuit_simulation.Graph.Graph;
+import com.example.thermal_circuit_simulation.Graph.Vertex;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Matrices;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,7 +12,7 @@ import java.util.*;
 public class Main {
     public Map<String, Elements> initializationOfElements() throws FileNotFoundException {
         Map<String, Elements> elementsMap = new HashMap<>();
-        Scanner scanner = new Scanner(new File("G:\\Vitaly\\Program Files\\IntelliJ IDEA\\IntelliJ IDEA Community Edition 2019.1.3\\IdeaProjects\\SimulationCode\\src\\com\\example\\simulation_code\\input.txt"));
+        Scanner scanner = new Scanner(new File("G:\\Vitaly\\Program Files\\IntelliJ IDEA\\IntelliJ IDEA Community Edition 2019.1.3\\IdeaProjects\\SimulationCode\\src\\com\\example\\thermal_circuit_simulation\\input.txt"));
         //--------------------------ПГ
         SteamGenerator pg = new SteamGenerator("ПГ", 1786.1);
         elementsMap.put(pg.NAME, pg);
@@ -152,12 +152,11 @@ public class Main {
 
         elementsMap.put(pnd4.NAME, pnd4);
         //-----------------------Деаэратор
-        Heaters d = new Heaters(
+        Deaerator d = new Deaerator(
                 scanner.next(),
                 Double.parseDouble(scanner.next()),
                 Integer.parseInt(scanner.next()),
-                csd,
-                pnd4
+                csd
         );
         //d.describeHeater();
 

@@ -1,6 +1,6 @@
-package com.example.simulation_code.HelperСlassesAndInterfaces;
+package com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces;
 
-import com.example.simulation_code.Elements.Elements;
+import com.example.thermal_circuit_simulation.Elements.Elements;
 
 public class Equation {
     private Elements element;

@@ -1,4 +1,4 @@
-package com.example.simulation_code.Elements;
+package com.example.thermal_circuit_simulation.Elements;
 
 import com.hummeling.if97.IF97;
 

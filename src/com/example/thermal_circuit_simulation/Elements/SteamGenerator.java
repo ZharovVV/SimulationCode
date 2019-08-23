@@ -1,4 +1,4 @@
-package com.example.simulation_code.Elements;
+package com.example.thermal_circuit_simulation.Elements;
 
 public class SteamGenerator extends Elements{
     private double steamСonsumption;

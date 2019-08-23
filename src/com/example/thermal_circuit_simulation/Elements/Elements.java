@@ -1,6 +1,6 @@
-package com.example.simulation_code.Elements;
+package com.example.thermal_circuit_simulation.Elements;
 
-import com.example.simulation_code.HelperСlassesAndInterfaces.Describable;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Describable;
 
 public class Elements implements Describable {
     public final String NAME;

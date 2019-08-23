@@ -1,14 +1,14 @@
-package com.example.simulation_code.Elements;
+package com.example.thermal_circuit_simulation.Elements;
 
-import com.example.simulation_code.Graph.Graph;
-import com.example.simulation_code.HelperСlassesAndInterfaces.*;
-import com.example.simulation_code.HelperСlassesAndInterfaces.Matrices;
-import com.example.simulation_code.Graph.Vertex;
+import com.example.thermal_circuit_simulation.Graph.Graph;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.*;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Matrices;
+import com.example.thermal_circuit_simulation.Graph.Vertex;
 
 import java.util.ArrayList;
 import java.util.Map;
 
-import static com.example.simulation_code.Graph.Graph.*;
+import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 
 public class MixingPoints extends Elements implements MatrixCompilation,Describable  {
     private double enthalpyOfHeatedMedium;                      // Энтальпия обогреваемой среды на выходе из точки смешения

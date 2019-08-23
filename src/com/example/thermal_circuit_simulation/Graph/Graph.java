@@ -1,7 +1,7 @@
-package com.example.simulation_code.Graph;
+package com.example.thermal_circuit_simulation.Graph;
 
-import com.example.simulation_code.Elements.*;
-import com.example.simulation_code.HelperСlassesAndInterfaces.Matrices;
+import com.example.thermal_circuit_simulation.Elements.*;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Matrices;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -158,6 +158,11 @@ public class Graph {
         if (element.getClass() == Heaters.class) {
             Heaters heater = (Heaters) element;
             heater.matrixCompilation(v, matrices, this);
+        }
+
+        if (element.getClass() == Deaerator.class) {
+            Deaerator deaerator = (Deaerator) element;
+            deaerator.matrixCompilation(v, matrices, this);
         }
 
         if (element.getClass() == MixingPoints.class) {
