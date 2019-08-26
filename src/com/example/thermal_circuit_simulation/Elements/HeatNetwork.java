@@ -54,7 +54,7 @@ public class HeatNetwork extends Elements {
         System.out.println("Температура: " + outletTemperature + " ,℃");
         System.out.println("Энтальпия: " + outletEnthalpy + " ,кДж/кг");
         System.out.println("Расход сетевой воды: " + networkWaterConsumption + " ,кг/c");
-        System.out.println("-----------------------------------------------------------------------------------------");
+        System.out.println("------------------------------------------------------------------------------------------------------------------");
         System.out.println();
     }
 }

@@ -65,7 +65,7 @@ public class TurbineCylinders extends Elements implements MatrixCompilation {
                 System.out.println();
             }
         }
-        System.out.println("---------------------------------------------------------------------------------------");
+        System.out.println("------------------------------------------------------------------------------------------------------------------");
         System.out.println();
     }
 
@@ -96,7 +96,7 @@ public class TurbineCylinders extends Elements implements MatrixCompilation {
                 Elements element = vertexList.get(j).element;
                 if (element.getClass() == SteamGenerator.class) {
                     SteamGenerator steamGenerator = (SteamGenerator) element;
-                    freeMemoryMatrix[indexOfListOfEquation] = (-1) * relations * steamGenerator.getSteamСonsumption();
+                    freeMemoryMatrix[indexOfListOfEquation] += (-1) * relations * steamGenerator.getSteamСonsumption();
                 }
 
                 if (element.getClass() == Superheaters.class) {
@@ -131,7 +131,7 @@ public class TurbineCylinders extends Elements implements MatrixCompilation {
 
                 if (element.getClass() == TurboDrive.class) {
                     TurboDrive turboDrive = (TurboDrive) element;
-                    freeMemoryMatrix[indexOfListOfEquation] = (-1) * relations * turboDrive.getSteamConsumption();
+                    freeMemoryMatrix[indexOfListOfEquation] += (-1) * relations * turboDrive.getSteamConsumption();
                 }
             }
         }
@@ -143,7 +143,7 @@ public class TurbineCylinders extends Elements implements MatrixCompilation {
                 Elements element = vertexList.get(j).element;
                 if (element.getClass() == SteamGenerator.class) {
                     SteamGenerator steamGenerator = (SteamGenerator) element;
-                    freeMemoryMatrix[indexOfListOfEquation] = (-1) * relations * steamGenerator.getSteamСonsumption();
+                    freeMemoryMatrix[indexOfListOfEquation] += (-1) * relations * steamGenerator.getSteamСonsumption();
                 }
 
                 if (element.getClass() == Superheaters.class) {
@@ -183,7 +183,7 @@ public class TurbineCylinders extends Elements implements MatrixCompilation {
 
                 if (element.getClass() == TurboDrive.class) {
                     TurboDrive turboDrive = (TurboDrive) element;
-                    freeMemoryMatrix[indexOfListOfEquation] = (-1) * relations * turboDrive.getSteamConsumption();
+                    freeMemoryMatrix[indexOfListOfEquation] += (-1) * relations * turboDrive.getSteamConsumption();
                 }
             }
         }

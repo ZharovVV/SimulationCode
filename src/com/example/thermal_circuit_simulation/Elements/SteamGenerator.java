@@ -16,6 +16,7 @@ public class SteamGenerator extends Elements{
     public void describe() {
         super.describe();
         System.out.println("Расход пара через ПГ: " + steamСonsumption + " ,кг/с");
+        System.out.println("------------------------------------------------------------------------------------------------------------------");
         System.out.println();
     }
 }

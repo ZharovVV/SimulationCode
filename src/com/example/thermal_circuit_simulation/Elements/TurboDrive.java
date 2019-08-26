@@ -39,8 +39,8 @@ public class TurboDrive extends Elements {
                       double condenserPressure,
                       double feedwaterFlow,
                       Pumps feedPump,
-                      TurbineCylinders turbineCylinder,
-                      int selectionNumber) {
+                      int selectionNumber,
+                      TurbineCylinders turbineCylinder) {
         super(name);
         this.mechanicalEfficiency = mechanicalEfficiency;
         this.relativeInternalEfficiency = relativeInternalEfficiency;
@@ -70,7 +70,7 @@ public class TurboDrive extends Elements {
         System.out.println("Энтальпия на входе: " + inletEnthalpy + " ,кДж/кг");
         System.out.println("Энтальпия на выходе: " + outletEnthalpy + " ,кДж/кг");
         System.out.println("Расход пара через ТП: " + steamConsumption + " ,кг/c");
-        System.out.println("-----------------------------------------------------------------------------------------");
+        System.out.println("------------------------------------------------------------------------------------------------------------------");
         System.out.println();
     }
 }

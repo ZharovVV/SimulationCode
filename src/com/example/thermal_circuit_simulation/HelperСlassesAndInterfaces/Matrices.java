@@ -1,6 +1,8 @@
 package com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces;
 
 import com.example.thermal_circuit_simulation.Elements.*;
+import com.example.thermal_circuit_simulation.Elements.Ejectors.MainEjectorsWithCooler;
+import com.example.thermal_circuit_simulation.Elements.Ejectors.SealEjectorsWithCooler;
 import com.example.thermal_circuit_simulation.Graph.Vertex;
 import org.apache.commons.math3.linear.*;
 
@@ -102,6 +104,22 @@ public class Matrices {
                 listOfLinesOfEquations.add(pump.getMaterialBalanceEquation());
             }
 
+            if (element.getClass() == MainEjectorsWithCooler.class) {
+                MainEjectorsWithCooler mainEjectorWithCooler = (MainEjectorsWithCooler) element;
+                i = i + 1;
+                j = j + 1;
+                listOfColumnsOfConsumptions.add(mainEjectorWithCooler.getConsumptionOfWater());
+                listOfLinesOfEquations.add(mainEjectorWithCooler.getMaterialBalanceEquation());
+            }
+
+            if (element.getClass() == SealEjectorsWithCooler.class) {
+                SealEjectorsWithCooler sealEjectorWithCooler = (SealEjectorsWithCooler) element;
+                i = i + 1;
+                j = j + 1;
+                listOfColumnsOfConsumptions.add(sealEjectorWithCooler.getConsumptionOfWater());
+                listOfLinesOfEquations.add(sealEjectorWithCooler.getMaterialBalanceEquation());
+            }
+
             if (element.getClass() == MixingPoints.class) {
                 MixingPoints mixingPoint = (MixingPoints) element;
                 i = i + 1;
@@ -110,7 +128,7 @@ public class Matrices {
                 listOfLinesOfEquations.add(mixingPoint.getMaterialBalanceEquation());
             }
         }
-        System.out.println("Число уравнений: " + i + " Число неизвестных: " + j);
+        /*System.out.println("Число уравнений: " + i + " Число неизвестных: " + j);*/
         coefficientMatrix = new double[i][j];
         freeMemoryMatrix = new double[i];
     }

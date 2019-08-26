@@ -101,10 +101,6 @@ public class Deaerator extends Elements implements MatrixCompilation, Describabl
                     coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][heaterIndexOfListConsumption] = relations;
                     coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatingSteam();
                 }
-
-                if (relations == -1) {
-                    // TODO: 23.08.2019 блок кода для связи деаэратора и эжекторов
-                }
             }
         }
         //--------------------------------------------------------------------------------------------------------------

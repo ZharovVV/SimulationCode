@@ -94,5 +94,7 @@ public class MixingPoints extends Elements implements MatrixCompilation,Describa
         super.describe();
         System.out.println("Энтальпия воды на выходе из точки смешения: " + enthalpyOfHeatedMedium + " ,кДж/кг");
         System.out.println("Расход воды на выходе из точки смешения: " + consumptionOfHeatedMedium.consumptionValue + " ,кг/c");
+        System.out.println("------------------------------------------------------------------------------------------------------------------");
+        System.out.println();
     }
 }

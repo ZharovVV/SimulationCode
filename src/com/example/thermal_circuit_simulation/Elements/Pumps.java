@@ -1,5 +1,7 @@
 package com.example.thermal_circuit_simulation.Elements;
 
+import com.example.thermal_circuit_simulation.Elements.Ejectors.MainEjectorsWithCooler;
+import com.example.thermal_circuit_simulation.Elements.Ejectors.SealEjectorsWithCooler;
 import com.example.thermal_circuit_simulation.Graph.Graph;
 import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Consumptions;
 import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Equation;
@@ -47,6 +49,11 @@ public class Pumps extends Elements implements MatrixCompilation {
             this.inletTemperature = deaerator.getTemperatureOfHeatedMedium();
             this.inletPressure = deaerator.getPressureOfHeatedMedium();
             this.inletEnthalpy = deaerator.getEnthalpyOfHeatedMedium();
+        } else if (previousElement.getClass() == SealEjectorsWithCooler.class) {
+            SealEjectorsWithCooler sealEjectorsWithCooler = (SealEjectorsWithCooler) previousElement;
+            this.inletTemperature = sealEjectorsWithCooler.getOutletTemperature();
+            this.inletPressure = sealEjectorsWithCooler.getOutletPressure();
+            this.inletEnthalpy = sealEjectorsWithCooler.getOutletEnthalpy();
         }
         this.outletTemperature = inletTemperature;
         this.outletPressure = inletPressure + pumpHead;
@@ -119,7 +126,7 @@ public class Pumps extends Elements implements MatrixCompilation {
         System.out.println("Температура: " + outletTemperature + " ,℃");
         System.out.println("Энтальпия: " + outletEnthalpy + " ,кДж/кг");
         System.out.println("Расход воды: " + consumptionOfWater.consumptionValue + " ,кг/c");
-        System.out.println("-----------------------------------------------------------------------------------------");
+        System.out.println("------------------------------------------------------------------------------------------------------------------");
         System.out.println();
     }
 
@@ -172,6 +179,17 @@ public class Pumps extends Elements implements MatrixCompilation {
                         int indexOfListConsumption = listOfConsumptions.indexOf(deaerator.getConsumptionOfHeatedMedium());
                         coefficientMatrix[materialBalanceEquation][indexOfListConsumption] = relations;
                     }
+                }
+
+                if (element.getClass() == MainEjectorsWithCooler.class && relations == -1) {
+                    coefficientMatrix[materialBalanceEquation][pumpIndexOfListConsumption] = relations;
+                }
+
+                if (element.getClass() == SealEjectorsWithCooler.class && relations == 1) {
+                    SealEjectorsWithCooler ejector = (SealEjectorsWithCooler) element;
+                    // Получение номера столбца расхода воды охладителя
+                    int indexOfListConsumption = listOfConsumptions.indexOf(ejector.getConsumptionOfWater());
+                    coefficientMatrix[materialBalanceEquation][indexOfListConsumption] = relations;
                 }
             }
         }

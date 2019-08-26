@@ -1,6 +1,10 @@
 package com.example.thermal_circuit_simulation.Graph;
 
 import com.example.thermal_circuit_simulation.Elements.*;
+import com.example.thermal_circuit_simulation.Elements.Ejectors.MainEjectorsWithCooler;
+import com.example.thermal_circuit_simulation.Elements.Ejectors.SealEjectorsWithCooler;
+import com.example.thermal_circuit_simulation.Elements.Seals.TurbineShaftSeals;
+import com.example.thermal_circuit_simulation.Elements.Seals.ValveStemSeals;
 import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Matrices;
 
 import java.util.ArrayDeque;
@@ -168,6 +172,26 @@ public class Graph {
         if (element.getClass() == MixingPoints.class) {
             MixingPoints mixingPoint = (MixingPoints) element;
             mixingPoint.matrixCompilation(v, matrices, this);
+        }
+
+        if (element.getClass() == ValveStemSeals.class) {
+            ValveStemSeals valveStemSeal = (ValveStemSeals) element;
+            valveStemSeal.matrixCompilation(v, matrices, this);
+        }
+
+        if (element.getClass() == TurbineShaftSeals.class) {
+            TurbineShaftSeals turbineShaftSeal = (TurbineShaftSeals) element;
+            turbineShaftSeal.matrixCompilation(v, matrices, this);
+        }
+
+        if (element.getClass() == MainEjectorsWithCooler.class) {
+            MainEjectorsWithCooler mainEjectorWithCooler = (MainEjectorsWithCooler) element;
+            mainEjectorWithCooler.matrixCompilation(v, matrices, this);
+        }
+
+        if (element.getClass() == SealEjectorsWithCooler.class) {
+            SealEjectorsWithCooler sealEjectorWithCooler = (SealEjectorsWithCooler) element;
+            sealEjectorWithCooler.matrixCompilation(v, matrices, this);
         }
     }
 

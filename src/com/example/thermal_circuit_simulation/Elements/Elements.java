@@ -13,6 +13,7 @@ public class Elements implements Describable {
     @Override
     public void describe() {
         System.out.println("Параметры " + NAME + " :");
+        System.out.println("------------------------------------------------------------------------------------------------------------------");
     }
 }
 

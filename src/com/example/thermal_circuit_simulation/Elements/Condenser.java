@@ -108,7 +108,7 @@ public class Condenser extends Elements implements MatrixCompilation, Describabl
 
                 if (element.getClass() == TurboDrive.class) {
                     TurboDrive turboDrive = (TurboDrive) element;
-                    freeMemoryMatrix[materialBalanceEquation]=(-1)*relations*turboDrive.getSteamConsumption();
+                    freeMemoryMatrix[materialBalanceEquation] += (-1) * relations * turboDrive.getSteamConsumption();
                 }
             }
         }
@@ -123,7 +123,7 @@ public class Condenser extends Elements implements MatrixCompilation, Describabl
                 Elements element = vertexList.get(j).element;
 
                 if (element.getClass() == Pumps.class) {
-                    coefficientMatrix[materialBalanceEquation][condenserIndexOfListConsumption]=relations;
+                    coefficientMatrix[materialBalanceEquation][condenserIndexOfListConsumption] = relations;
                 }
             }
         }
@@ -146,7 +146,7 @@ public class Condenser extends Elements implements MatrixCompilation, Describabl
         System.out.println("Температура: " + temperatureOfSteamDrain + " ,℃");
         System.out.println("Энтальпия: " + enthalpyOfSteamDrain + " ,кДж/кг");
         System.out.println("Расход воды на выходе из конденсатора: " + consumptionOfSteamDrain.consumptionValue + " ,кг/c");
-        System.out.println("-----------------------------------------------------------------------------------------");
+        System.out.println("------------------------------------------------------------------------------------------------------------------");
         System.out.println();
     }
 }
