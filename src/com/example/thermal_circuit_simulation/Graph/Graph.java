@@ -6,6 +6,7 @@ import com.example.thermal_circuit_simulation.Elements.Ejectors.SealEjectorsWith
 import com.example.thermal_circuit_simulation.Elements.Seals.TurbineShaftSeals;
 import com.example.thermal_circuit_simulation.Elements.Seals.ValveStemSeals;
 import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Matrices;
+import com.example.thermal_circuit_simulation.ThermalEfficiencyIndicators.ThermalEfficiencyIndicators;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -95,6 +96,46 @@ public class Graph {
         }
 
         return matrices;
+    }
+
+    public ThermalEfficiencyIndicators dfsAndCalculationOfThermalEfficiencyIndicators(double generatorEfficiency, double mechanicalEfficiencyOfTurbogenerator) {
+        ThermalEfficiencyIndicators thermalEfficiencyIndicators = new ThermalEfficiencyIndicators(generatorEfficiency, mechanicalEfficiencyOfTurbogenerator);
+        vertexList.get(0).wasVisited = true;
+        stack.add(0);
+
+        while (!stack.isEmpty()) {
+            int v = getAdjUnvisitedVertex(stack.peekLast());
+            if (v == -3) {          // Если такой вершины нет,
+                stack.pollLast();     // элемент извлекается из стека
+            } else {                // Если вершина найдена
+                vertexList.get(v).wasVisited = true;    // Пометка
+                calculationOfThermalEfficiencyIndicators(v, thermalEfficiencyIndicators);     // Расчет показателей тепловой экономичности, связанных с элементом v.
+                stack.addLast(v);                   // Занесение в стек
+            }
+        }
+
+        for (int i = 0; i < nVerts; i++) {
+            vertexList.get(i).wasVisited = false;
+        }
+
+        thermalEfficiencyIndicators.calculationOfInternalCompartmentPower();
+        thermalEfficiencyIndicators.calculationOfGuaranteedElectricPower();
+
+        return thermalEfficiencyIndicators;
+    }
+
+    private void calculationOfThermalEfficiencyIndicators(int v, ThermalEfficiencyIndicators thermalEfficiencyIndicators) {
+        Elements element = vertexList.get(v).element;
+        if (element.getClass() == TurbineCylinders.class) {
+            TurbineCylinders turbineCylinder = (TurbineCylinders) element;
+            turbineCylinder.calculationOfThermalEfficiencyIndicators(v, thermalEfficiencyIndicators, this);
+        }
+
+        if (element.getClass() == Pumps.class) {
+            Pumps pump = (Pumps) element;
+            pump.calculationOfThermalEfficiencyIndicators(v, thermalEfficiencyIndicators, this);
+        }
+
     }
 
 

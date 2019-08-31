@@ -8,9 +8,8 @@ import com.example.thermal_circuit_simulation.Elements.Seals.ValveStemSeals;
 import com.example.thermal_circuit_simulation.Graph.Graph;
 import com.example.thermal_circuit_simulation.Graph.Vertex;
 import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Matrices;
+import com.example.thermal_circuit_simulation.ThermalEfficiencyIndicators.ThermalEfficiencyIndicators;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.*;
 
 import static java.lang.Double.NaN;
@@ -48,7 +47,7 @@ public class Main {
         cnd.addSelection(2, 0.340, 139);
         cnd.addSelection(3, 0.092, 0.945);
         cnd.addSelection(4, 0.025, 0.902);
-        cnd.addSelection(5, 0.004, 0.87);
+        cnd.addSelection(5, 0.0039, 0.8755);
         elementsMap.put(cnd.NAME, cnd);
         //-------------------------Конденсатор
         Condenser condenser = new Condenser("Конденсатор", cnd);
@@ -57,7 +56,7 @@ public class Main {
         Deaerator d = new Deaerator("Деаэратор", 0.69, 3, csd);
         elementsMap.put(d.NAME, d);
         //-------------------------Конденсатный насос 1
-        Pumps kn1 = new Pumps("КНI", 0.78, 0.9, condenser);
+        Pumps kn1 = new Pumps("КНI", 0.78, 0.9, condenser, true);
         elementsMap.put(kn1.NAME, kn1);
         //-------------------------Основной эжектор
         MainEjectorsWithCooler mainEjector = new MainEjectorsWithCooler("Основной Эжектор", 0.15, 2, 1.22, kn1);
@@ -66,7 +65,7 @@ public class Main {
         SealEjectorsWithCooler sealEjector = new SealEjectorsWithCooler("Эжектор Уплотнений", 0.15, 6, 1.06, mainEjector);
         elementsMap.put(sealEjector.NAME, sealEjector);
         //-------------------------Конденсатный насос 2
-        Pumps kn2 = new Pumps("КНII", 0.78, 1.0, sealEjector);
+        Pumps kn2 = new Pumps("КНII", 0.78, 1.0, sealEjector, true);
         elementsMap.put(kn2.NAME, kn2);
         //-------------------------ПНД1
         Heaters pnd1 = new Heaters("ПНД1", 1, 0.15, NaN, 2.5, 4,
@@ -97,7 +96,7 @@ public class Main {
                 cnd, pnd3);
         elementsMap.put(pnd4.NAME, pnd4);
         //-----------------------ПН
-        Pumps pn = new Pumps("ПН", 0.89, 8.9, d);
+        Pumps pn = new Pumps("ПН", 0.89, 8.9, d, false);
         elementsMap.put(pn.NAME, pn);
         //-----------------------ПВД5
         Heaters pvd5 = new Heaters("ПВД5", 5, 0.4, 5, 5, 3,
@@ -130,7 +129,7 @@ public class Main {
         elementsMap.put(t3.NAME, t3);
         //---------------------ТП
         TurboDrive turboDrive = new TurboDrive("ТП", 0.96, 0.73, 0.004, 1786.1,
-                pn, 0,cnd
+                pn, 0, cnd
         );
         elementsMap.put(turboDrive.NAME, turboDrive);
         //-------------------------------------------
@@ -356,6 +355,10 @@ public class Main {
         for (Vertex vertex : vertexArrayList) {
             vertex.element.describe();
         }
+
+        ThermalEfficiencyIndicators thermalEfficiencyIndicators =
+                theGraph.dfsAndCalculationOfThermalEfficiencyIndicators(0.988, 0.99);
+        thermalEfficiencyIndicators.describe();
         /*Map<Integer,int[][]> map = theGraph.getAdjMat();
         for (Map.Entry<Integer, int[][]> entry : map.entrySet()) {
             System.out.println(entry.getKey());
@@ -370,7 +373,7 @@ public class Main {
 
     }
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
         Map<String, Elements> elementsMap = new Main().initializationOfElements();
         new Main().runGraph(elementsMap);

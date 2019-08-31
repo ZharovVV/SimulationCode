@@ -1,11 +1,10 @@
 package com.example.thermal_circuit_simulation.Elements;
 
+import com.example.thermal_circuit_simulation.Elements.Seals.ValveStemSeals;
 import com.example.thermal_circuit_simulation.Graph.Graph;
-import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Consumptions;
-import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Equation;
-import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.MatrixCompilation;
-import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Matrices;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.*;
 import com.example.thermal_circuit_simulation.Graph.Vertex;
+import com.example.thermal_circuit_simulation.ThermalEfficiencyIndicators.ThermalEfficiencyIndicators;
 import com.hummeling.if97.IF97;
 
 import java.util.ArrayList;
@@ -13,16 +12,19 @@ import java.util.Map;
 
 import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 
-public class TurbineCylinders extends Elements implements MatrixCompilation {
+public class TurbineCylinders extends Elements implements MatrixCompilation, CalculationOfThermalEfficiencyIndicators {
     public final int NUMBER_OF_SELECTIONS;                                                  // Число отборов в турбине
     private ArrayList<Parameters> listOfParametersInSelections;                             // Список параметров отбора, включая параметры на входе и выходе из цилиндра
 
     private Equation materialBalanceEquation = new Equation(this);
 
+    private ArrayList<Consumptions> listOfConsumptionThroughTheCompartmentOfThisTurbine;
+
     public TurbineCylinders(String name, int numberOfSelections) {
         super(name);
         this.NUMBER_OF_SELECTIONS = numberOfSelections;
         listOfParametersInSelections = new ArrayList<>(numberOfSelections + 2);
+        listOfConsumptionThroughTheCompartmentOfThisTurbine = new ArrayList<>();
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -185,6 +187,98 @@ public class TurbineCylinders extends Elements implements MatrixCompilation {
                     TurboDrive turboDrive = (TurboDrive) element;
                     freeMemoryMatrix[indexOfListOfEquation] += (-1) * relations * turboDrive.getSteamConsumption();
                 }
+            }
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Override
+    public void calculationOfThermalEfficiencyIndicators(int v, ThermalEfficiencyIndicators thermalEfficiencyIndicators, Graph theGraph) {
+        //--------------------------Инициализация-----------------------------------------------------------------------
+        int nVerts = theGraph.getnVerts();
+        Map<Integer, int[][]> adjMat = theGraph.getAdjMat();
+        ArrayList<Vertex> vertexList = theGraph.getVertexList();
+        ArrayList<Consumptions> listOfConsumptionThroughTheCompartment = thermalEfficiencyIndicators.getListOfConsumptionThroughTheCompartment();
+        ArrayList<Double> listOfHeatTransferCompartments = thermalEfficiencyIndicators.getListOfHeatTransferCompartments();
+
+
+        for (Parameters parametersInSelection : listOfParametersInSelections) {
+            int index = listOfParametersInSelections.indexOf(parametersInSelection);
+            if (index < listOfParametersInSelections.size() - 1) {
+                double heatTransfer = parametersInSelection.enthalpy - listOfParametersInSelections.get(index + 1).enthalpy;
+                if (heatTransfer != 0.0) {
+                    Consumptions consumption = new Consumptions();
+                    listOfConsumptionThroughTheCompartmentOfThisTurbine.add(consumption);
+                    int i = listOfConsumptionThroughTheCompartmentOfThisTurbine.indexOf(consumption);
+                    listOfConsumptionThroughTheCompartment.add(listOfConsumptionThroughTheCompartmentOfThisTurbine.get(i));
+                    listOfHeatTransferCompartments.add(heatTransfer);
+                }
+            }
+        }
+
+
+        for (int j = 0; j < nVerts; j++) {
+            int relations = adjMat.get(SUPERHEATED_STEAM)[v][j];
+            if (relations == -1 || relations == 1) {
+                Elements element = vertexList.get(j).element;
+
+                if (element.getClass() == Superheaters.class) {
+                    Superheaters superheater = (Superheaters) element;
+                    listOfConsumptionThroughTheCompartmentOfThisTurbine.get(0).consumptionValue += relations * superheater.getConsumptionOfHeatedMedium().consumptionValue;
+                }
+
+                if (element.getClass() == TurboDrive.class) {
+                    TurboDrive turboDrive = (TurboDrive) element;
+                    listOfConsumptionThroughTheCompartmentOfThisTurbine.get(0).consumptionValue += relations * turboDrive.getSteamConsumption();
+                }
+            }
+        }
+
+        for (int j = 0; j < nVerts; j++) {
+            int relations = adjMat.get(HEATING_STEAM)[v][j];
+            if (relations == -1 || relations == 1) {
+                Elements element = vertexList.get(j).element;
+
+                if (element.getClass() == SteamGenerator.class) {
+                    SteamGenerator steamGenerator = (SteamGenerator) element;
+                    listOfConsumptionThroughTheCompartmentOfThisTurbine.get(0).consumptionValue += relations * steamGenerator.getSteamСonsumption();
+                }
+
+                if (element.getClass() == ValveStemSeals.class) {
+                    ValveStemSeals valveStemSeal = (ValveStemSeals) element;
+                    double sealConsumption = valveStemSeal.getElementContributionToSteamConsumptionInSeals().get(this);
+                    listOfConsumptionThroughTheCompartmentOfThisTurbine.get(0).consumptionValue += relations * sealConsumption;
+                }
+
+                if (element.getClass() == TurboDrive.class) {
+                    TurboDrive turboDrive = (TurboDrive) element;
+                    int index = turboDrive.getSelectionNumber();
+                    listOfConsumptionThroughTheCompartmentOfThisTurbine.get(index).consumptionValue += relations * turboDrive.getSteamConsumption();
+                }
+
+                if (element.getClass() == Superheaters.class) {
+                    Superheaters superheater = (Superheaters) element;
+                    int selectionNumber = superheater.getSelectionNumber();
+                    listOfConsumptionThroughTheCompartmentOfThisTurbine.get(selectionNumber).consumptionValue +=
+                            relations * superheater.getConsumptionOfHeatingSteam().consumptionValue;
+                }
+
+                if (element.getClass() == Heaters.class) {
+                    Heaters heater = (Heaters) element;
+                    int selectionNumber = heater.getSelectionNumber();
+                    if (selectionNumber < listOfConsumptionThroughTheCompartmentOfThisTurbine.size()) {
+                        listOfConsumptionThroughTheCompartmentOfThisTurbine.get(selectionNumber).consumptionValue +=
+                                relations * heater.getConsumptionOfHeatingSteam().consumptionValue;
+                    }
+                }
+
+            }
+        }
+
+        for (Consumptions consumptions : listOfConsumptionThroughTheCompartmentOfThisTurbine) {
+            int index = listOfConsumptionThroughTheCompartmentOfThisTurbine.indexOf(consumptions);
+            if (index > 0) {
+                consumptions.consumptionValue += listOfConsumptionThroughTheCompartmentOfThisTurbine.get(index - 1).consumptionValue;
             }
         }
     }

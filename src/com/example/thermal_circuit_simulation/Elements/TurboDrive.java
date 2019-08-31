@@ -10,6 +10,7 @@ public class TurboDrive extends Elements {
     private double steamConsumption;            // Расход пара через ТП
     private double inletEnthalpy;
     private double outletEnthalpy;
+    private int selectionNumber;
 
 
     public TurboDrive(String name,
@@ -42,6 +43,7 @@ public class TurboDrive extends Elements {
                       int selectionNumber,
                       TurbineCylinders turbineCylinder) {
         super(name);
+        this.selectionNumber = selectionNumber;
         this.mechanicalEfficiency = mechanicalEfficiency;
         this.relativeInternalEfficiency = relativeInternalEfficiency;
         this.condenserPressure = condenserPressure;
@@ -58,6 +60,10 @@ public class TurboDrive extends Elements {
 
     public double getSteamConsumption() {
         return steamConsumption;
+    }
+
+    public int getSelectionNumber() {
+        return selectionNumber;
     }
 
     @Override

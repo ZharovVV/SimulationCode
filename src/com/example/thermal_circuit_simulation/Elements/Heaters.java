@@ -172,6 +172,10 @@ public class Heaters extends Elements implements MatrixCompilation {
         return temperatureOfSteamDrain;
     }
 
+    public int getSelectionNumber() {
+        return selectionNumber;
+    }
+
     public double getCoefficient() {
         return coefficient;
     }

@@ -3,11 +3,9 @@ package com.example.thermal_circuit_simulation.Elements;
 import com.example.thermal_circuit_simulation.Elements.Ejectors.MainEjectorsWithCooler;
 import com.example.thermal_circuit_simulation.Elements.Ejectors.SealEjectorsWithCooler;
 import com.example.thermal_circuit_simulation.Graph.Graph;
-import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Consumptions;
-import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Equation;
-import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.MatrixCompilation;
-import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Matrices;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.*;
 import com.example.thermal_circuit_simulation.Graph.Vertex;
+import com.example.thermal_circuit_simulation.ThermalEfficiencyIndicators.ThermalEfficiencyIndicators;
 import com.hummeling.if97.IF97;
 
 import java.util.ArrayList;
@@ -15,7 +13,7 @@ import java.util.Map;
 
 import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 
-public class Pumps extends Elements implements MatrixCompilation {
+public class Pumps extends Elements implements MatrixCompilation, CalculationOfThermalEfficiencyIndicators {
     private double efficiency;              // КПД насоса
     private double pumpHead;                // Необходимый напор насоса
 
@@ -26,20 +24,22 @@ public class Pumps extends Elements implements MatrixCompilation {
     private double outletTemperature;       // Температура на выходе из насоса
     private double outletPressure;          // Давление на выходе из насоса
     private double outletEnthalpy;          // Энтальпия на выходе из насоса
+    private boolean isThePumpDriveElectric; // Привод насоса электрический ?
 
     private Consumptions consumptionOfWater = new Consumptions();
     private Equation materialBalanceEquation = new Equation(this);
 
-    public Pumps(String name, double efficiency, double pumpHead, Elements previousElement) {
+    public Pumps(String name, double efficiency, double pumpHead, Elements previousElement, boolean isThePumpDriveElectric) {
         super(name);
         this.efficiency = efficiency;
         this.pumpHead = pumpHead;
+        this.isThePumpDriveElectric = isThePumpDriveElectric;
         if (previousElement.getClass() == Heaters.class) {                          // Если предыдущий элемент - подогреватель
             Heaters previousHeater = (Heaters) previousElement;
             this.inletTemperature = previousHeater.getTemperatureOfHeatedMedium();
             this.inletPressure = previousHeater.getPressureOfHeatedMedium();
             this.inletEnthalpy = previousHeater.getEnthalpyOfHeatedMedium();
-        } else if (previousElement.getClass() == Condenser.class) {                                                                    // Если предыдущий элемент - конденсатор
+        } else if (previousElement.getClass() == Condenser.class) {                 // Если предыдущий элемент - конденсатор
             Condenser condenser = (Condenser) previousElement;
             this.inletTemperature = condenser.getTemperatureOfSteamDrain();
             this.inletPressure = condenser.getPressureOfSteamDrain();
@@ -70,6 +70,7 @@ public class Pumps extends Elements implements MatrixCompilation {
     public Pumps(String name, boolean isDrainagePump, double efficiency, double pumpHead, Heaters previousHeaterOnSteamDrainLine) {
         super(name);
         if (isDrainagePump) {
+            this.isThePumpDriveElectric = true;
             this.efficiency = efficiency;
             this.pumpHead = pumpHead;
             this.inletTemperature = previousHeaterOnSteamDrainLine.getTemperatureOfSteamDrain();
@@ -222,5 +223,12 @@ public class Pumps extends Elements implements MatrixCompilation {
             }
         }
         //--------------------------------------------------------------------------------------------------------------
+    }
+
+    @Override
+    public void calculationOfThermalEfficiencyIndicators(int v, ThermalEfficiencyIndicators thermalEfficiencyIndicators, Graph theGraph) {
+        if (isThePumpDriveElectric) {
+            // TODO: 01.09.2019 дописать код!!!
+        }
     }
 }

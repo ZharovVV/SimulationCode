@@ -127,6 +127,10 @@ public class Superheaters extends Elements implements MatrixCompilation {
         return coefficient;
     }
 
+    public int getSelectionNumber() {
+        return selectionNumber;
+    }
+
     public Consumptions getConsumptionOfHeatingSteam() {
         return consumptionOfHeatingSteam;
     }
