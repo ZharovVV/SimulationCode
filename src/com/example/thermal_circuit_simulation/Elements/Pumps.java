@@ -16,7 +16,7 @@ import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 public class Pumps extends Elements implements MatrixCompilation, CalculationOfThermalEfficiencyIndicators {
     private double efficiency;              // КПД насоса
     private double pumpHead;                // Необходимый напор насоса
-
+    private double pumpDriveEfficiency;     // КПД привода насоса (Если используется турбопривод, то имеется в виду механический КПД
     private double inletTemperature;        // Температура на входе в насос
     private double inletPressure;           // Давление на входе в насос
     private double inletEnthalpy;           // Энтальпия на входе в насос
@@ -29,9 +29,10 @@ public class Pumps extends Elements implements MatrixCompilation, CalculationOfT
     private Consumptions consumptionOfWater = new Consumptions();
     private Equation materialBalanceEquation = new Equation(this);
 
-    public Pumps(String name, double efficiency, double pumpHead, Elements previousElement, boolean isThePumpDriveElectric) {
+    public Pumps(String name, double efficiency, double pumpHead, Elements previousElement, boolean isThePumpDriveElectric, double pumpDriveEfficiency) {
         super(name);
         this.efficiency = efficiency;
+        this.pumpDriveEfficiency = pumpDriveEfficiency;
         this.pumpHead = pumpHead;
         this.isThePumpDriveElectric = isThePumpDriveElectric;
         if (previousElement.getClass() == Heaters.class) {                          // Если предыдущий элемент - подогреватель
@@ -67,11 +68,12 @@ public class Pumps extends Elements implements MatrixCompilation, CalculationOfT
     }
 
     // Конструктор для дренажного насоса
-    public Pumps(String name, boolean isDrainagePump, double efficiency, double pumpHead, Heaters previousHeaterOnSteamDrainLine) {
+    public Pumps(String name, boolean isDrainagePump, double efficiency, double pumpHead, Heaters previousHeaterOnSteamDrainLine, double pumpDriveEfficiency) {
         super(name);
         if (isDrainagePump) {
             this.isThePumpDriveElectric = true;
             this.efficiency = efficiency;
+            this.pumpDriveEfficiency = pumpDriveEfficiency;
             this.pumpHead = pumpHead;
             this.inletTemperature = previousHeaterOnSteamDrainLine.getTemperatureOfSteamDrain();
             this.inletPressure = previousHeaterOnSteamDrainLine.getPressureOfSteamDrain();
@@ -101,6 +103,10 @@ public class Pumps extends Elements implements MatrixCompilation, CalculationOfT
 
     public double getOutletEnthalpy() {
         return outletEnthalpy;
+    }
+
+    public double getPumpDriveEfficiency() {
+        return pumpDriveEfficiency;
     }
 
     public Consumptions getConsumptionOfWater() {
@@ -228,7 +234,7 @@ public class Pumps extends Elements implements MatrixCompilation, CalculationOfT
     @Override
     public void calculationOfThermalEfficiencyIndicators(int v, ThermalEfficiencyIndicators thermalEfficiencyIndicators, Graph theGraph) {
         if (isThePumpDriveElectric) {
-            // TODO: 01.09.2019 дописать код!!!
+            thermalEfficiencyIndicators.getMapOfPowerConsumptionForPumpDrive().put(this, enthalpyIncrease * consumptionOfWater.consumptionValue / pumpDriveEfficiency / 1000);
         }
     }
 }

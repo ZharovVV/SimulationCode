@@ -1,8 +1,11 @@
 package com.example.thermal_circuit_simulation.Elements;
 
+import com.example.thermal_circuit_simulation.Graph.Graph;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.CalculationOfThermalEfficiencyIndicators;
+import com.example.thermal_circuit_simulation.ThermalEfficiencyIndicators.ThermalEfficiencyIndicators;
 import com.hummeling.if97.IF97;
 
-public class HeatNetwork extends Elements {
+public class HeatNetwork extends Elements implements CalculationOfThermalEfficiencyIndicators {
     private double inletTemperature;            // Температура на входе в ТС
     private double inletPressure;               // Давление на входе в ТС
     private double inletEnthalpy;               // Энтальпия на входе в ТС
@@ -56,5 +59,10 @@ public class HeatNetwork extends Elements {
         System.out.println("Расход сетевой воды: " + networkWaterConsumption + " ,кг/c");
         System.out.println("------------------------------------------------------------------------------------------------------------------");
         System.out.println();
+    }
+
+    @Override
+    public void calculationOfThermalEfficiencyIndicators(int v, ThermalEfficiencyIndicators thermalEfficiencyIndicators, Graph theGraph) {
+        thermalEfficiencyIndicators.setThermalPowerOfHeatNetwork(thermalPowerOfHeatNetwork);
     }
 }

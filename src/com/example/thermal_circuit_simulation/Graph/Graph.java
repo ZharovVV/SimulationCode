@@ -78,6 +78,7 @@ public class Graph {
     public Matrices dfsAndMatrixCompilation() {
         Matrices matrices = new Matrices(vertexList);
         vertexList.get(0).wasVisited = true;
+        matrixCompilation(0, matrices);
         stack.add(0);
 
         while (!stack.isEmpty()) {
@@ -101,6 +102,7 @@ public class Graph {
     public ThermalEfficiencyIndicators dfsAndCalculationOfThermalEfficiencyIndicators(double generatorEfficiency, double mechanicalEfficiencyOfTurbogenerator) {
         ThermalEfficiencyIndicators thermalEfficiencyIndicators = new ThermalEfficiencyIndicators(generatorEfficiency, mechanicalEfficiencyOfTurbogenerator);
         vertexList.get(0).wasVisited = true;
+        calculationOfThermalEfficiencyIndicators(0, thermalEfficiencyIndicators);
         stack.add(0);
 
         while (!stack.isEmpty()) {
@@ -120,12 +122,18 @@ public class Graph {
 
         thermalEfficiencyIndicators.calculationOfInternalCompartmentPower();
         thermalEfficiencyIndicators.calculationOfGuaranteedElectricPower();
+        thermalEfficiencyIndicators.calculationOfElectricityConsumptionForOwnNeeds();
+        thermalEfficiencyIndicators.calculationOfHeatConsumptionForATurbineForElectricityGeneration();
+        thermalEfficiencyIndicators.calculationOfSpecificGrossHeatConsumptionForElectricityProduction();
+        thermalEfficiencyIndicators.calculationOfElectricalEfficiency();
 
         return thermalEfficiencyIndicators;
     }
 
+    @SuppressWarnings("ConstantConditions")
     private void calculationOfThermalEfficiencyIndicators(int v, ThermalEfficiencyIndicators thermalEfficiencyIndicators) {
         Elements element = vertexList.get(v).element;
+        // TODO: 01.09.2019 Переделать метод! Можно написать проще.
         if (element.getClass() == TurbineCylinders.class) {
             TurbineCylinders turbineCylinder = (TurbineCylinders) element;
             turbineCylinder.calculationOfThermalEfficiencyIndicators(v, thermalEfficiencyIndicators, this);
@@ -134,6 +142,21 @@ public class Graph {
         if (element.getClass() == Pumps.class) {
             Pumps pump = (Pumps) element;
             pump.calculationOfThermalEfficiencyIndicators(v, thermalEfficiencyIndicators, this);
+        }
+
+        if (element.getClass() == SteamGenerator.class) {
+            SteamGenerator steamGenerator = (SteamGenerator) element;
+            steamGenerator.calculationOfThermalEfficiencyIndicators(v, thermalEfficiencyIndicators, this);
+        }
+
+        if (element.getClass() == HeatNetwork.class) {
+            HeatNetwork heatNetwork = (HeatNetwork) element;
+            heatNetwork.calculationOfThermalEfficiencyIndicators(v, thermalEfficiencyIndicators, this);
+        }
+
+        if (element.getClass() == TurboDrive.class) {
+            TurboDrive turboDrive = (TurboDrive) element;
+            turboDrive.calculationOfThermalEfficiencyIndicators(v, thermalEfficiencyIndicators, this);
         }
 
     }
@@ -175,6 +198,12 @@ public class Graph {
     @SuppressWarnings("ConstantConditions")
     private void matrixCompilation(int v, Matrices matrices) {
         Elements element = vertexList.get(v).element;
+        // TODO: 01.09.2019 Переделать метод! Можно написать проще.
+        if (element.getClass() == SteamGenerator.class) {
+            SteamGenerator steamGenerator = (SteamGenerator) element;
+            steamGenerator.matrixCompilation(v, matrices, this);
+        }
+
         if (element.getClass() == TurbineCylinders.class) {
             TurbineCylinders turbineCylinder = (TurbineCylinders) element;
             turbineCylinder.matrixCompilation(v, matrices, this);

@@ -98,7 +98,7 @@ public class TurbineCylinders extends Elements implements MatrixCompilation, Cal
                 Elements element = vertexList.get(j).element;
                 if (element.getClass() == SteamGenerator.class) {
                     SteamGenerator steamGenerator = (SteamGenerator) element;
-                    freeMemoryMatrix[indexOfListOfEquation] += (-1) * relations * steamGenerator.getSteamСonsumption();
+                    freeMemoryMatrix[indexOfListOfEquation] += (-1) * relations * steamGenerator.getSteamConsumption();
                 }
 
                 if (element.getClass() == Superheaters.class) {
@@ -145,7 +145,7 @@ public class TurbineCylinders extends Elements implements MatrixCompilation, Cal
                 Elements element = vertexList.get(j).element;
                 if (element.getClass() == SteamGenerator.class) {
                     SteamGenerator steamGenerator = (SteamGenerator) element;
-                    freeMemoryMatrix[indexOfListOfEquation] += (-1) * relations * steamGenerator.getSteamСonsumption();
+                    freeMemoryMatrix[indexOfListOfEquation] += (-1) * relations * steamGenerator.getSteamConsumption();
                 }
 
                 if (element.getClass() == Superheaters.class) {
@@ -241,7 +241,7 @@ public class TurbineCylinders extends Elements implements MatrixCompilation, Cal
 
                 if (element.getClass() == SteamGenerator.class) {
                     SteamGenerator steamGenerator = (SteamGenerator) element;
-                    listOfConsumptionThroughTheCompartmentOfThisTurbine.get(0).consumptionValue += relations * steamGenerator.getSteamСonsumption();
+                    listOfConsumptionThroughTheCompartmentOfThisTurbine.get(0).consumptionValue += relations * steamGenerator.getSteamConsumption();
                 }
 
                 if (element.getClass() == ValveStemSeals.class) {

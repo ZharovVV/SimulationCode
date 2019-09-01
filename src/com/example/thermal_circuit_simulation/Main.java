@@ -18,7 +18,7 @@ public class Main {
     public Map<String, Elements> initializationOfElements() {
         Map<String, Elements> elementsMap = new HashMap<>();
         //--------------------------ПГ
-        SteamGenerator pg = new SteamGenerator("ПГ", 1786.1);
+        SteamGenerator pg = new SteamGenerator("ПГ", 1720);   //1786.1
         elementsMap.put(pg.NAME, pg);
 
         //--------------------------ЦСД
@@ -56,7 +56,7 @@ public class Main {
         Deaerator d = new Deaerator("Деаэратор", 0.69, 3, csd);
         elementsMap.put(d.NAME, d);
         //-------------------------Конденсатный насос 1
-        Pumps kn1 = new Pumps("КНI", 0.78, 0.9, condenser, true);
+        Pumps kn1 = new Pumps("КНI", 0.78, 0.9, condenser, true, 0.86);
         elementsMap.put(kn1.NAME, kn1);
         //-------------------------Основной эжектор
         MainEjectorsWithCooler mainEjector = new MainEjectorsWithCooler("Основной Эжектор", 0.15, 2, 1.22, kn1);
@@ -65,14 +65,14 @@ public class Main {
         SealEjectorsWithCooler sealEjector = new SealEjectorsWithCooler("Эжектор Уплотнений", 0.15, 6, 1.06, mainEjector);
         elementsMap.put(sealEjector.NAME, sealEjector);
         //-------------------------Конденсатный насос 2
-        Pumps kn2 = new Pumps("КНII", 0.78, 1.0, sealEjector, true);
+        Pumps kn2 = new Pumps("КНII", 0.78, 1.0, sealEjector, true, 0.86);
         elementsMap.put(kn2.NAME, kn2);
         //-------------------------ПНД1
         Heaters pnd1 = new Heaters("ПНД1", 1, 0.15, NaN, 2.5, 4,
                 cnd, kn2);
         elementsMap.put(pnd1.NAME, pnd1);
         //-------------------------ДН1
-        Pumps dn1 = new Pumps("ДН1", true, 0.76, 2, pnd1);
+        Pumps dn1 = new Pumps("ДН1", true, 0.76, 2, pnd1, 0.86);
         elementsMap.put(dn1.NAME, dn1);
         //-------------------------См1
         MixingPoints sm1 = new MixingPoints("См1", pnd1);
@@ -86,7 +86,7 @@ public class Main {
                 cnd, pnd2);
         elementsMap.put(pnd3.NAME, pnd3);
         //------------------------ДН2
-        Pumps dn2 = new Pumps("ДН2", true, 0.76, 1.5, pnd3);
+        Pumps dn2 = new Pumps("ДН2", true, 0.76, 1.5, pnd3, 0.86);
         elementsMap.put(dn2.NAME, dn2);
         //------------------------См2
         MixingPoints sm2 = new MixingPoints("См2", pnd3);
@@ -96,7 +96,7 @@ public class Main {
                 cnd, pnd3);
         elementsMap.put(pnd4.NAME, pnd4);
         //-----------------------ПН
-        Pumps pn = new Pumps("ПН", 0.89, 8.9, d, false);
+        Pumps pn = new Pumps("ПН", 0.89, 8.9, d, false, 0.96);
         elementsMap.put(pn.NAME, pn);
         //-----------------------ПВД5
         Heaters pvd5 = new Heaters("ПВД5", 5, 0.4, 5, 5, 3,
@@ -128,9 +128,7 @@ public class Main {
                 cnd, t2);
         elementsMap.put(t3.NAME, t3);
         //---------------------ТП
-        TurboDrive turboDrive = new TurboDrive("ТП", 0.96, 0.73, 0.004, 1786.1,
-                pn, 0, cnd
-        );
+        TurboDrive turboDrive = new TurboDrive("ТП", 0.73, 0.004, 1720, pn, 0, cnd); //1786.1
         elementsMap.put(turboDrive.NAME, turboDrive);
         //-------------------------------------------
 

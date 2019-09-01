@@ -102,8 +102,8 @@ public class TurbineShaftSeals extends Elements implements MatrixCompilation {
         for (Map.Entry<Elements, Double> elementsDoubleEntry : elementContributionToSteamConsumptionInSeals.entrySet()) {
             System.out.println("Элемент схемы: " + elementsDoubleEntry.getKey().NAME +
                     " Расход пара из (в) уплотнения: " + elementContributionToSteamConsumptionInSeals.get(elementsDoubleEntry.getKey()));
-            System.out.println("------------------------------------------------------------------------------------------------------------------");
-            System.out.println();
         }
+        System.out.println("------------------------------------------------------------------------------------------------------------------");
+        System.out.println();
     }
 }
