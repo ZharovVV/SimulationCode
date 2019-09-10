@@ -1,15 +1,15 @@
 package com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces;
 
-import com.example.thermal_circuit_simulation.Elements.Elements;
+import com.example.thermal_circuit_simulation.Elements.Element;
 
 public class Equation {
-    private Elements element;
+    private Element element;
 
-    public Equation(Elements element) {
+    public Equation(Element element) {
         this.element = element;
     }
 
-    public Elements getElement() {
+    public Element getElement() {
         return element;
     }
 }

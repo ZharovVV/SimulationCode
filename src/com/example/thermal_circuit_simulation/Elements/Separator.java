@@ -14,7 +14,7 @@ import java.util.Map;
 import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 
 
-public class Separator extends Elements implements MatrixCompilation {
+public class Separator extends Element implements MatrixCompilation {
     //------------------------------Характеристики сепаратора-----------------------------------------------------------
     private double hydraulicResistanceFromCylinderToSeparator;    // Гидравлическое сопротивление от отбора до сепаратора
     private double outletDegreeOfDryness;                         // Степень сухости на выходе из сепаратора
@@ -37,21 +37,43 @@ public class Separator extends Elements implements MatrixCompilation {
     private Equation materialBalanceEquation = new Equation(this);
     private Equation heatBalanceEquation = new Equation(this);
 
-    public Separator(String name, double hydraulicResistanceFromCylinderToSeparator, double outletDegreeOfDryness, TurbineCylinders turbineCylinder) {
+    public Separator(String name, double hydraulicResistanceFromCylinderToSeparator, double outletDegreeOfDryness) {
         super(name);
         this.hydraulicResistanceFromCylinderToSeparator = hydraulicResistanceFromCylinderToSeparator;
         this.outletDegreeOfDryness = outletDegreeOfDryness;
-        this.pressureOfHeatingSteam =
-                turbineCylinder.parametersInSelection(turbineCylinder.NUMBER_OF_SELECTIONS + 1).getPressure() - hydraulicResistanceFromCylinderToSeparator;
+    }
+
+    @Override
+    public void calculationOfInitialParameters(int v, Graph theGraph) {
+        //--------------------------Инициализация-----------------------------------------------------------------------
+        int nVerts = theGraph.getnVerts();
+        Map<Integer, int[][]> adjMat = theGraph.getAdjMat();
+        ArrayList<Vertex> vertexList = theGraph.getVertexList();
         IF97 waterSteam = new IF97(IF97.UnitSystem.DEFAULT);
-        this.temperatureOfHeatingSteam = waterSteam.saturationTemperatureP(pressureOfHeatingSteam) - 273.15;
-        this.enthalpyOfHeatingSteam = turbineCylinder.parametersInSelection(turbineCylinder.NUMBER_OF_SELECTIONS + 1).getEnthalpy();
-        this.pressureOfSteamDrain = pressureOfHeatingSteam;
-        this.temperatureOfSteamDrain = temperatureOfHeatingSteam;
-        this.enthalpyOfSteamDrain = waterSteam.specificEnthalpySaturatedLiquidP(pressureOfSteamDrain);
-        this.pressureOfHeatedMedium = pressureOfSteamDrain;
-        this.temperatureOfHeatedMedium = temperatureOfHeatingSteam;
-        this.enthalpyOfHeatedMedium = waterSteam.specificEnthalpyPX(pressureOfHeatingSteam,outletDegreeOfDryness);
+        //----------------------------------------------------------------------------------------------------------
+
+        //--------------------------------Связи с элементами по линии греющего пара---------------------------------
+        for (int j = 0; j < nVerts; j++) {
+            int relations = adjMat.get(HEATING_STEAM)[v][j];
+            if (relations == -1 || relations == 1) {
+                Element element = vertexList.get(j).element;
+
+                if (element.getClass() == TurbineCylinder.class && relations == 1) {
+                    TurbineCylinder turbineCylinder = (TurbineCylinder) element;
+                    this.pressureOfHeatingSteam =
+                            turbineCylinder.parametersInSelection(turbineCylinder.NUMBER_OF_SELECTIONS + 1).getPressure() - hydraulicResistanceFromCylinderToSeparator;
+                    this.temperatureOfHeatingSteam = waterSteam.saturationTemperatureP(pressureOfHeatingSteam) - 273.15;
+                    this.enthalpyOfHeatingSteam = turbineCylinder.parametersInSelection(turbineCylinder.NUMBER_OF_SELECTIONS + 1).getEnthalpy();
+                    this.pressureOfSteamDrain = pressureOfHeatingSteam;
+                    this.temperatureOfSteamDrain = temperatureOfHeatingSteam;
+                    this.enthalpyOfSteamDrain = waterSteam.specificEnthalpySaturatedLiquidP(pressureOfSteamDrain);
+                    this.pressureOfHeatedMedium = pressureOfSteamDrain;
+                    this.temperatureOfHeatedMedium = temperatureOfHeatingSteam;
+                    this.enthalpyOfHeatedMedium = waterSteam.specificEnthalpyPX(pressureOfHeatingSteam,outletDegreeOfDryness);
+                }
+            }
+        }
+        //--------------------------------------------------------------------------------------------------------------
     }
 
     public double getPressureOfHeatedMedium() {
@@ -141,14 +163,14 @@ public class Separator extends Elements implements MatrixCompilation {
             int relations = adjMat.get(SUPERHEATED_STEAM)[v][j];
             int separatorIndexOfListConsumption = listOfConsumptions.indexOf(this.getConsumptionOfHeatedMedium());
             if (relations == -1 || relations == 1) {
-                Elements element = vertexList.get(j).element;
+                Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Superheaters.class) {
+                if (element.getClass() == Superheater.class) {
                     coefficientMatrix[materialBalanceEquation][separatorIndexOfListConsumption] = relations;
                     coefficientMatrix[heatBalanceEquation][separatorIndexOfListConsumption] = relations * this.getEnthalpyOfHeatedMedium();
                 }
 
-                if (element.getClass() == TurbineCylinders.class) {
+                if (element.getClass() == TurbineCylinder.class) {
                     coefficientMatrix[materialBalanceEquation][separatorIndexOfListConsumption] = relations;
                     if (relations == 1) {
                         coefficientMatrix[heatBalanceEquation][separatorIndexOfListConsumption] = relations * this.getEnthalpyOfHeatingSteam();
@@ -165,8 +187,8 @@ public class Separator extends Elements implements MatrixCompilation {
             int relations = adjMat.get(HEATING_STEAM)[v][j];
             int separatorIndexOfListConsumption = listOfConsumptions.indexOf(this.getConsumptionOfHeatingSteam());
             if (relations == -1 || relations == 1) {
-                Elements element = vertexList.get(j).element;
-                if (element.getClass() == TurbineCylinders.class) {
+                Element element = vertexList.get(j).element;
+                if (element.getClass() == TurbineCylinder.class) {
                     coefficientMatrix[materialBalanceEquation][separatorIndexOfListConsumption] = relations;
                     if (relations == 1) {
                         coefficientMatrix[heatBalanceEquation][separatorIndexOfListConsumption] = relations * this.getEnthalpyOfHeatingSteam();
@@ -184,9 +206,9 @@ public class Separator extends Elements implements MatrixCompilation {
             int separatorIndexOfListConsumption = listOfConsumptions.indexOf(this.getConsumptionOfSteamDrain());
 
             if (relations == -1 || relations == 1) {
-                Elements element = vertexList.get(j).element;
+                Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Heaters.class) {
+                if (element.getClass() == Heater.class) {
                     coefficientMatrix[materialBalanceEquation][separatorIndexOfListConsumption] = relations;
                     coefficientMatrix[heatBalanceEquation][separatorIndexOfListConsumption] = relations * this.getEnthalpyOfSteamDrain();
                 }

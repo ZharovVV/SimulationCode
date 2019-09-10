@@ -14,7 +14,7 @@ import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 /**
  * Основной эжектор с охладителем пара эжектора
  */
-public class MainEjectorsWithCooler extends Elements implements MatrixCompilation {
+public class MainEjectorWithCooler extends Element implements MatrixCompilation {
 
     private double hydraulicResistanceInCooler;                 // Гидравлическое сопротивление в охладителе пара эжектора
     private double enthalpyIncrease;                            // Повышение энтальпии
@@ -33,29 +33,51 @@ public class MainEjectorsWithCooler extends Elements implements MatrixCompilatio
     private Consumptions consumptionOfWater = new Consumptions();
     private Equation materialBalanceEquation = new Equation(this);
 
-    public MainEjectorsWithCooler(String name, double hydraulicResistanceInCooler, double enthalpyIncrease, double highPressureFlow, Elements previousElement) {
+    public MainEjectorWithCooler(String name, double hydraulicResistanceInCooler, double enthalpyIncrease, double highPressureFlow) {
         super(name);
         this.hydraulicResistanceInCooler = hydraulicResistanceInCooler;
         this.enthalpyIncrease = enthalpyIncrease;
         this.highPressureFlow = highPressureFlow;
         this.outputFlow = highPressureFlow;
-        if (previousElement.getClass() == Pumps.class) {
-            Pumps pump = (Pumps) previousElement;
-            this.inletPressure = pump.getOutletPressure();
-            this.inletTemperature = pump.getOutletTemperature();
-            this.inletEnthalpy = pump.getOutletEnthalpy();
-        } else if (previousElement.getClass() == SealEjectorsWithCooler.class) {
-            SealEjectorsWithCooler sealEjectorWithCooler = (SealEjectorsWithCooler) previousElement;
-            this.inletPressure = sealEjectorWithCooler.getOutletPressure();
-            this.inletTemperature = sealEjectorWithCooler.getOutletTemperature();
-            this.inletEnthalpy = sealEjectorWithCooler.getOutletEnthalpy();
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Override
+    public void calculationOfInitialParameters(int v, Graph theGraph) {
+        // TODO: 10.09.2019 instanceof
+        //--------------------------Инициализация-----------------------------------------------------------------------
+        int nVerts = theGraph.getnVerts();
+        Map<Integer, int[][]> adjMat = theGraph.getAdjMat();
+        ArrayList<Vertex> vertexList = theGraph.getVertexList();
+        IF97 waterSteam = new IF97(IF97.UnitSystem.DEFAULT);
+        //--------------------------------------------------------------------------------------------------------------
+
+        //--------------------------------Связи с элементами по линии питательной воды----------------------------------
+        for (int j = 0; j < nVerts; j++) {
+            int relations = adjMat.get(FEED_WATER)[v][j];
+            if (relations == 1) {
+                Element element = vertexList.get(j).element;
+
+                if (element instanceof Pump) {
+                    Pump pump = (Pump) element;
+                    this.inletPressure = pump.getOutletPressure();
+                    this.inletTemperature = pump.getOutletTemperature();
+                    this.inletEnthalpy = pump.getOutletEnthalpy();
+                }
+
+                if (element.getClass() == SealEjectorWithCooler.class) {
+                    SealEjectorWithCooler sealEjectorWithCooler = (SealEjectorWithCooler) element;
+                    this.inletTemperature = sealEjectorWithCooler.getOutletTemperature();
+                    this.inletPressure = sealEjectorWithCooler.getOutletPressure();
+                    this.inletEnthalpy = sealEjectorWithCooler.getOutletEnthalpy();
+                }
+            }
         }
+        //--------------------------------------------------------------------------------------------------------------
+
         this.outletPressure = inletPressure - hydraulicResistanceInCooler;
         this.outletEnthalpy = inletEnthalpy + enthalpyIncrease;
-
-        IF97 waterSteam = new IF97(IF97.UnitSystem.DEFAULT);
         this.outletTemperature = waterSteam.temperaturePH(outletPressure, outletEnthalpy) - 273.15;
-
     }
 
     public double getOutletTemperature() {
@@ -95,7 +117,7 @@ public class MainEjectorsWithCooler extends Elements implements MatrixCompilatio
         for (int j = 0; j < nVerts; j++) {
             int relations = adjMat.get(HEATING_STEAM)[v][j];
             if (relations == -1 || relations == 1) {
-                Elements element = vertexList.get(j).element;
+                Element element = vertexList.get(j).element;
 
                 if (element.getClass() == Deaerator.class && relations == 1) {
                     Deaerator deaerator = (Deaerator) element;
@@ -116,7 +138,7 @@ public class MainEjectorsWithCooler extends Elements implements MatrixCompilatio
         for (int j = 0; j < nVerts; j++) {
             int relations = adjMat.get(STEAM_DRAIN)[v][j];
             if (relations == -1 || relations == 1) {
-                Elements element = vertexList.get(j).element;
+                Element element = vertexList.get(j).element;
 
                 if (element.getClass() == Condenser.class) {
                     Condenser condenser = (Condenser) element;
@@ -133,20 +155,20 @@ public class MainEjectorsWithCooler extends Elements implements MatrixCompilatio
             // Получение номера столбца расхода воды в охладителе
             int coolerIndexOfListConsumption = listOfConsumptions.indexOf(this.getConsumptionOfWater());
             if (relations == -1 || relations == 1) {
-                Elements element = vertexList.get(j).element;
+                Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Pumps.class) {
+                if (element.getClass() == Pump.class) {
                     if (relations == -1) {
                        coefficientMatrix[coolerMaterialBalanceEquationOnHeatedMediumLine][coolerIndexOfListConsumption] = relations;
                     } else {
-                        Pumps pump = (Pumps) element;
+                        Pump pump = (Pump) element;
                         // Получение номера столбца расхода воды насоса
                         int indexOfListConsumption = listOfConsumptions.indexOf(pump.getConsumptionOfWater());
                         coefficientMatrix[coolerMaterialBalanceEquationOnHeatedMediumLine][indexOfListConsumption] = relations;
                     }
                 }
 
-                if (element.getClass() == SealEjectorsWithCooler.class) {
+                if (element.getClass() == SealEjectorWithCooler.class) {
                     coefficientMatrix[coolerMaterialBalanceEquationOnHeatedMediumLine][coolerIndexOfListConsumption] = relations;
                 }
             }

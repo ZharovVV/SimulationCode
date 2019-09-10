@@ -1,6 +1,6 @@
 package com.example.thermal_circuit_simulation.ThermalEfficiencyIndicators;
 
-import com.example.thermal_circuit_simulation.Elements.Pumps;
+import com.example.thermal_circuit_simulation.Elements.Pump;
 import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Consumptions;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public class ThermalEfficiencyIndicators {
     /**
      * Расходы электроэнергии на привод насосов, МВт.
      */
-    private HashMap<Pumps, Double> mapOfPowerConsumptionForPumpDrive;
+    private HashMap<Pump, Double> mapOfPowerConsumptionForPumpDrive;
 
     /**
      * Расход электроэнергии на собственные нужды, МВт.
@@ -106,7 +106,7 @@ public class ThermalEfficiencyIndicators {
         return listOfHeatTransferCompartments;
     }
 
-    public HashMap<Pumps, Double> getMapOfPowerConsumptionForPumpDrive() {
+    public HashMap<Pump, Double> getMapOfPowerConsumptionForPumpDrive() {
         return mapOfPowerConsumptionForPumpDrive;
     }
 
@@ -171,8 +171,8 @@ public class ThermalEfficiencyIndicators {
 
         System.out.println();
         System.out.println("Расходы электроэнергии на приводы насосов: ");
-        for (Map.Entry<Pumps, Double> pumpsDoubleEntry : mapOfPowerConsumptionForPumpDrive.entrySet()) {
-            Pumps pump = pumpsDoubleEntry.getKey();
+        for (Map.Entry<Pump, Double> pumpsDoubleEntry : mapOfPowerConsumptionForPumpDrive.entrySet()) {
+            Pump pump = pumpsDoubleEntry.getKey();
             double power = mapOfPowerConsumptionForPumpDrive.get(pump);
             System.out.println(pump.NAME + " : " + power + " ,МВт");
         }

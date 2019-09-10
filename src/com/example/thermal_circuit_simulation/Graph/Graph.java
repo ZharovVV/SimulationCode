@@ -1,8 +1,8 @@
 package com.example.thermal_circuit_simulation.Graph;
 
 import com.example.thermal_circuit_simulation.Elements.*;
-import com.example.thermal_circuit_simulation.Elements.Ejectors.MainEjectorsWithCooler;
-import com.example.thermal_circuit_simulation.Elements.Ejectors.SealEjectorsWithCooler;
+import com.example.thermal_circuit_simulation.Elements.Ejectors.MainEjectorWithCooler;
+import com.example.thermal_circuit_simulation.Elements.Ejectors.SealEjectorWithCooler;
 import com.example.thermal_circuit_simulation.Elements.Seals.TurbineShaftSeals;
 import com.example.thermal_circuit_simulation.Elements.Seals.ValveStemSeals;
 import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Matrices;
@@ -21,6 +21,7 @@ public class Graph {
     public static final int HEATING_STEAM = 3;
     public static final int STEAM_DRAIN = 4;
     public static final int SUPERHEATED_STEAM = 5;
+    public static final int MECHANICAL_COMMUNICATION = 6;
     private Map<Integer, int[][]> adjMat;        // Матрица смежности для каждой среды
     private int nVerts; //Текущее количество вершин
     private ArrayDeque<Integer> stack;
@@ -33,6 +34,7 @@ public class Graph {
         adjMat.put(HEATING_STEAM, new int[MAX_VERTS][MAX_VERTS]);
         adjMat.put(STEAM_DRAIN, new int[MAX_VERTS][MAX_VERTS]);
         adjMat.put(SUPERHEATED_STEAM, new int[MAX_VERTS][MAX_VERTS]);
+        adjMat.put(MECHANICAL_COMMUNICATION, new int[MAX_VERTS][MAX_VERTS]);
         vertexList = new ArrayList<>();
         stack = new ArrayDeque<>();
     }
@@ -48,6 +50,16 @@ public class Graph {
         int end = vertexList.indexOf(finalVertex);
         matrix[start][end] = -1;
         matrix[end][start] = 1;
+    }
+
+    // Метод для связи между цилиндром и подогревателем
+    public void addEdge(int mediumType, Vertex initialVertex, int selectionNumber, Vertex finalVertex) {
+        int[][] matrix = adjMat.get(mediumType);
+        int start = vertexList.indexOf(initialVertex);
+        int end = vertexList.indexOf(finalVertex);
+        matrix[start][end] = -1;
+        matrix[end][start] = 1;
+        finalVertex.element.setSelectionNumber(selectionNumber);
     }
 
     public void displayVertex(int v) {
@@ -75,6 +87,32 @@ public class Graph {
         }
     }
 
+    public void dfsAndCalculationOfInitialParameters() {
+        vertexList.get(0).wasVisited = true;
+        calculationOfInitialParameters(0);
+        stack.add(0);
+
+        while (!stack.isEmpty()) {
+            int v = getAdjUnvisitedVertex(stack.peekLast());
+            if (v == -3) {          // Если такой вершины нет,
+                stack.pollLast();     // элемент извлекается из стека
+            } else {                // Если вершина найдена
+                vertexList.get(v).wasVisited = true;    // Пометка
+                calculationOfInitialParameters(v);      // Вычисление начальных параметров элемента
+                stack.addLast(v);                   // Занесение в стек
+            }
+        }
+
+        for (int i = 0; i < nVerts; i++) {
+            vertexList.get(i).wasVisited = false;
+        }
+    }
+
+    private void calculationOfInitialParameters(int v) {
+        Element element = vertexList.get(v).element;
+        element.calculationOfInitialParameters(v, this);
+    }
+
     public Matrices dfsAndMatrixCompilation() {
         Matrices matrices = new Matrices(vertexList);
         vertexList.get(0).wasVisited = true;
@@ -98,6 +136,77 @@ public class Graph {
 
         return matrices;
     }
+
+    @SuppressWarnings("ConstantConditions")
+    private void matrixCompilation(int v, Matrices matrices) {
+        Element element = vertexList.get(v).element;
+        // TODO: 01.09.2019 Переделать метод! Можно написать проще.
+        if (element.getClass() == SteamGenerator.class) {
+            SteamGenerator steamGenerator = (SteamGenerator) element;
+            steamGenerator.matrixCompilation(v, matrices, this);
+        }
+
+        if (element.getClass() == TurbineCylinder.class) {
+            TurbineCylinder turbineCylinder = (TurbineCylinder) element;
+            turbineCylinder.matrixCompilation(v, matrices, this);
+        }
+
+        if (element.getClass() == Separator.class) {
+            Separator separator = (Separator) element;
+            separator.matrixCompilation(v, matrices, this);
+        }
+
+        if (element.getClass() == Superheater.class) {
+            Superheater superheater = (Superheater) element;
+            superheater.matrixCompilation(v, matrices, this);
+        }
+
+        if (element.getClass() == Condenser.class) {
+            Condenser condenser = (Condenser) element;
+            condenser.matrixCompilation(v, matrices, this);
+        }
+
+        if (element.getClass() == Pump.class) {
+            Pump pump = (Pump) element;
+            pump.matrixCompilation(v, matrices, this);
+        }
+
+        if (element.getClass() == Heater.class) {
+            Heater heater = (Heater) element;
+            heater.matrixCompilation(v, matrices, this);
+        }
+
+        if (element.getClass() == Deaerator.class) {
+            Deaerator deaerator = (Deaerator) element;
+            deaerator.matrixCompilation(v, matrices, this);
+        }
+
+        if (element.getClass() == MixingPoint.class) {
+            MixingPoint mixingPoint = (MixingPoint) element;
+            mixingPoint.matrixCompilation(v, matrices, this);
+        }
+
+        if (element.getClass() == ValveStemSeals.class) {
+            ValveStemSeals valveStemSeal = (ValveStemSeals) element;
+            valveStemSeal.matrixCompilation(v, matrices, this);
+        }
+
+        if (element.getClass() == TurbineShaftSeals.class) {
+            TurbineShaftSeals turbineShaftSeal = (TurbineShaftSeals) element;
+            turbineShaftSeal.matrixCompilation(v, matrices, this);
+        }
+
+        if (element.getClass() == MainEjectorWithCooler.class) {
+            MainEjectorWithCooler mainEjectorWithCooler = (MainEjectorWithCooler) element;
+            mainEjectorWithCooler.matrixCompilation(v, matrices, this);
+        }
+
+        if (element.getClass() == SealEjectorWithCooler.class) {
+            SealEjectorWithCooler sealEjectorWithCooler = (SealEjectorWithCooler) element;
+            sealEjectorWithCooler.matrixCompilation(v, matrices, this);
+        }
+    }
+
 
     public ThermalEfficiencyIndicators dfsAndCalculationOfThermalEfficiencyIndicators(double generatorEfficiency, double mechanicalEfficiencyOfTurbogenerator) {
         ThermalEfficiencyIndicators thermalEfficiencyIndicators = new ThermalEfficiencyIndicators(generatorEfficiency, mechanicalEfficiencyOfTurbogenerator);
@@ -132,15 +241,15 @@ public class Graph {
 
     @SuppressWarnings("ConstantConditions")
     private void calculationOfThermalEfficiencyIndicators(int v, ThermalEfficiencyIndicators thermalEfficiencyIndicators) {
-        Elements element = vertexList.get(v).element;
+        Element element = vertexList.get(v).element;
         // TODO: 01.09.2019 Переделать метод! Можно написать проще.
-        if (element.getClass() == TurbineCylinders.class) {
-            TurbineCylinders turbineCylinder = (TurbineCylinders) element;
+        if (element.getClass() == TurbineCylinder.class) {
+            TurbineCylinder turbineCylinder = (TurbineCylinder) element;
             turbineCylinder.calculationOfThermalEfficiencyIndicators(v, thermalEfficiencyIndicators, this);
         }
 
-        if (element.getClass() == Pumps.class) {
-            Pumps pump = (Pumps) element;
+        if (element.getClass() == Pump.class) {
+            Pump pump = (Pump) element;
             pump.calculationOfThermalEfficiencyIndicators(v, thermalEfficiencyIndicators, this);
         }
 
@@ -161,7 +270,6 @@ public class Graph {
 
     }
 
-
     private int getAdjUnvisitedVertex(int v) {
         for (int j = 0; j < nVerts; j++) {
             if (adjMat.get(SUPERHEATED_STEAM)[v][j] == -1 && !vertexList.get(j).wasVisited) {
@@ -170,6 +278,12 @@ public class Graph {
         }
         for (int j = 0; j < nVerts; j++) {
             if (adjMat.get(HEATING_STEAM)[v][j] == -1 && !vertexList.get(j).wasVisited) {
+                return j;
+            }
+        }
+
+        for (int j = 0; j < nVerts; j++) {
+            if (adjMat.get(STEAM_DRAIN)[v][j] == -1 && !vertexList.get(j).wasVisited) {
                 return j;
             }
         }
@@ -186,85 +300,10 @@ public class Graph {
             }
         }
 
-        for (int j = 0; j < nVerts; j++) {
-            if (adjMat.get(STEAM_DRAIN)[v][j] == -1 && !vertexList.get(j).wasVisited) {
-                return j;
-            }
-        }
+
 
         return -3;
     }
-
-    @SuppressWarnings("ConstantConditions")
-    private void matrixCompilation(int v, Matrices matrices) {
-        Elements element = vertexList.get(v).element;
-        // TODO: 01.09.2019 Переделать метод! Можно написать проще.
-        if (element.getClass() == SteamGenerator.class) {
-            SteamGenerator steamGenerator = (SteamGenerator) element;
-            steamGenerator.matrixCompilation(v, matrices, this);
-        }
-
-        if (element.getClass() == TurbineCylinders.class) {
-            TurbineCylinders turbineCylinder = (TurbineCylinders) element;
-            turbineCylinder.matrixCompilation(v, matrices, this);
-        }
-
-        if (element.getClass() == Separator.class) {
-            Separator separator = (Separator) element;
-            separator.matrixCompilation(v, matrices, this);
-        }
-
-        if (element.getClass() == Superheaters.class) {
-            Superheaters superheater = (Superheaters) element;
-            superheater.matrixCompilation(v, matrices, this);
-        }
-
-        if (element.getClass() == Condenser.class) {
-            Condenser condenser = (Condenser) element;
-            condenser.matrixCompilation(v, matrices, this);
-        }
-
-        if (element.getClass() == Pumps.class) {
-            Pumps pump = (Pumps) element;
-            pump.matrixCompilation(v, matrices, this);
-        }
-
-        if (element.getClass() == Heaters.class) {
-            Heaters heater = (Heaters) element;
-            heater.matrixCompilation(v, matrices, this);
-        }
-
-        if (element.getClass() == Deaerator.class) {
-            Deaerator deaerator = (Deaerator) element;
-            deaerator.matrixCompilation(v, matrices, this);
-        }
-
-        if (element.getClass() == MixingPoints.class) {
-            MixingPoints mixingPoint = (MixingPoints) element;
-            mixingPoint.matrixCompilation(v, matrices, this);
-        }
-
-        if (element.getClass() == ValveStemSeals.class) {
-            ValveStemSeals valveStemSeal = (ValveStemSeals) element;
-            valveStemSeal.matrixCompilation(v, matrices, this);
-        }
-
-        if (element.getClass() == TurbineShaftSeals.class) {
-            TurbineShaftSeals turbineShaftSeal = (TurbineShaftSeals) element;
-            turbineShaftSeal.matrixCompilation(v, matrices, this);
-        }
-
-        if (element.getClass() == MainEjectorsWithCooler.class) {
-            MainEjectorsWithCooler mainEjectorWithCooler = (MainEjectorsWithCooler) element;
-            mainEjectorWithCooler.matrixCompilation(v, matrices, this);
-        }
-
-        if (element.getClass() == SealEjectorsWithCooler.class) {
-            SealEjectorsWithCooler sealEjectorWithCooler = (SealEjectorsWithCooler) element;
-            sealEjectorWithCooler.matrixCompilation(v, matrices, this);
-        }
-    }
-
 
     public Map<Integer, int[][]> getAdjMat() {
         return adjMat;

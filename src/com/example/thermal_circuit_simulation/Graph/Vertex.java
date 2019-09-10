@@ -1,12 +1,12 @@
 package com.example.thermal_circuit_simulation.Graph;
 
-import com.example.thermal_circuit_simulation.Elements.Elements;
+import com.example.thermal_circuit_simulation.Elements.Element;
 
 public class Vertex {
-    public Elements element;
+    public Element element;
     public boolean wasVisited;
 
-    public Vertex(Elements element) {
+    public Vertex(Element element) {
         wasVisited = false;
         this.element = element;
     }

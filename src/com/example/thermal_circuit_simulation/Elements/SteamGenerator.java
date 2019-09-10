@@ -2,7 +2,6 @@ package com.example.thermal_circuit_simulation.Elements;
 
 import com.example.thermal_circuit_simulation.Graph.Graph;
 import com.example.thermal_circuit_simulation.Graph.Vertex;
-import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.CalculationOfThermalEfficiencyIndicators;
 import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Matrices;
 import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.MatrixCompilation;
 import com.example.thermal_circuit_simulation.ThermalEfficiencyIndicators.ThermalEfficiencyIndicators;
@@ -12,7 +11,7 @@ import java.util.Map;
 
 import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 
-public class SteamGenerator extends Elements implements MatrixCompilation, CalculationOfThermalEfficiencyIndicators {
+public class SteamGenerator extends Element implements MatrixCompilation {
     private double steamConsumption;        // Расход пара через ПГ
     private double inletEnthalpy;           // Энтальпия на входе в ПГ (на выходе из последнего подогревателя)
     private double outletEnthalpy;          // Энтальпия на выходе из ПГ (на входе в цилиндр)
@@ -46,10 +45,10 @@ public class SteamGenerator extends Elements implements MatrixCompilation, Calcu
         for (int j = 0; j < nVerts; j++) {
             int relations = adjMat.get(HEATING_STEAM)[v][j];
             if (relations == -1 || relations == 1) {
-                Elements element = vertexList.get(j).element;
+                Element element = vertexList.get(j).element;
 
-                if (element.getClass() == TurbineCylinders.class) {
-                    TurbineCylinders turbineCylinder = (TurbineCylinders) element;
+                if (element.getClass() == TurbineCylinder.class) {
+                    TurbineCylinder turbineCylinder = (TurbineCylinder) element;
                     outletEnthalpy = turbineCylinder.parametersInSelection(0).getEnthalpy();
                 }
             }
@@ -60,10 +59,10 @@ public class SteamGenerator extends Elements implements MatrixCompilation, Calcu
         for (int j = 0; j < nVerts; j++) {
             int relations = adjMat.get(FEED_WATER)[v][j];
             if (relations == -1 || relations == 1) {
-                Elements element = vertexList.get(j).element;
+                Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Heaters.class) {
-                    Heaters heater = (Heaters) element;
+                if (element.getClass() == Heater.class) {
+                    Heater heater = (Heater) element;
                     inletEnthalpy = heater.getEnthalpyOfHeatedMedium();
                 }
             }

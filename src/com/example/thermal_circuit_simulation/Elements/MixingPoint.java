@@ -10,17 +10,40 @@ import java.util.Map;
 
 import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 
-public class MixingPoints extends Elements implements MatrixCompilation,Describable  {
+public class MixingPoint extends Element implements MatrixCompilation {
+    private double pressureOfHeatedMedium;
+    private double temperatureOfHeatedMedium;
     private double enthalpyOfHeatedMedium;                      // Энтальпия обогреваемой среды на выходе из точки смешения
     private Consumptions consumptionOfHeatedMedium = new Consumptions();                      // Расход обогреваемой среды на выходе из точки смешения
     private Equation materialBalanceEquation = new Equation(this);
-    private Heaters previousHeaterOnFeedWaterLine;
+    private Heater previousHeaterOnFeedWaterLine;
 
-    public MixingPoints(String name, Heaters previousHeaterOnFeedWaterLine) {
+    public MixingPoint(String name) {
         super(name);
-        this.previousHeaterOnFeedWaterLine = previousHeaterOnFeedWaterLine;
-        this.enthalpyOfHeatedMedium = previousHeaterOnFeedWaterLine.getEnthalpyOfHeatedMedium() + 5.0;
-        consumptionOfHeatedMedium.consumptionValue = Double.NaN;
+    }
+
+    @Override
+    public void calculationOfInitialParameters(int v, Graph theGraph) {
+        //--------------------------Инициализация-----------------------------------------------------------------------
+        int nVerts = theGraph.getnVerts();
+        Map<Integer, int[][]> adjMat = theGraph.getAdjMat();
+        ArrayList<Vertex> vertexList = theGraph.getVertexList();
+        //--------------------------------Связи с элементами по линии питательной воды----------------------------------
+        for (int j = 0; j < nVerts; j++) {
+            int relations = adjMat.get(FEED_WATER)[v][j];
+            if (relations == 1) {
+                Element element = vertexList.get(j).element;
+                if (element.getClass() == Heater.class) {
+                    Heater previousHeaterOnFeedWaterLine = (Heater) element;
+                    this.previousHeaterOnFeedWaterLine = previousHeaterOnFeedWaterLine;
+                    pressureOfHeatedMedium = previousHeaterOnFeedWaterLine.getPressureOfHeatedMedium();
+                    temperatureOfHeatedMedium = previousHeaterOnFeedWaterLine.getTemperatureOfHeatedMedium();
+                    this.enthalpyOfHeatedMedium = previousHeaterOnFeedWaterLine.getEnthalpyOfHeatedMedium() + 5.0;
+                    consumptionOfHeatedMedium.consumptionValue = Double.NaN;
+                }
+            }
+        }
+        //--------------------------------------------------------------------------------------------------------------
     }
 
     public Consumptions getConsumptionOfHeatedMedium() {
@@ -29,6 +52,14 @@ public class MixingPoints extends Elements implements MatrixCompilation,Describa
 
     public Equation getMaterialBalanceEquation() {
         return materialBalanceEquation;
+    }
+
+    public double getPressureOfHeatedMedium() {
+        return pressureOfHeatedMedium;
+    }
+
+    public double getTemperatureOfHeatedMedium() {
+        return temperatureOfHeatedMedium;
     }
 
     public double getEnthalpyOfHeatedMedium() {
@@ -51,16 +82,17 @@ public class MixingPoints extends Elements implements MatrixCompilation,Describa
         for (int j = 0; j < nVerts; j++) {
             int relations = adjMat.get(STEAM_DRAIN)[v][j];
             if (relations == 1) {
-                Elements element = vertexList.get(j).element;
+                Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Pumps.class) {
-                    Pumps pump = (Pumps) element;
+                if (element.getClass() == Pump.class) {
+                    Pump pump = (Pump) element;
                     int indexOfListConsumption = listOfConsumptions.indexOf(pump.getConsumptionOfWater());
                     coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][indexOfListConsumption] = relations;
-                    if (!(Double.isNaN(this.consumptionOfHeatedMedium.consumptionValue))) {
+                    if (!(Double.isNaN(this.consumptionOfHeatedMedium.consumptionValue))) { // После первой итерации, когда расход уже известен
                         enthalpyOfHeatedMedium = (
                                 previousHeaterOnFeedWaterLine.getConsumptionOfHeatedMedium().consumptionValue * previousHeaterOnFeedWaterLine.getEnthalpyOfHeatedMedium() +
                                         pump.getConsumptionOfWater().consumptionValue * pump.getOutletEnthalpy()) / this.consumptionOfHeatedMedium.consumptionValue;
+
                     }
                 }
             }
@@ -73,13 +105,13 @@ public class MixingPoints extends Elements implements MatrixCompilation,Describa
             // Номер столбца расхода обогреваемой среды точки смешения
             int mixingPointIndexOfListConsumption = listOfConsumptions.indexOf(this.getConsumptionOfHeatedMedium());
             if (relations == 1 || relations == -1) {
-                Elements element = vertexList.get(j).element;
+                Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Heaters.class) {
+                if (element.getClass() == Heater.class) {
                     if (relations == -1) {
                         coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][mixingPointIndexOfListConsumption] = relations;
                     } else {
-                        Heaters heater = (Heaters) element;
+                        Heater heater = (Heater) element;
                         int indexOfListConsumption = listOfConsumptions.indexOf(heater.getConsumptionOfHeatedMedium());
                         coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][indexOfListConsumption] = relations;
                     }

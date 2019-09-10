@@ -1,14 +1,21 @@
 package com.example.thermal_circuit_simulation.Elements;
 
 import com.example.thermal_circuit_simulation.Graph.Graph;
-import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.CalculationOfThermalEfficiencyIndicators;
+import com.example.thermal_circuit_simulation.Graph.Vertex;
 import com.example.thermal_circuit_simulation.ThermalEfficiencyIndicators.ThermalEfficiencyIndicators;
 import com.hummeling.if97.IF97;
 
-public class TurboDrive extends Elements implements CalculationOfThermalEfficiencyIndicators {
+import java.util.ArrayList;
+import java.util.Map;
+
+import static com.example.thermal_circuit_simulation.Graph.Graph.HEATING_STEAM;
+import static com.example.thermal_circuit_simulation.Graph.Graph.MECHANICAL_COMMUNICATION;
+
+public class TurboDrive extends Element {
     private double mechanicalEfficiency;        //Механический КПД Турбопривода
     private double relativeInternalEfficiency;  //Относительный внутренний КПД ТП
     private double condenserPressure;           // Давление в конденсаторе ТП
+    private double feedwaterFlow;               // Расход питательной воды через ПН
     private double turboPower;                // Мощность ТП
     private double steamConsumption;            // Расход пара через ТП
     private double inletEnthalpy;
@@ -21,8 +28,8 @@ public class TurboDrive extends Elements implements CalculationOfThermalEfficien
                       double relativeInternalEfficiency,
                       double condenserPressure,
                       double feedwaterFlow,
-                      Pumps feedPump,
-                      Superheaters superheater) {
+                      Pump feedPump,
+                      Superheater superheater) {
         // TODO: 01.09.2019 Нужен ли вообще этот конструктор?
         super(name);
         this.mechanicalEfficiency = mechanicalEfficiency;
@@ -41,24 +48,63 @@ public class TurboDrive extends Elements implements CalculationOfThermalEfficien
     public TurboDrive(String name,
                       double relativeInternalEfficiency,
                       double condenserPressure,
-                      double feedwaterFlow,
-                      Pumps feedPump,
-                      int selectionNumber,
-                      TurbineCylinders turbineCylinder) {
+                      double feedwaterFlow) {
         super(name);
-        this.selectionNumber = selectionNumber;
-        this.mechanicalEfficiency = feedPump.getPumpDriveEfficiency();
         this.relativeInternalEfficiency = relativeInternalEfficiency;
         this.condenserPressure = condenserPressure;
-        TurbineCylinders.Parameters parameters = turbineCylinder.parametersInSelection(selectionNumber);
-        this.inletEnthalpy = parameters.getEnthalpy();
+        this.feedwaterFlow = feedwaterFlow;
+    }
+
+    @Override
+    public void calculationOfInitialParameters(int v, Graph theGraph) {
+        //--------------------------Инициализация-----------------------------------------------------------------------
+        int nVerts = theGraph.getnVerts();
+        Map<Integer, int[][]> adjMat = theGraph.getAdjMat();
+        ArrayList<Vertex> vertexList = theGraph.getVertexList();
         IF97 waterSteam = new IF97(IF97.UnitSystem.DEFAULT);
-        this.outletEnthalpy =
-                inletEnthalpy - relativeInternalEfficiency * (inletEnthalpy - waterSteam.specificEnthalpyPS(
-                        condenserPressure,
-                        waterSteam.specificEntropyPH(parameters.getPressure(), parameters.getEnthalpy())));
-        this.turboPower = feedPump.getEnthalpyIncrease() * feedwaterFlow / 1000 / mechanicalEfficiency;
+        //--------------------------------------------------------------------------------------------------------------
+
+        //--------------------------------Связи с элементами по линии греющего пара-------------------------------------
+        for (int j = 0; j < nVerts; j++) {
+            int relations = adjMat.get(HEATING_STEAM)[v][j];
+            if (relations == -1 || relations == 1) {
+                Element element = vertexList.get(j).element;
+
+                if (element.getClass() == TurbineCylinder.class) {
+                    TurbineCylinder turbineCylinder = (TurbineCylinder) element;
+                    TurbineCylinder.Parameters parameters = turbineCylinder.parametersInSelection(selectionNumber);
+                    this.inletEnthalpy = parameters.getEnthalpy();
+
+                    this.outletEnthalpy =
+                            inletEnthalpy - relativeInternalEfficiency * (inletEnthalpy - waterSteam.specificEnthalpyPS(
+                                    condenserPressure,
+                                    waterSteam.specificEntropyPH(parameters.getPressure(), parameters.getEnthalpy())));
+                }
+            }
+        }
+        //--------------------------------------------------------------------------------------------------------------
+
+        //--------------------------------Связи с элементами по линии греющего пара-------------------------------------
+        for (int j = 0; j < nVerts; j++) {
+            int relations = adjMat.get(MECHANICAL_COMMUNICATION)[v][j];
+            if (relations == -1 || relations == 1) {
+                Element element = vertexList.get(j).element;
+
+                if (element instanceof Pump) {
+                    Pump feedPump = (Pump) element;
+                    this.mechanicalEfficiency = feedPump.getPumpDriveEfficiency();
+                    this.turboPower = feedPump.getEnthalpyIncrease() * feedwaterFlow / 1000 / mechanicalEfficiency;
+                }
+            }
+        }
+        //--------------------------------------------------------------------------------------------------------------
+
         this.steamConsumption = turboPower * 1000 / (inletEnthalpy - outletEnthalpy);
+    }
+
+    @Override
+    public void setSelectionNumber(int selectionNumber) {
+        this.selectionNumber = selectionNumber;
     }
 
     public double getSteamConsumption() {

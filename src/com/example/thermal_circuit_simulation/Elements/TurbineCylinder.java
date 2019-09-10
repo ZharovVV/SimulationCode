@@ -12,7 +12,7 @@ import java.util.Map;
 
 import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 
-public class TurbineCylinders extends Elements implements MatrixCompilation, CalculationOfThermalEfficiencyIndicators {
+public class TurbineCylinder extends Element implements MatrixCompilation {
     public final int NUMBER_OF_SELECTIONS;                                                  // Число отборов в турбине
     private ArrayList<Parameters> listOfParametersInSelections;                             // Список параметров отбора, включая параметры на входе и выходе из цилиндра
 
@@ -20,7 +20,7 @@ public class TurbineCylinders extends Elements implements MatrixCompilation, Cal
 
     private ArrayList<Consumptions> listOfConsumptionThroughTheCompartmentOfThisTurbine;
 
-    public TurbineCylinders(String name, int numberOfSelections) {
+    public TurbineCylinder(String name, int numberOfSelections) {
         super(name);
         this.NUMBER_OF_SELECTIONS = numberOfSelections;
         listOfParametersInSelections = new ArrayList<>(numberOfSelections + 2);
@@ -95,21 +95,21 @@ public class TurbineCylinders extends Elements implements MatrixCompilation, Cal
             int relations = adjMat.get(SUPERHEATED_STEAM)[v][j];
 
             if (relations == -1 || relations == 1) {
-                Elements element = vertexList.get(j).element;
+                Element element = vertexList.get(j).element;
                 if (element.getClass() == SteamGenerator.class) {
                     SteamGenerator steamGenerator = (SteamGenerator) element;
                     freeMemoryMatrix[indexOfListOfEquation] += (-1) * relations * steamGenerator.getSteamConsumption();
                 }
 
-                if (element.getClass() == Superheaters.class) {
-                    Superheaters superheater = (Superheaters) element;
+                if (element.getClass() == Superheater.class) {
+                    Superheater superheater = (Superheater) element;
                     // Получение номера столбца
                     int indexOfListConsumption = listOfConsumptions.indexOf(superheater.getConsumptionOfHeatedMedium());
                     coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
                 }
 
-                if (element.getClass() == Heaters.class) {
-                    Heaters heater = (Heaters) element;
+                if (element.getClass() == Heater.class) {
+                    Heater heater = (Heater) element;
                     // Получение номера столбца
                     int indexOfListConsumption = listOfConsumptions.indexOf(heater.getConsumptionOfHeatingSteam());
                     coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
@@ -142,21 +142,21 @@ public class TurbineCylinders extends Elements implements MatrixCompilation, Cal
             int relations = adjMat.get(HEATING_STEAM)[v][j];
 
             if (relations == -1 || relations == 1) {
-                Elements element = vertexList.get(j).element;
+                Element element = vertexList.get(j).element;
                 if (element.getClass() == SteamGenerator.class) {
                     SteamGenerator steamGenerator = (SteamGenerator) element;
                     freeMemoryMatrix[indexOfListOfEquation] += (-1) * relations * steamGenerator.getSteamConsumption();
                 }
 
-                if (element.getClass() == Superheaters.class) {
-                    Superheaters superheater = (Superheaters) element;
+                if (element.getClass() == Superheater.class) {
+                    Superheater superheater = (Superheater) element;
                     // Получение номера столбца
                     int indexOfListConsumption = listOfConsumptions.indexOf(superheater.getConsumptionOfHeatingSteam());
                     coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
                 }
 
-                if (element.getClass() == Heaters.class) {
-                    Heaters heater = (Heaters) element;
+                if (element.getClass() == Heater.class) {
+                    Heater heater = (Heater) element;
                     // Получение номера столбца
                     int indexOfListConsumption = listOfConsumptions.indexOf(heater.getConsumptionOfHeatingSteam());
                     coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
@@ -220,10 +220,10 @@ public class TurbineCylinders extends Elements implements MatrixCompilation, Cal
         for (int j = 0; j < nVerts; j++) {
             int relations = adjMat.get(SUPERHEATED_STEAM)[v][j];
             if (relations == -1 || relations == 1) {
-                Elements element = vertexList.get(j).element;
+                Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Superheaters.class) {
-                    Superheaters superheater = (Superheaters) element;
+                if (element.getClass() == Superheater.class) {
+                    Superheater superheater = (Superheater) element;
                     listOfConsumptionThroughTheCompartmentOfThisTurbine.get(0).consumptionValue += relations * superheater.getConsumptionOfHeatedMedium().consumptionValue;
                 }
 
@@ -237,7 +237,7 @@ public class TurbineCylinders extends Elements implements MatrixCompilation, Cal
         for (int j = 0; j < nVerts; j++) {
             int relations = adjMat.get(HEATING_STEAM)[v][j];
             if (relations == -1 || relations == 1) {
-                Elements element = vertexList.get(j).element;
+                Element element = vertexList.get(j).element;
 
                 if (element.getClass() == SteamGenerator.class) {
                     SteamGenerator steamGenerator = (SteamGenerator) element;
@@ -256,15 +256,15 @@ public class TurbineCylinders extends Elements implements MatrixCompilation, Cal
                     listOfConsumptionThroughTheCompartmentOfThisTurbine.get(index).consumptionValue += relations * turboDrive.getSteamConsumption();
                 }
 
-                if (element.getClass() == Superheaters.class) {
-                    Superheaters superheater = (Superheaters) element;
+                if (element.getClass() == Superheater.class) {
+                    Superheater superheater = (Superheater) element;
                     int selectionNumber = superheater.getSelectionNumber();
                     listOfConsumptionThroughTheCompartmentOfThisTurbine.get(selectionNumber).consumptionValue +=
                             relations * superheater.getConsumptionOfHeatingSteam().consumptionValue;
                 }
 
-                if (element.getClass() == Heaters.class) {
-                    Heaters heater = (Heaters) element;
+                if (element.getClass() == Heater.class) {
+                    Heater heater = (Heater) element;
                     int selectionNumber = heater.getSelectionNumber();
                     if (selectionNumber < listOfConsumptionThroughTheCompartmentOfThisTurbine.size()) {
                         listOfConsumptionThroughTheCompartmentOfThisTurbine.get(selectionNumber).consumptionValue +=

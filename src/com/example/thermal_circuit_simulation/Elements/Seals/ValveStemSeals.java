@@ -17,19 +17,19 @@ import static com.example.thermal_circuit_simulation.Graph.Graph.*;
  * Уплотнения штоков клапанов турбины
  */
 
-public class ValveStemSeals  extends Elements implements MatrixCompilation {
+public class ValveStemSeals  extends Element implements MatrixCompilation {
     // TODO: 26.08.2019 Костыль, можно сделать лучше...
-    private HashMap<Elements,Double> elementContributionToSteamConsumptionInSeals;
-    private TurbineCylinders turbineCylinder;
+    private HashMap<Element,Double> elementContributionToSteamConsumptionInSeals;
+    private TurbineCylinder turbineCylinder;
 
 
-    public ValveStemSeals(String name, HashMap<Elements,Double> elementContributionToSteamConsumptionInSeals, TurbineCylinders turbineCylinder) {
+    public ValveStemSeals(String name, HashMap<Element,Double> elementContributionToSteamConsumptionInSeals, TurbineCylinder turbineCylinder) {
         super(name);
         this.elementContributionToSteamConsumptionInSeals = elementContributionToSteamConsumptionInSeals;
         this.turbineCylinder = turbineCylinder;
     }
 
-    public HashMap<Elements, Double> getElementContributionToSteamConsumptionInSeals() {
+    public HashMap<Element, Double> getElementContributionToSteamConsumptionInSeals() {
         return elementContributionToSteamConsumptionInSeals;
     }
 
@@ -48,10 +48,10 @@ public class ValveStemSeals  extends Elements implements MatrixCompilation {
         for (int j = 0; j < nVerts; j++) {
             int relations = adjMat.get(HEATING_STEAM)[v][j];
             if (relations == -1 || relations == 1) {
-                Elements element = vertexList.get(j).element;
+                Element element = vertexList.get(j).element;
 
-                if (element.getClass() == TurbineCylinders.class) {
-                    TurbineCylinders turbineCylinder = (TurbineCylinders) element;
+                if (element.getClass() == TurbineCylinder.class) {
+                    TurbineCylinder turbineCylinder = (TurbineCylinder) element;
                     int materialBalanceEquation = matrices.getListOfLinesOfEquations().indexOf(turbineCylinder.getMaterialBalanceEquation());
                     freeMemoryMatrix[materialBalanceEquation] += relations * elementContributionToSteamConsumptionInSeals.get(turbineCylinder);
                 }
@@ -66,8 +66,8 @@ public class ValveStemSeals  extends Elements implements MatrixCompilation {
 
                 }
 
-                if (element.getClass() == Heaters.class) {
-                    Heaters heater = (Heaters) element;
+                if (element.getClass() == Heater.class) {
+                    Heater heater = (Heater) element;
                     if (heater.isSurfaceHeater()) {
                         int materialBalanceEquation = matrices.getListOfLinesOfEquations().indexOf(heater.getMaterialBalanceEquationOnSteamDrainLine());
                         int heatBalanceEquation = matrices.getListOfLinesOfEquations().indexOf(heater.getHeatBalanceEquation());
@@ -91,7 +91,7 @@ public class ValveStemSeals  extends Elements implements MatrixCompilation {
     @Override
     public void describe() {
         super.describe();
-        for (Map.Entry<Elements, Double> elementsDoubleEntry : elementContributionToSteamConsumptionInSeals.entrySet()) {
+        for (Map.Entry<Element, Double> elementsDoubleEntry : elementContributionToSteamConsumptionInSeals.entrySet()) {
             System.out.println("Элемент схемы: " + elementsDoubleEntry.getKey().NAME +
                     " Расход пара из (в) уплотнения: " + elementContributionToSteamConsumptionInSeals.get(elementsDoubleEntry.getKey()));
         }

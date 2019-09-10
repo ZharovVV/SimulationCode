@@ -1,8 +1,8 @@
 package com.example.thermal_circuit_simulation;
 
 import com.example.thermal_circuit_simulation.Elements.*;
-import com.example.thermal_circuit_simulation.Elements.Ejectors.MainEjectorsWithCooler;
-import com.example.thermal_circuit_simulation.Elements.Ejectors.SealEjectorsWithCooler;
+import com.example.thermal_circuit_simulation.Elements.Ejectors.MainEjectorWithCooler;
+import com.example.thermal_circuit_simulation.Elements.Ejectors.SealEjectorWithCooler;
 import com.example.thermal_circuit_simulation.Elements.Seals.TurbineShaftSeals;
 import com.example.thermal_circuit_simulation.Elements.Seals.ValveStemSeals;
 import com.example.thermal_circuit_simulation.Graph.Graph;
@@ -15,14 +15,14 @@ import java.util.*;
 import static java.lang.Double.NaN;
 
 public class Main {
-    public Map<String, Elements> initializationOfElements() {
-        Map<String, Elements> elementsMap = new HashMap<>();
+    public Map<String, Element> initializationOfElements() {
+        Map<String, Element> elementsMap = new HashMap<>();
         //--------------------------ПГ
         SteamGenerator pg = new SteamGenerator("ПГ", 1720);   //1786.1
         elementsMap.put(pg.NAME, pg);
 
         //--------------------------ЦСД
-        TurbineCylinders csd = new TurbineCylinders("ЦСД", 3);
+        TurbineCylinder csd = new TurbineCylinder("ЦСД", 3);
         csd.addSelection(0, 5.88, 0.995);
         csd.addSelection(1, 2.982, 0.929);
         csd.addSelection(2, 1.92, 0.902);
@@ -30,18 +30,18 @@ public class Main {
         csd.addSelection(4, 1.203, 0.881);
         elementsMap.put(csd.NAME, csd);
         //-----------------------Сепаратор
-        Separator separator = new Separator("Сепаратор", 0.02, 0.999, csd);
+        Separator separator = new Separator("Сепаратор", 0.02, 0.999);
         elementsMap.put(separator.NAME, separator);
         //-----------------------ПП1
-        Superheaters pp1 = new Superheaters("ПП1", 1, 0.12, 0.02,
-                NaN, 20, 1, csd, separator);
+        Superheater pp1 = new Superheater("ПП1", 1, 0.12, 0.02,
+                NaN, 20);
         elementsMap.put(pp1.NAME, pp1);
         //-----------------------ПП2
-        Superheaters pp2 = new Superheaters("ПП2", 2, 0.2, 0.02,
-                NaN, 22.2, 0, csd, pp1);
+        Superheater pp2 = new Superheater("ПП2", 2, 0.2, 0.02,
+                NaN, 22.2);
         elementsMap.put(pp2.NAME, pp2);
         //--------------------------ЦНД
-        TurbineCylinders cnd = new TurbineCylinders("ЦНД", 4);
+        TurbineCylinder cnd = new TurbineCylinder("ЦНД", 4);
         cnd.addSelection(0, 1.118, 250);
         cnd.addSelection(1, 0.638, 193);
         cnd.addSelection(2, 0.340, 139);
@@ -50,89 +50,79 @@ public class Main {
         cnd.addSelection(5, 0.0039, 0.8755);
         elementsMap.put(cnd.NAME, cnd);
         //-------------------------Конденсатор
-        Condenser condenser = new Condenser("Конденсатор", cnd);
+        Condenser condenser = new Condenser("Конденсатор");
         elementsMap.put(condenser.NAME, condenser);
         //-----------------------Деаэратор
-        Deaerator d = new Deaerator("Деаэратор", 0.69, 3, csd);
+        Deaerator d = new Deaerator("Деаэратор", 0.69);
         elementsMap.put(d.NAME, d);
         //-------------------------Конденсатный насос 1
-        Pumps kn1 = new Pumps("КНI", 0.78, 0.9, condenser, true, 0.86);
+        Pump kn1 = new Pump("КНI", 0.78, 0.9, true, 0.86);
         elementsMap.put(kn1.NAME, kn1);
         //-------------------------Основной эжектор
-        MainEjectorsWithCooler mainEjector = new MainEjectorsWithCooler("Основной Эжектор", 0.15, 2, 1.22, kn1);
+        MainEjectorWithCooler mainEjector = new MainEjectorWithCooler("Основной Эжектор", 0.15, 2, 1.22);
         elementsMap.put(mainEjector.NAME, mainEjector);
         //-------------------------Эжектор уплотнений
-        SealEjectorsWithCooler sealEjector = new SealEjectorsWithCooler("Эжектор Уплотнений", 0.15, 6, 1.06, mainEjector);
+        SealEjectorWithCooler sealEjector = new SealEjectorWithCooler("Эжектор Уплотнений", 0.15, 6, 1.06);
         elementsMap.put(sealEjector.NAME, sealEjector);
         //-------------------------Конденсатный насос 2
-        Pumps kn2 = new Pumps("КНII", 0.78, 1.0, sealEjector, true, 0.86);
+        Pump kn2 = new Pump("КНII", 0.78, 1.0, true, 0.86);
         elementsMap.put(kn2.NAME, kn2);
         //-------------------------ПНД1
-        Heaters pnd1 = new Heaters("ПНД1", 1, 0.15, NaN, 2.5, 4,
-                cnd, kn2);
+        Heater pnd1 = new Heater("ПНД1", 1, 0.15, NaN, 2.5);
         elementsMap.put(pnd1.NAME, pnd1);
         //-------------------------ДН1
-        Pumps dn1 = new Pumps("ДН1", true, 0.76, 2, pnd1, 0.86);
+        Pump dn1 = new Pump("ДН1", 0.76, 2, true, 0.86);
         elementsMap.put(dn1.NAME, dn1);
         //-------------------------См1
-        MixingPoints sm1 = new MixingPoints("См1", pnd1);
+        MixingPoint sm1 = new MixingPoint("См1");
         elementsMap.put(sm1.NAME, sm1);
         //-------------------------ПНД2
-        Heaters pnd2 = new Heaters("ПНД2", 2, 0.15, 5, 3, 3,
-                cnd, pnd1);
+        Heater pnd2 = new Heater("ПНД2", 2, 0.15, 5, 3);
         elementsMap.put(pnd2.NAME, pnd2);
         //------------------------ПНД3
-        Heaters pnd3 = new Heaters("ПНД3", 3, 0.15, NaN, 4, 2,
-                cnd, pnd2);
+        Heater pnd3 = new Heater("ПНД3", 3, 0.15, NaN, 4);
         elementsMap.put(pnd3.NAME, pnd3);
         //------------------------ДН2
-        Pumps dn2 = new Pumps("ДН2", true, 0.76, 1.5, pnd3, 0.86);
+        Pump dn2 = new Pump("ДН2", 0.76, 1.5, true, 0.86);
         elementsMap.put(dn2.NAME, dn2);
         //------------------------См2
-        MixingPoints sm2 = new MixingPoints("См2", pnd3);
+        MixingPoint sm2 = new MixingPoint("См2");
         elementsMap.put(sm2.NAME, sm2);
         //------------------------ПНД4
-        Heaters pnd4 = new Heaters("ПНД4", 4, 0.15, 4.5, 4, 1,
-                cnd, pnd3);
+        Heater pnd4 = new Heater("ПНД4", 4, 0.15, 4.5, 4);
         elementsMap.put(pnd4.NAME, pnd4);
         //-----------------------ПН
-        Pumps pn = new Pumps("ПН", 0.89, 8.9, d, false, 0.96);
+        Pump pn = new Pump("ПН", 0.89, 8.9, false, 0.96);
         elementsMap.put(pn.NAME, pn);
         //-----------------------ПВД5
-        Heaters pvd5 = new Heaters("ПВД5", 5, 0.4, 5, 5, 3,
-                csd, pn);
+        Heater pvd5 = new Heater("ПВД5", 5, 0.4, 5, 5);
         elementsMap.put(pvd5.NAME, pvd5);
         //-----------------------ПВД6
-        Heaters pvd6 = new Heaters("ПВД6", 6, 0.4, 5, 5.5, 2,
-                csd, pvd5);
+        Heater pvd6 = new Heater("ПВД6", 6, 0.4, 5, 5.5);
         elementsMap.put(pvd6.NAME, pvd6);
         //-----------------------ПВД7
-        Heaters pvd7 = new Heaters("ПВД7", 7, 0.4, 5, 6.2, 1,
-                csd, pvd6);
+        Heater pvd7 = new Heater("ПВД7", 7, 0.4, 5, 6.2);
         elementsMap.put(pvd7.NAME, pvd7);
         //----------------------ТС
         HeatNetwork ts = new HeatNetwork("Теплосеть", 1, 150, 1.6, 60, 120);
         elementsMap.put(ts.NAME, ts);
         //----------------------Т1
-        Heaters t1 = new Heaters("Т1", 1, 0.2, NaN, 4, 3,
-                cnd, ts);
+        Heater t1 = new Heater("Т1", 1, 0.2, NaN, 4);
         elementsMap.put(t1.NAME, t1);
         //----------------------Т2
-        Heaters t2 = new Heaters("Т2", 2, 0.2, NaN, 4.6, 2,
-                cnd, t1);
+        Heater t2 = new Heater("Т2", 2, 0.2, NaN, 4.6);
         //t2.describeHeater();
 
         elementsMap.put(t2.NAME, t2);
         //----------------------Т3
-        Heaters t3 = new Heaters("Т3", 3, 0.2, NaN, 8.8, 1,
-                cnd, t2);
+        Heater t3 = new Heater("Т3", 3, 0.2, NaN, 8.8);
         elementsMap.put(t3.NAME, t3);
         //---------------------ТП
-        TurboDrive turboDrive = new TurboDrive("ТП", 0.73, 0.004, 1720, pn, 0, cnd); //1786.1
+        TurboDrive turboDrive = new TurboDrive("ТП", 0.73, 0.004, 1720); //1786.1
         elementsMap.put(turboDrive.NAME, turboDrive);
         //-------------------------------------------
 
-        HashMap<Elements, Double> mapForValveStemSeal = new HashMap<>();
+        HashMap<Element, Double> mapForValveStemSeal = new HashMap<>();
         mapForValveStemSeal.put(csd, 1.8);
         mapForValveStemSeal.put(separator, 1.33);
         mapForValveStemSeal.put(pnd3, 0.37);
@@ -140,7 +130,7 @@ public class Main {
         ValveStemSeals valveStemSeal = new ValveStemSeals("Уплотнение штоков клапанов ЦСД", mapForValveStemSeal, csd);
         elementsMap.put(valveStemSeal.NAME, valveStemSeal);
 
-        HashMap<Elements, Double> mapForTurbineShaftSealsForCSD = new HashMap<>();
+        HashMap<Element, Double> mapForTurbineShaftSealsForCSD = new HashMap<>();
         mapForTurbineShaftSealsForCSD.put(csd, 2.4);
         mapForTurbineShaftSealsForCSD.put(pnd4, 1.38);
         mapForTurbineShaftSealsForCSD.put(pnd1, 0.9);
@@ -148,7 +138,7 @@ public class Main {
         TurbineShaftSeals turbineShaftSealForCSD = new TurbineShaftSeals("Уплотнение вала ЦСД", mapForTurbineShaftSealsForCSD, csd);
         elementsMap.put(turbineShaftSealForCSD.NAME, turbineShaftSealForCSD);
 
-        HashMap<Elements, Double> mapForTurbineShaftSealsForCND = new HashMap<>();
+        HashMap<Element, Double> mapForTurbineShaftSealsForCND = new HashMap<>();
         mapForTurbineShaftSealsForCND.put(cnd, 1.48);
         mapForTurbineShaftSealsForCND.put(d, 2.56);
         mapForTurbineShaftSealsForCND.put(sealEjector, 1.08);
@@ -160,7 +150,7 @@ public class Main {
 
     }
 
-    public void runGraph(Map<String, Elements> elementsMap) {
+    public void runGraph(Map<String, Element> elementsMap) {
         Graph theGraph = new Graph();
         Vertex pg = new Vertex(elementsMap.get("ПГ"));
         Vertex csd = new Vertex(elementsMap.get("ЦСД"));
@@ -228,19 +218,19 @@ public class Main {
         theGraph.addVertex(t3);
         theGraph.addVertex(turboDrive);
 
-        /*for (Elements element: elementsList) {
+        /*for (Element element: elementsList) {
             theGraph.addVertex(new Vertex(element));
         }*/
         theGraph.addEdge(Graph.HEATING_STEAM, pg, csd);
         theGraph.addEdge(Graph.FEED_WATER, pvd7, pg);
 
         theGraph.addEdge(Graph.HEATING_STEAM, csd, separator);
-        theGraph.addEdge(Graph.HEATING_STEAM, csd, pp2);
-        theGraph.addEdge(Graph.HEATING_STEAM, csd, pp1);
-        theGraph.addEdge(Graph.HEATING_STEAM, csd, pvd7);
-        theGraph.addEdge(Graph.HEATING_STEAM, csd, pvd6);
-        theGraph.addEdge(Graph.HEATING_STEAM, csd, pvd5);
-        theGraph.addEdge(Graph.HEATING_STEAM, csd, d);
+        theGraph.addEdge(Graph.HEATING_STEAM, csd, 0, pp2);
+        theGraph.addEdge(Graph.HEATING_STEAM, csd, 1, pp1);
+        theGraph.addEdge(Graph.HEATING_STEAM, csd, 1, pvd7);
+        theGraph.addEdge(Graph.HEATING_STEAM, csd, 2, pvd6);
+        theGraph.addEdge(Graph.HEATING_STEAM, csd, 3, pvd5);
+        theGraph.addEdge(Graph.HEATING_STEAM, csd, 3, d);
         theGraph.addEdge(Graph.HEATING_STEAM, csd, valveStemSeal);
 
         theGraph.addEdge(Graph.HEATING_STEAM, valveStemSeal, separator);
@@ -263,15 +253,15 @@ public class Main {
         theGraph.addEdge(Graph.SUPERHEATED_STEAM, pp2, cnd);
         theGraph.addEdge(Graph.STEAM_DRAIN, pp2, pvd7);
 
-        theGraph.addEdge(Graph.HEATING_STEAM, cnd, turboDrive);
+        theGraph.addEdge(Graph.HEATING_STEAM, cnd, 0, turboDrive);
         theGraph.addEdge(Graph.HEATING_STEAM, cnd, condenser);
-        theGraph.addEdge(Graph.HEATING_STEAM, cnd, pnd4);
-        theGraph.addEdge(Graph.HEATING_STEAM, cnd, pnd3);
-        theGraph.addEdge(Graph.HEATING_STEAM, cnd, pnd2);
-        theGraph.addEdge(Graph.HEATING_STEAM, cnd, pnd1);
-        theGraph.addEdge(Graph.HEATING_STEAM, cnd, t3);
-        theGraph.addEdge(Graph.HEATING_STEAM, cnd, t2);
-        theGraph.addEdge(Graph.HEATING_STEAM, cnd, t1);
+        theGraph.addEdge(Graph.HEATING_STEAM, cnd, 1, pnd4);
+        theGraph.addEdge(Graph.HEATING_STEAM, cnd, 2, pnd3);
+        theGraph.addEdge(Graph.HEATING_STEAM, cnd, 3, pnd2);
+        theGraph.addEdge(Graph.HEATING_STEAM, cnd, 4, pnd1);
+        theGraph.addEdge(Graph.HEATING_STEAM, cnd, 1, t3);
+        theGraph.addEdge(Graph.HEATING_STEAM, cnd, 2, t2);
+        theGraph.addEdge(Graph.HEATING_STEAM, cnd, 3, t1);
 
         theGraph.addEdge(Graph.HEATING_STEAM, turbineShaftSealForCND, cnd);
         theGraph.addEdge(Graph.HEATING_STEAM, turbineShaftSealForCND, sealEjector);
@@ -331,8 +321,10 @@ public class Main {
         theGraph.addEdge(Graph.STEAM_DRAIN, t2, t1);
 
         theGraph.addEdge(Graph.STEAM_DRAIN, turboDrive, condenser);
+        theGraph.addEdge(Graph.MECHANICAL_COMMUNICATION, turboDrive, pn);
 
         /*theGraph.dfs();*/
+        theGraph.dfsAndCalculationOfInitialParameters();
         Matrices matrices = theGraph.dfsAndMatrixCompilation();
         /*matrices.describeMatrices();*/
         ArrayList<Vertex> vertexArrayList = theGraph.getVertexList();
@@ -373,7 +365,7 @@ public class Main {
 
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
-        Map<String, Elements> elementsMap = new Main().initializationOfElements();
+        Map<String, Element> elementsMap = new Main().initializationOfElements();
         new Main().runGraph(elementsMap);
         long finishTime = System.currentTimeMillis();
         System.out.println((finishTime - startTime) + " ms");

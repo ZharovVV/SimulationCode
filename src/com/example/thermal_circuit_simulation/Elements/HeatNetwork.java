@@ -1,11 +1,10 @@
 package com.example.thermal_circuit_simulation.Elements;
 
 import com.example.thermal_circuit_simulation.Graph.Graph;
-import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.CalculationOfThermalEfficiencyIndicators;
 import com.example.thermal_circuit_simulation.ThermalEfficiencyIndicators.ThermalEfficiencyIndicators;
 import com.hummeling.if97.IF97;
 
-public class HeatNetwork extends Elements implements CalculationOfThermalEfficiencyIndicators {
+public class HeatNetwork extends Element {
     private double inletTemperature;            // Температура на входе в ТС
     private double inletPressure;               // Давление на входе в ТС
     private double inletEnthalpy;               // Энтальпия на входе в ТС

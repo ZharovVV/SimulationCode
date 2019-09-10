@@ -1,8 +1,8 @@
 package com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces;
 
 import com.example.thermal_circuit_simulation.Elements.*;
-import com.example.thermal_circuit_simulation.Elements.Ejectors.MainEjectorsWithCooler;
-import com.example.thermal_circuit_simulation.Elements.Ejectors.SealEjectorsWithCooler;
+import com.example.thermal_circuit_simulation.Elements.Ejectors.MainEjectorWithCooler;
+import com.example.thermal_circuit_simulation.Elements.Ejectors.SealEjectorWithCooler;
 import com.example.thermal_circuit_simulation.Graph.Vertex;
 import org.apache.commons.math3.linear.*;
 
@@ -23,9 +23,9 @@ public class Matrices {
         int j = 0;
 
         for (Vertex vertex : vertexList) {
-            Elements element = vertex.element;
-            if (element.getClass() == Heaters.class) {
-                Heaters heater = (Heaters) element;
+            Element element = vertex.element;
+            if (element.getClass() == Heater.class) {
+                Heater heater = (Heater) element;
                 if (heater.isSurfaceHeater()) {
                     i = i + 3;
                     j = j + 3;
@@ -56,8 +56,8 @@ public class Matrices {
             }
 
 
-            if (element.getClass() == Superheaters.class) {
-                Superheaters superheater = (Superheaters) element;
+            if (element.getClass() == Superheater.class) {
+                Superheater superheater = (Superheater) element;
                 i = i + 3;
                 j = j + 3;
                 listOfColumnsOfConsumptions.add(superheater.getConsumptionOfHeatingSteam());
@@ -80,8 +80,8 @@ public class Matrices {
 
             }
 
-            if (element.getClass() == TurbineCylinders.class) {
-                TurbineCylinders turbineCylinder = (TurbineCylinders) element;
+            if (element.getClass() == TurbineCylinder.class) {
+                TurbineCylinder turbineCylinder = (TurbineCylinder) element;
                 i = i + 1;
                 listOfLinesOfEquations.add(turbineCylinder.getMaterialBalanceEquation());
 
@@ -96,32 +96,32 @@ public class Matrices {
                 listOfLinesOfEquations.add(condenser.getMaterialBalanceEquation());
             }
 
-            if (element.getClass() == Pumps.class) {
-                Pumps pump = (Pumps) element;
+            if (element.getClass() == Pump.class) {
+                Pump pump = (Pump) element;
                 i = i + 1;
                 j = j + 1;
                 listOfColumnsOfConsumptions.add(pump.getConsumptionOfWater());
                 listOfLinesOfEquations.add(pump.getMaterialBalanceEquation());
             }
 
-            if (element.getClass() == MainEjectorsWithCooler.class) {
-                MainEjectorsWithCooler mainEjectorWithCooler = (MainEjectorsWithCooler) element;
+            if (element.getClass() == MainEjectorWithCooler.class) {
+                MainEjectorWithCooler mainEjectorWithCooler = (MainEjectorWithCooler) element;
                 i = i + 1;
                 j = j + 1;
                 listOfColumnsOfConsumptions.add(mainEjectorWithCooler.getConsumptionOfWater());
                 listOfLinesOfEquations.add(mainEjectorWithCooler.getMaterialBalanceEquation());
             }
 
-            if (element.getClass() == SealEjectorsWithCooler.class) {
-                SealEjectorsWithCooler sealEjectorWithCooler = (SealEjectorsWithCooler) element;
+            if (element.getClass() == SealEjectorWithCooler.class) {
+                SealEjectorWithCooler sealEjectorWithCooler = (SealEjectorWithCooler) element;
                 i = i + 1;
                 j = j + 1;
                 listOfColumnsOfConsumptions.add(sealEjectorWithCooler.getConsumptionOfWater());
                 listOfLinesOfEquations.add(sealEjectorWithCooler.getMaterialBalanceEquation());
             }
 
-            if (element.getClass() == MixingPoints.class) {
-                MixingPoints mixingPoint = (MixingPoints) element;
+            if (element.getClass() == MixingPoint.class) {
+                MixingPoint mixingPoint = (MixingPoint) element;
                 i = i + 1;
                 j = j + 1;
                 listOfColumnsOfConsumptions.add(mixingPoint.getConsumptionOfHeatedMedium());
@@ -148,8 +148,8 @@ public class Matrices {
         DecompositionSolver solver = new LUDecomposition(matrixOfCoefficient).getSolver();
         RealVector solution = solver.solve(matrixOfFreeMember);
 
-        for (Consumptions consumptions : listOfColumnsOfConsumptions) {
-            int i = listOfColumnsOfConsumptions.indexOf(consumptions);
+        for (int i = 0; i < listOfColumnsOfConsumptions.size(); i++) {
+            Consumptions consumptions = listOfColumnsOfConsumptions.get(i);
             consumptions.consumptionValue = solution.getEntry(i);
         }
     }

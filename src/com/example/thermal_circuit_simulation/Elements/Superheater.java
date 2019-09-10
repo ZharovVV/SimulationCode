@@ -13,10 +13,9 @@ import java.util.Map;
 
 import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 
-public class Superheaters extends Elements implements MatrixCompilation {
+public class Superheater extends Element implements MatrixCompilation {
     //-----------------------------Характеристики подогревателя---------------------------------------------------------
     private int heaterNumber;                                   // Номер подогревателя по ходу пара
-    private boolean isSurfaceHeater;                            // Подогреватель поверхностного типа? false, если тип подогревателя смешивающий
     private int selectionNumber;                                // Номер отбора
     private double hydraulicResistanceFromSelectionToHeater;    // Гидравлическое сопротивление от отбора до подогревателя
     private double hydraulicResistanceInHeater;                 // Гидравлическое сопротивление в подогревателе
@@ -44,56 +43,82 @@ public class Superheaters extends Elements implements MatrixCompilation {
     private Equation materialBalanceEquationOnHeatedMediumLine = new Equation(this);
     private Equation heatBalanceEquation = new Equation(this);
 
-    public Superheaters(String name,
-                        int heaterNumber,
-                        double hydraulicResistanceFromSelectionToHeater,
-                        double hydraulicResistanceInHeater,
-                        double underheatingOfSteamDrain,
-                        double underheatingOfHeatedMedium,
-                        int selectionNumber,
-                        TurbineCylinders turbineCylinder,
-                        Elements previousElement) {
+    public Superheater(String name,
+                       int heaterNumber,
+                       double hydraulicResistanceFromSelectionToHeater,
+                       double hydraulicResistanceInHeater,
+                       double underheatingOfSteamDrain,
+                       double underheatingOfHeatedMedium) {
         super(name);
+        this.heaterNumber = heaterNumber;
         this.hydraulicResistanceFromSelectionToHeater = hydraulicResistanceFromSelectionToHeater;
-        this.isSurfaceHeater = true;
-        this.selectionNumber = selectionNumber;
         this.hydraulicResistanceInHeater = hydraulicResistanceInHeater;
         this.underheatingOfSteamDrain = underheatingOfSteamDrain;
         this.underheatingOfHeatedMedium = underheatingOfHeatedMedium;
+    }
 
-        this.pressureOfHeatingSteam =                           // Считаем давление в подогревателе
-                turbineCylinder.parametersInSelection(selectionNumber).getPressure() - hydraulicResistanceFromSelectionToHeater;
-        this.pressureOfSteamDrain = pressureOfHeatingSteam;
-
+    @Override
+    public void calculationOfInitialParameters(int v, Graph theGraph) {
+        //--------------------------Инициализация-----------------------------------------------------------------------
+        int nVerts = theGraph.getnVerts();
+        Map<Integer, int[][]> adjMat = theGraph.getAdjMat();
+        ArrayList<Vertex> vertexList = theGraph.getVertexList();
         IF97 waterSteam = new IF97(IF97.UnitSystem.DEFAULT);
-        this.temperatureOfHeatingSteam =                        // Температура греющего пара
-                waterSteam.saturationTemperatureP(pressureOfHeatingSteam) - 273.15;
+        //--------------------------------------------------------------------------------------------------------------
 
-        this.enthalpyOfHeatingSteam =                           // Энтальпия греющего пара
-                turbineCylinder.parametersInSelection(selectionNumber).getEnthalpy();
+        //--------------------------------Связи с элементами по линии греющего пара-------------------------------------
+        for (int j = 0; j < nVerts; j++) {
+            int relations = adjMat.get(HEATING_STEAM)[v][j];
+            if (relations == 1) {
+                Element element = vertexList.get(j).element;
 
-        if (previousElement.getClass() == Separator.class) {                          // Если предыдущий элемент - сепаратор
-            Separator separator = (Separator) previousElement;
-            this.pressureOfHeatedMedium =                                           // Давление обогреваемой среды на выходе = давлению обогреваемой среды на выходе из предыдущего элемента - потери в подогревателе
-                    separator.getPressureOfHeatedMedium() - hydraulicResistanceInHeater;
-            if (Double.isNaN(underheatingOfSteamDrain)) {                           // Если охладитель дренажа отсутствует
-                this.temperatureOfSteamDrain = temperatureOfHeatingSteam;               // Температура дренажа = температуре греющего пара
-            } else {                                                                // иначе
-                this.temperatureOfSteamDrain =                                          // Температура дренажа = температуре обогреваемой среды на выходе из предыдущего подогревателя + недогрев
-                        separator.getTemperatureOfHeatedMedium() + underheatingOfSteamDrain;
-            }
-        } else {
-            Superheaters previousSuperheater = (Superheaters) previousElement;
-            this.pressureOfHeatedMedium =                                           // Давление обогреваемой среды на выходе = давлению обогреваемой среды на выходе из предыдущего элемента - потери в подогревателе
-                    previousSuperheater.getPressureOfHeatedMedium() - hydraulicResistanceInHeater;
-            if (Double.isNaN(underheatingOfSteamDrain)) {                           // Если охладитель дренажа отсутствует
-                this.temperatureOfSteamDrain = temperatureOfHeatingSteam;               // Температура дренажа = температуре греющего пара
-            } else {                                                                // иначе
-                this.temperatureOfSteamDrain =                                          // Температура дренажа = температуре обогреваемой среды на выходе из предыдущего подогревателя + недогрев
-                        previousSuperheater.getTemperatureOfHeatedMedium() + underheatingOfSteamDrain;
+                if (element.getClass() == TurbineCylinder.class) {
+                    TurbineCylinder turbineCylinder = (TurbineCylinder) element;
+                    this.pressureOfHeatingSteam =                           // Считаем давление в подогревателе
+                            turbineCylinder.parametersInSelection(selectionNumber).getPressure() - hydraulicResistanceFromSelectionToHeater;
+                    this.pressureOfSteamDrain = pressureOfHeatingSteam;
+                    this.temperatureOfHeatingSteam =                        // Температура греющего пара
+                            waterSteam.saturationTemperatureP(pressureOfHeatingSteam) - 273.15;
+
+                    this.enthalpyOfHeatingSteam =                           // Энтальпия греющего пара
+                            turbineCylinder.parametersInSelection(selectionNumber).getEnthalpy();
+                }
             }
         }
+        //--------------------------------------------------------------------------------------------------------------
 
+        //--------------------------------Связи с элементами по линии перегретого пара----------------------------------
+        for (int j = 0; j < nVerts; j++) {
+            int relations = adjMat.get(SUPERHEATED_STEAM)[v][j];
+            if (relations == 1) {
+                Element element = vertexList.get(j).element;
+
+                if (element instanceof Separator) {
+                    Separator separator = (Separator) element;
+                    this.pressureOfHeatedMedium =                                           // Давление обогреваемой среды на выходе = давлению обогреваемой среды на выходе из предыдущего элемента - потери в подогревателе
+                            separator.getPressureOfHeatedMedium() - hydraulicResistanceInHeater;
+                    if (Double.isNaN(underheatingOfSteamDrain)) {                           // Если охладитель дренажа отсутствует
+                        this.temperatureOfSteamDrain = temperatureOfHeatingSteam;               // Температура дренажа = температуре греющего пара
+                    } else {                                                                // иначе
+                        this.temperatureOfSteamDrain =                                          // Температура дренажа = температуре обогреваемой среды на выходе из предыдущего подогревателя + недогрев
+                                separator.getTemperatureOfHeatedMedium() + underheatingOfSteamDrain;
+                    }
+                }
+
+                if (element instanceof Superheater) {
+                    Superheater superheater = (Superheater) element;
+                    this.pressureOfHeatedMedium =                                           // Давление обогреваемой среды на выходе = давлению обогреваемой среды на выходе из предыдущего элемента - потери в подогревателе
+                            superheater.getPressureOfHeatedMedium() - hydraulicResistanceInHeater;
+                    if (Double.isNaN(underheatingOfSteamDrain)) {                           // Если охладитель дренажа отсутствует
+                        this.temperatureOfSteamDrain = temperatureOfHeatingSteam;               // Температура дренажа = температуре греющего пара
+                    } else {                                                                // иначе
+                        this.temperatureOfSteamDrain =                                          // Температура дренажа = температуре обогреваемой среды на выходе из предыдущего подогревателя + недогрев
+                                superheater.getTemperatureOfHeatedMedium() + underheatingOfSteamDrain;
+                    }
+                }
+            }
+        }
+        //--------------------------------------------------------------------------------------------------------------
 
         this.enthalpyOfSteamDrain =                                             // Энтальпия дренажа находится по температуре дренажа на линии насыщения для воды
                 waterSteam.specificEnthalpySaturatedLiquidT(temperatureOfSteamDrain + 273.15);
@@ -101,6 +126,11 @@ public class Superheaters extends Elements implements MatrixCompilation {
         this.temperatureOfHeatedMedium = temperatureOfHeatingSteam - underheatingOfHeatedMedium;
         this.enthalpyOfHeatedMedium = waterSteam.specificEnthalpyPT(pressureOfHeatedMedium, temperatureOfHeatedMedium + 273.15);
         this.coefficient = 1 - heaterNumber / 1000;
+    }
+
+    @Override
+    public void setSelectionNumber(int selectionNumber) {
+        this.selectionNumber = selectionNumber;
     }
 
     public double getPressureOfHeatedMedium() {
@@ -181,10 +211,10 @@ public class Superheaters extends Elements implements MatrixCompilation {
             int superheaterIndexOfListConsumption = listOfConsumptions.indexOf(this.getConsumptionOfHeatedMedium());
 
             if (relations == -1 || relations == 1) {
-                Elements element = vertexList.get(j).element;
+                Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Superheaters.class) {
-                    Superheaters superheater2 = (Superheaters) element;
+                if (element.getClass() == Superheater.class) {
+                    Superheater superheater2 = (Superheater) element;
                     int indexOfListConsumption = listOfConsumptions.indexOf(superheater2.getConsumptionOfHeatedMedium());
                     if (relations == -1) {
                         coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][superheaterIndexOfListConsumption] = relations;
@@ -195,12 +225,12 @@ public class Superheaters extends Elements implements MatrixCompilation {
                     }
                 }
 
-                if (element.getClass() == TurbineCylinders.class) {
-                    TurbineCylinders turbineCylinders = (TurbineCylinders) element;
+                if (element.getClass() == TurbineCylinder.class) {
+                    TurbineCylinder turbineCylinder = (TurbineCylinder) element;
                     coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][superheaterIndexOfListConsumption] = relations;
                     if (relations == 1) {
-                        coefficientMatrix[heatBalanceEquation][superheaterIndexOfListConsumption] = relations * turbineCylinders
-                                .parametersInSelection(turbineCylinders.NUMBER_OF_SELECTIONS + 1).getEnthalpy();
+                        coefficientMatrix[heatBalanceEquation][superheaterIndexOfListConsumption] = relations * turbineCylinder
+                                .parametersInSelection(turbineCylinder.NUMBER_OF_SELECTIONS + 1).getEnthalpy();
                     } else {
                         coefficientMatrix[heatBalanceEquation][superheaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatedMedium();
                     }
@@ -221,9 +251,9 @@ public class Superheaters extends Elements implements MatrixCompilation {
             int relations = adjMat.get(HEATING_STEAM)[v][j];
             int superheaterIndexOfListConsumption = listOfConsumptions.indexOf(this.getConsumptionOfHeatingSteam());
             if (relations == -1 || relations == 1) {
-                Elements element = vertexList.get(j).element;
+                Element element = vertexList.get(j).element;
 
-                if (element.getClass() == TurbineCylinders.class) {
+                if (element.getClass() == TurbineCylinder.class) {
                     coefficientMatrix[materialBalanceEquationOnSteamDrainLine][superheaterIndexOfListConsumption] = relations;
                     coefficientMatrix[heatBalanceEquation][superheaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatingSteam() * this.getCoefficient();
                 }
@@ -236,9 +266,9 @@ public class Superheaters extends Elements implements MatrixCompilation {
             int relations = adjMat.get(STEAM_DRAIN)[v][j];
             int superheaterIndexOfListConsumption = listOfConsumptions.indexOf(this.getConsumptionOfSteamDrain());
             if (relations == -1 || relations == 1) {
-                Elements element = vertexList.get(j).element;
+                Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Heaters.class) {
+                if (element.getClass() == Heater.class) {
                     coefficientMatrix[materialBalanceEquationOnSteamDrainLine][superheaterIndexOfListConsumption] = relations;
                     coefficientMatrix[heatBalanceEquation][superheaterIndexOfListConsumption] = relations * this.getEnthalpyOfSteamDrain() * this.getCoefficient();
                 }
@@ -256,12 +286,6 @@ public class Superheaters extends Elements implements MatrixCompilation {
     public void describe() {
         super.describe();
         System.out.println("-----------------------------Характеристики подогревателя---------------------------------------------------------");
-        System.out.print("Тип подогревателя: ");
-        if (isSurfaceHeater) {
-            System.out.println("поверхностный");
-        } else {
-            System.out.println("смеешивающий");
-        }
         System.out.println("Гидравлическое сопротивление от отбора до подогревателя: " + hydraulicResistanceFromSelectionToHeater + " ,МПа");
         System.out.println("Гидравлическое сопротивление в подогревателе: " + hydraulicResistanceInHeater + " ,МПа");
         System.out.println("Недогрев дренажа (температурный напор между обогреваемой средой на входе и дренажом на выходе): " + underheatingOfSteamDrain + " ,℃");

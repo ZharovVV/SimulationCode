@@ -1,7 +1,7 @@
 package com.example.thermal_circuit_simulation.Elements;
 
-import com.example.thermal_circuit_simulation.Elements.Ejectors.MainEjectorsWithCooler;
-import com.example.thermal_circuit_simulation.Elements.Ejectors.SealEjectorsWithCooler;
+import com.example.thermal_circuit_simulation.Elements.Ejectors.MainEjectorWithCooler;
+import com.example.thermal_circuit_simulation.Elements.Ejectors.SealEjectorWithCooler;
 import com.example.thermal_circuit_simulation.Graph.Graph;
 import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.*;
 import com.example.thermal_circuit_simulation.Graph.Vertex;
@@ -13,7 +13,7 @@ import java.util.Map;
 
 import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 
-public class Pumps extends Elements implements MatrixCompilation, CalculationOfThermalEfficiencyIndicators {
+public class Pump extends Element implements MatrixCompilation {
     private double efficiency;              // КПД насоса
     private double pumpHead;                // Необходимый напор насоса
     private double pumpDriveEfficiency;     // КПД привода насоса (Если используется турбопривод, то имеется в виду механический КПД
@@ -29,64 +29,84 @@ public class Pumps extends Elements implements MatrixCompilation, CalculationOfT
     private Consumptions consumptionOfWater = new Consumptions();
     private Equation materialBalanceEquation = new Equation(this);
 
-    public Pumps(String name, double efficiency, double pumpHead, Elements previousElement, boolean isThePumpDriveElectric, double pumpDriveEfficiency) {
+    public Pump(String name, double efficiency, double pumpHead, boolean isThePumpDriveElectric, double pumpDriveEfficiency) {
         super(name);
         this.efficiency = efficiency;
         this.pumpDriveEfficiency = pumpDriveEfficiency;
         this.pumpHead = pumpHead;
         this.isThePumpDriveElectric = isThePumpDriveElectric;
-        if (previousElement.getClass() == Heaters.class) {                          // Если предыдущий элемент - подогреватель
-            Heaters previousHeater = (Heaters) previousElement;
-            this.inletTemperature = previousHeater.getTemperatureOfHeatedMedium();
-            this.inletPressure = previousHeater.getPressureOfHeatedMedium();
-            this.inletEnthalpy = previousHeater.getEnthalpyOfHeatedMedium();
-        } else if (previousElement.getClass() == Condenser.class) {                 // Если предыдущий элемент - конденсатор
-            Condenser condenser = (Condenser) previousElement;
-            this.inletTemperature = condenser.getTemperatureOfSteamDrain();
-            this.inletPressure = condenser.getPressureOfSteamDrain();
-            this.inletEnthalpy = condenser.getEnthalpyOfSteamDrain();
-        } else if (previousElement.getClass() == Deaerator.class) {
-            Deaerator deaerator = (Deaerator) previousElement;
-            this.inletTemperature = deaerator.getTemperatureOfHeatedMedium();
-            this.inletPressure = deaerator.getPressureOfHeatedMedium();
-            this.inletEnthalpy = deaerator.getEnthalpyOfHeatedMedium();
-        } else if (previousElement.getClass() == SealEjectorsWithCooler.class) {
-            SealEjectorsWithCooler sealEjectorsWithCooler = (SealEjectorsWithCooler) previousElement;
-            this.inletTemperature = sealEjectorsWithCooler.getOutletTemperature();
-            this.inletPressure = sealEjectorsWithCooler.getOutletPressure();
-            this.inletEnthalpy = sealEjectorsWithCooler.getOutletEnthalpy();
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Override
+    public void calculationOfInitialParameters(int v, Graph theGraph) {
+        // TODO: 10.09.2019 instanceof
+        //--------------------------Инициализация-----------------------------------------------------------------------
+        int nVerts = theGraph.getnVerts();
+        Map<Integer, int[][]> adjMat = theGraph.getAdjMat();
+        ArrayList<Vertex> vertexList = theGraph.getVertexList();
+        IF97 waterSteam = new IF97(IF97.UnitSystem.DEFAULT);
+        //--------------------------------------------------------------------------------------------------------------
+
+        //--------------------------------Связи с элементами по линии питательной воды----------------------------------
+        for (int j = 0; j < nVerts; j++) {
+            int relations = adjMat.get(FEED_WATER)[v][j];
+            if (relations == 1) {
+                Element element = vertexList.get(j).element;
+
+                if (element instanceof Condenser) {
+                    Condenser condenser = (Condenser) element;
+                    this.inletTemperature = condenser.getTemperatureOfSteamDrain();
+                    this.inletPressure = condenser.getPressureOfSteamDrain();
+                    this.inletEnthalpy = condenser.getEnthalpyOfSteamDrain();
+                }
+
+                if (element.getClass() == Heater.class) {
+                    Heater heater = (Heater) element;
+                    this.inletTemperature = heater.getTemperatureOfHeatedMedium();
+                    this.inletPressure = heater.getPressureOfHeatedMedium();
+                    this.inletEnthalpy = heater.getEnthalpyOfHeatedMedium();
+                }
+
+                if (element.getClass() == Deaerator.class) {
+                    Deaerator deaerator = (Deaerator) element;
+                    this.inletTemperature = deaerator.getTemperatureOfHeatedMedium();
+                    this.inletPressure = deaerator.getPressureOfHeatedMedium();
+                    this.inletEnthalpy = deaerator.getEnthalpyOfHeatedMedium();
+                }
+
+                if (element.getClass() == SealEjectorWithCooler.class) {
+                    SealEjectorWithCooler sealEjectorWithCooler = (SealEjectorWithCooler) element;
+                    this.inletTemperature = sealEjectorWithCooler.getOutletTemperature();
+                    this.inletPressure = sealEjectorWithCooler.getOutletPressure();
+                    this.inletEnthalpy = sealEjectorWithCooler.getOutletEnthalpy();
+                }
+            }
         }
+        //--------------------------------------------------------------------------------------------------------------
+
+        //---------------------------------Связи с элементами по линии дренажа греющего пара----------------------------
+        for (int j = 0; j < nVerts; j++) {
+            int relations = adjMat.get(STEAM_DRAIN)[v][j];
+            if (relations == 1) {
+                Element element = vertexList.get(j).element;
+
+                if (element.getClass() == Heater.class) {
+                    Heater heater = (Heater) element;
+                    this.inletTemperature = heater.getTemperatureOfSteamDrain();
+                    this.inletPressure = heater.getPressureOfSteamDrain();
+                    this.inletEnthalpy = heater.getEnthalpyOfSteamDrain();
+                }
+
+            }
+        }
+        //--------------------------------------------------------------------------------------------------------------
+
         this.outletTemperature = inletTemperature;
         this.outletPressure = inletPressure + pumpHead;
-
-        IF97 waterSteam = new IF97(IF97.UnitSystem.DEFAULT);
-
         this.enthalpyIncrease =
                 pumpHead * waterSteam.specificVolumePT((inletPressure + outletPressure) / 2, inletTemperature + 273.15) * 1000 / efficiency;
         this.outletEnthalpy = inletEnthalpy + enthalpyIncrease;
-
-    }
-
-    // Конструктор для дренажного насоса
-    public Pumps(String name, boolean isDrainagePump, double efficiency, double pumpHead, Heaters previousHeaterOnSteamDrainLine, double pumpDriveEfficiency) {
-        super(name);
-        if (isDrainagePump) {
-            this.isThePumpDriveElectric = true;
-            this.efficiency = efficiency;
-            this.pumpDriveEfficiency = pumpDriveEfficiency;
-            this.pumpHead = pumpHead;
-            this.inletTemperature = previousHeaterOnSteamDrainLine.getTemperatureOfSteamDrain();
-            this.inletPressure = previousHeaterOnSteamDrainLine.getPressureOfSteamDrain();
-            this.inletEnthalpy = previousHeaterOnSteamDrainLine.getEnthalpyOfSteamDrain();
-            this.outletTemperature = inletTemperature;
-            this.outletPressure = inletPressure + pumpHead;
-
-            IF97 waterSteam = new IF97(IF97.UnitSystem.DEFAULT);
-
-            this.enthalpyIncrease =
-                    pumpHead * waterSteam.specificVolumePT((inletPressure + outletPressure) / 2, inletTemperature + 273.15) * 1000 / efficiency;
-            this.outletEnthalpy = inletEnthalpy + enthalpyIncrease;
-        }
     }
 
     public double getOutletTemperature() {
@@ -157,7 +177,7 @@ public class Pumps extends Elements implements MatrixCompilation, CalculationOfT
             // Получение номера столбца расхода воды в насосе
             int pumpIndexOfListConsumption = listOfConsumptions.indexOf(this.getConsumptionOfWater());
             if (relations == -1 || relations == 1) {
-                Elements element = vertexList.get(j).element;
+                Element element = vertexList.get(j).element;
 
                 if (element.getClass() == Condenser.class) {
                     Condenser condenser = (Condenser) element;
@@ -166,11 +186,11 @@ public class Pumps extends Elements implements MatrixCompilation, CalculationOfT
                     coefficientMatrix[materialBalanceEquation][indexOfListConsumption] = relations;
                 }
 
-                if (element.getClass() == Heaters.class) {
+                if (element.getClass() == Heater.class) {
                     if (relations == -1) {
                         coefficientMatrix[materialBalanceEquation][pumpIndexOfListConsumption] = relations;
                     } else {
-                        Heaters heater = (Heaters) element;
+                        Heater heater = (Heater) element;
                         // Получение номера столбца расхода обогреваемой среды подогревателя
                         int indexOfListConsumption = listOfConsumptions.indexOf(heater.getConsumptionOfHeatedMedium());
                         coefficientMatrix[materialBalanceEquation][indexOfListConsumption] = relations;
@@ -188,12 +208,12 @@ public class Pumps extends Elements implements MatrixCompilation, CalculationOfT
                     }
                 }
 
-                if (element.getClass() == MainEjectorsWithCooler.class && relations == -1) {
+                if (element.getClass() == MainEjectorWithCooler.class && relations == -1) {
                     coefficientMatrix[materialBalanceEquation][pumpIndexOfListConsumption] = relations;
                 }
 
-                if (element.getClass() == SealEjectorsWithCooler.class && relations == 1) {
-                    SealEjectorsWithCooler ejector = (SealEjectorsWithCooler) element;
+                if (element.getClass() == SealEjectorWithCooler.class && relations == 1) {
+                    SealEjectorWithCooler ejector = (SealEjectorWithCooler) element;
                     // Получение номера столбца расхода воды охладителя
                     int indexOfListConsumption = listOfConsumptions.indexOf(ejector.getConsumptionOfWater());
                     coefficientMatrix[materialBalanceEquation][indexOfListConsumption] = relations;
@@ -208,20 +228,20 @@ public class Pumps extends Elements implements MatrixCompilation, CalculationOfT
             // Получение номера столбца расхода воды в насосе
             int pumpIndexOfListConsumption = listOfConsumptions.indexOf(this.getConsumptionOfWater());
             if (relations == -1 || relations == 1) {
-                Elements element = vertexList.get(j).element;
+                Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Heaters.class) {
+                if (element.getClass() == Heater.class) {
                     if (relations == -1) {
                         coefficientMatrix[materialBalanceEquation][pumpIndexOfListConsumption] = relations;
                     } else {
-                        Heaters heater = (Heaters) element;
+                        Heater heater = (Heater) element;
                         // Получение номера столбца расхода дренажа греющего пара подогревателя
                         int indexOfListConsumption = listOfConsumptions.indexOf(heater.getConsumptionOfSteamDrain());
                         coefficientMatrix[materialBalanceEquation][indexOfListConsumption] = relations;
                     }
                 }
 
-                if (element.getClass() == MixingPoints.class) {
+                if (element.getClass() == MixingPoint.class) {
                     if (relations == -1) {
                         coefficientMatrix[materialBalanceEquation][pumpIndexOfListConsumption] = relations;
                     }
