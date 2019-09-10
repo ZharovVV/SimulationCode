@@ -10,7 +10,7 @@ import java.util.Map;
 
 import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 
-public class MixingPoint extends Element implements MatrixCompilation {
+public class MixingPoint extends Element {
     private double pressureOfHeatedMedium;
     private double temperatureOfHeatedMedium;
     private double enthalpyOfHeatedMedium;                      // Энтальпия обогреваемой среды на выходе из точки смешения

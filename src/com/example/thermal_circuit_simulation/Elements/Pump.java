@@ -13,7 +13,7 @@ import java.util.Map;
 
 import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 
-public class Pump extends Element implements MatrixCompilation {
+public class Pump extends Element {
     private double efficiency;              // КПД насоса
     private double pumpHead;                // Необходимый напор насоса
     private double pumpDriveEfficiency;     // КПД привода насоса (Если используется турбопривод, то имеется в виду механический КПД

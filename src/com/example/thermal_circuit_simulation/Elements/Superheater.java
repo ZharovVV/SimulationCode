@@ -13,7 +13,7 @@ import java.util.Map;
 
 import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 
-public class Superheater extends Element implements MatrixCompilation {
+public class Superheater extends Element {
     //-----------------------------Характеристики подогревателя---------------------------------------------------------
     private int heaterNumber;                                   // Номер подогревателя по ходу пара
     private int selectionNumber;                                // Номер отбора

@@ -11,7 +11,7 @@ import java.util.Map;
 
 import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 
-public class SteamGenerator extends Element implements MatrixCompilation {
+public class SteamGenerator extends Element {
     private double steamConsumption;        // Расход пара через ПГ
     private double inletEnthalpy;           // Энтальпия на входе в ПГ (на выходе из последнего подогревателя)
     private double outletEnthalpy;          // Энтальпия на выходе из ПГ (на входе в цилиндр)

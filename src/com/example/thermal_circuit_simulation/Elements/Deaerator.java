@@ -10,7 +10,7 @@ import java.util.Map;
 
 import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 
-public class Deaerator extends Element implements MatrixCompilation {
+public class Deaerator extends Element {
     //-----------------------------Характеристики подогревателя---------------------------------------------------------
     private int selectionNumber;                                // Номер отбора
     //-----------------------------Характеристики греющего пара---------------------------------------------------------

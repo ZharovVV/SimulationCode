@@ -12,7 +12,7 @@ import java.util.Map;
 
 import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 
-public class TurbineCylinder extends Element implements MatrixCompilation {
+public class TurbineCylinder extends Element {
     public final int NUMBER_OF_SELECTIONS;                                                  // Число отборов в турбине
     private ArrayList<Parameters> listOfParametersInSelections;                             // Список параметров отбора, включая параметры на входе и выходе из цилиндра
 

@@ -13,7 +13,7 @@ import java.util.Map;
 
 import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 
-public class Condenser extends Element implements MatrixCompilation {
+public class Condenser extends Element {
     //-----------------------------Характеристики греющего пара---------------------------------------------------------
     private double pressureOfHeatingSteam;                      // Давление греющего пара на входе в конденсатор
     private double temperatureOfHeatingSteam;                   // Температура греющего пара на входе в конденсатор

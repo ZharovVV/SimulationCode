@@ -14,7 +14,7 @@ import java.util.Map;
 import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 
 
-public class Separator extends Element implements MatrixCompilation {
+public class Separator extends Element {
     //------------------------------Характеристики сепаратора-----------------------------------------------------------
     private double hydraulicResistanceFromCylinderToSeparator;    // Гидравлическое сопротивление от отбора до сепаратора
     private double outletDegreeOfDryness;                         // Степень сухости на выходе из сепаратора

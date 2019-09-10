@@ -323,28 +323,9 @@ public class Main {
         theGraph.addEdge(Graph.STEAM_DRAIN, turboDrive, condenser);
         theGraph.addEdge(Graph.MECHANICAL_COMMUNICATION, turboDrive, pn);
 
-        /*theGraph.dfs();*/
-        theGraph.dfsAndCalculationOfInitialParameters();
-        Matrices matrices = theGraph.dfsAndMatrixCompilation();
-        /*matrices.describeMatrices();*/
-        ArrayList<Vertex> vertexArrayList = theGraph.getVertexList();
+        theGraph.startCalculation();
+        theGraph.describe();
 
-
-        matrices.solvingSystemAndSettingConsumption();
-
-
-        matrices = theGraph.dfsAndMatrixCompilation();
-        matrices.solvingSystemAndSettingConsumption();
-        matrices = theGraph.dfsAndMatrixCompilation();
-        matrices.solvingSystemAndSettingConsumption();
-        matrices = theGraph.dfsAndMatrixCompilation();
-        matrices.solvingSystemAndSettingConsumption();
-        matrices = theGraph.dfsAndMatrixCompilation();
-        matrices.solvingSystemAndSettingConsumption();
-
-        for (Vertex vertex : vertexArrayList) {
-            vertex.element.describe();
-        }
 
         ThermalEfficiencyIndicators thermalEfficiencyIndicators =
                 theGraph.dfsAndCalculationOfThermalEfficiencyIndicators(0.988, 0.99);

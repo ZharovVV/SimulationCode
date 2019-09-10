@@ -14,7 +14,7 @@ import java.util.Map;
 
 import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 
-public class Heater extends Element implements MatrixCompilation {
+public class Heater extends Element {
     //-----------------------------Характеристики подогревателя---------------------------------------------------------
     private int heaterNumber;                                   // Номер подогревателя по ходу воды
     private boolean isSurfaceHeater;                            // Подогреватель поверхностного типа? false, если тип подогревателя смешивающий
@@ -67,8 +67,7 @@ public class Heater extends Element implements MatrixCompilation {
             String name,
             double pressureInHeater,
             int selectionNumber,
-            TurbineCylinder turbineCylinder,
-            Element previousElement
+            TurbineCylinder turbineCylinder
     ) {
         super(name);
         this.isSurfaceHeater = false;
