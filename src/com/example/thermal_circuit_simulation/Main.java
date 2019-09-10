@@ -7,7 +7,6 @@ import com.example.thermal_circuit_simulation.Elements.Seals.TurbineShaftSeals;
 import com.example.thermal_circuit_simulation.Elements.Seals.ValveStemSeals;
 import com.example.thermal_circuit_simulation.Graph.Graph;
 import com.example.thermal_circuit_simulation.Graph.Vertex;
-import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Matrices;
 import com.example.thermal_circuit_simulation.ThermalEfficiencyIndicators.ThermalEfficiencyIndicators;
 
 import java.util.*;
@@ -33,12 +32,10 @@ public class Main {
         Separator separator = new Separator("Сепаратор", 0.02, 0.999);
         elementsMap.put(separator.NAME, separator);
         //-----------------------ПП1
-        Superheater pp1 = new Superheater("ПП1", 1, 0.12, 0.02,
-                NaN, 20);
+        Superheater pp1 = new Superheater("ПП1", 1, 0.12, 0.02, 20);
         elementsMap.put(pp1.NAME, pp1);
         //-----------------------ПП2
-        Superheater pp2 = new Superheater("ПП2", 2, 0.2, 0.02,
-                NaN, 22.2);
+        Superheater pp2 = new Superheater("ПП2", 2, 0.2, 0.02, 22.2);
         elementsMap.put(pp2.NAME, pp2);
         //--------------------------ЦНД
         TurbineCylinder cnd = new TurbineCylinder("ЦНД", 4);
@@ -68,7 +65,7 @@ public class Main {
         Pump kn2 = new Pump("КНII", 0.78, 1.0, true, 0.86);
         elementsMap.put(kn2.NAME, kn2);
         //-------------------------ПНД1
-        Heater pnd1 = new Heater("ПНД1", 1, 0.15, NaN, 2.5);
+        Heater pnd1 = new Heater("ПНД1", 1, 0.15, 2.5);
         elementsMap.put(pnd1.NAME, pnd1);
         //-------------------------ДН1
         Pump dn1 = new Pump("ДН1", 0.76, 2, true, 0.86);
@@ -80,7 +77,7 @@ public class Main {
         Heater pnd2 = new Heater("ПНД2", 2, 0.15, 5, 3);
         elementsMap.put(pnd2.NAME, pnd2);
         //------------------------ПНД3
-        Heater pnd3 = new Heater("ПНД3", 3, 0.15, NaN, 4);
+        Heater pnd3 = new Heater("ПНД3", 3, 0.15, 4);
         elementsMap.put(pnd3.NAME, pnd3);
         //------------------------ДН2
         Pump dn2 = new Pump("ДН2", 0.76, 1.5, true, 0.86);
@@ -107,15 +104,15 @@ public class Main {
         HeatNetwork ts = new HeatNetwork("Теплосеть", 1, 150, 1.6, 60, 120);
         elementsMap.put(ts.NAME, ts);
         //----------------------Т1
-        Heater t1 = new Heater("Т1", 1, 0.2, NaN, 4);
+        Heater t1 = new Heater("Т1", 1, 0.2, 4);
         elementsMap.put(t1.NAME, t1);
         //----------------------Т2
-        Heater t2 = new Heater("Т2", 2, 0.2, NaN, 4.6);
+        Heater t2 = new Heater("Т2", 2, 0.2, 4.6);
         //t2.describeHeater();
 
         elementsMap.put(t2.NAME, t2);
         //----------------------Т3
-        Heater t3 = new Heater("Т3", 3, 0.2, NaN, 8.8);
+        Heater t3 = new Heater("Т3", 3, 0.2, 8.8);
         elementsMap.put(t3.NAME, t3);
         //---------------------ТП
         TurboDrive turboDrive = new TurboDrive("ТП", 0.73, 0.004, 1720); //1786.1

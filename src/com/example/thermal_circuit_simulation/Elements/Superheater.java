@@ -47,13 +47,12 @@ public class Superheater extends Element {
                        int heaterNumber,
                        double hydraulicResistanceFromSelectionToHeater,
                        double hydraulicResistanceInHeater,
-                       double underheatingOfSteamDrain,
                        double underheatingOfHeatedMedium) {
         super(name);
         this.heaterNumber = heaterNumber;
         this.hydraulicResistanceFromSelectionToHeater = hydraulicResistanceFromSelectionToHeater;
         this.hydraulicResistanceInHeater = hydraulicResistanceInHeater;
-        this.underheatingOfSteamDrain = underheatingOfSteamDrain;
+        this.underheatingOfSteamDrain = Double.NaN;
         this.underheatingOfHeatedMedium = underheatingOfHeatedMedium;
     }
 

@@ -46,7 +46,7 @@ public class Heater extends Element {
     private Equation heatBalanceEquation = new Equation(this);
 
 
-    //-----------------------------Конструктор для поверхностного подогревателя-----------------------------------------
+    //-----------------------------Конструктор для поверхностного подогревателя с ОД------------------------------------
     public Heater(
             String name,                                        // Название подогревателя
             int heaterNumber,
@@ -59,6 +59,21 @@ public class Heater extends Element {
         this.isSurfaceHeater = true;
         this.hydraulicResistanceInHeater = hydraulicResistanceInHeater;
         this.underheatingOfSteamDrain = underheatingOfSteamDrain;
+        this.underheatingOfHeatedMedium = underheatingOfHeatedMedium;
+    }
+
+    //-----------------------------Конструктор для поверхностного подогревателя без ОД----------------------------------
+    public Heater(
+            String name,                                        // Название подогревателя
+            int heaterNumber,
+            double hydraulicResistanceInHeater,
+            double underheatingOfHeatedMedium
+    ) {
+        super(name);
+        this.heaterNumber = heaterNumber;
+        this.isSurfaceHeater = true;
+        this.hydraulicResistanceInHeater = hydraulicResistanceInHeater;
+        this.underheatingOfSteamDrain = Double.NaN;
         this.underheatingOfHeatedMedium = underheatingOfHeatedMedium;
     }
 
