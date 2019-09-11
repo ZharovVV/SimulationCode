@@ -36,7 +36,6 @@ public class TurbineShaftSeals extends Element implements MatrixCompilation {
         return elementContributionToSteamConsumptionInSeals;
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
     public void matrixCompilation(int v, Matrices matrices, Graph theGraph) {
         //--------------------------Инициализация-----------------------------------------------------------------------
@@ -53,14 +52,14 @@ public class TurbineShaftSeals extends Element implements MatrixCompilation {
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == TurbineCylinder.class) {
+                if (element instanceof TurbineCylinder) {
                     TurbineCylinder turbineCylinder = (TurbineCylinder) element;
                     int materialBalanceEquation = matrices.getListOfLinesOfEquations().indexOf(turbineCylinder.getMaterialBalanceEquation());
                     freeMemoryMatrix[materialBalanceEquation] += relations * elementContributionToSteamConsumptionInSeals.get(turbineCylinder);
                 }
 
 
-                if (element.getClass() == Heater.class) {
+                if (element instanceof Heater) {
                     Heater heater = (Heater) element;
                     if (heater.isSurfaceHeater()) {
                         int materialBalanceEquation = matrices.getListOfLinesOfEquations().indexOf(heater.getMaterialBalanceEquationOnSteamDrainLine());
@@ -79,7 +78,7 @@ public class TurbineShaftSeals extends Element implements MatrixCompilation {
                     }
                 }
 
-                if (element.getClass() == Deaerator.class) {
+                if (element instanceof Deaerator) {
                     Deaerator deaerator = (Deaerator) element;
                     if (relations == 1) {
                         int materialBalanceEquation = matrices.getListOfLinesOfEquations().indexOf(deaerator.getMaterialBalanceEquationOnHeatedMediumLine());

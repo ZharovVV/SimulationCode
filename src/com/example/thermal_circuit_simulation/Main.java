@@ -66,7 +66,11 @@ public class Main {
         elementsMap.put(kn2.NAME, kn2);
         //-------------------------ПНД1
         Heater pnd1 = new Heater("ПНД1", 1, 0.15, 2.5);
+        /*Heater pnd1 = new Heater("ПНД1", 1);//Смешивающий подогреватель*/
         elementsMap.put(pnd1.NAME, pnd1);
+        /*//-------------------------Перекачивающий насос
+        Pump n = new Pump("Насос", 0.76, 1.425, true, 0.86);
+        elementsMap.put(n.NAME, n);*/
         //-------------------------ДН1
         Pump dn1 = new Pump("ДН1", 0.76, 2, true, 0.86);
         elementsMap.put(dn1.NAME, dn1);
@@ -164,6 +168,7 @@ public class Main {
         Vertex sealEjector = new Vertex(elementsMap.get("Эжектор Уплотнений"));
         Vertex kn2 = new Vertex(elementsMap.get("КНII"));
         Vertex pnd1 = new Vertex(elementsMap.get("ПНД1"));
+        /*Vertex n = new Vertex(elementsMap.get("Насос"));*/
         Vertex dn1 = new Vertex(elementsMap.get("ДН1"));
         Vertex sm1 = new Vertex(elementsMap.get("См1"));
         Vertex pnd2 = new Vertex(elementsMap.get("ПНД2"));
@@ -197,6 +202,7 @@ public class Main {
         theGraph.addVertex(sealEjector);
         theGraph.addVertex(kn2);
         theGraph.addVertex(pnd1);
+        /*theGraph.addVertex(n);*/
         theGraph.addVertex(dn1);
         theGraph.addVertex(sm1);
         theGraph.addVertex(pnd2);
@@ -281,6 +287,8 @@ public class Main {
         theGraph.addEdge(Graph.FEED_WATER, kn2, pnd1);
 
         theGraph.addEdge(Graph.FEED_WATER, pnd1, sm1);
+        /*theGraph.addEdge(Graph.FEED_WATER, pnd1, n);
+        theGraph.addEdge(Graph.FEED_WATER, n, pnd2);*/
         theGraph.addEdge(Graph.FEED_WATER, sm1, pnd2);
         theGraph.addEdge(Graph.STEAM_DRAIN, pnd1, dn1);
         theGraph.addEdge(Graph.STEAM_DRAIN, dn1, sm1);

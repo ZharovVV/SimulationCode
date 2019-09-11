@@ -15,7 +15,6 @@ public class Matrices {
     private ArrayList<Consumptions> listOfColumnsOfConsumptions;
     private ArrayList<Equation> listOfLinesOfEquations;
 
-    @SuppressWarnings("ConstantConditions")
     public Matrices(ArrayList<Vertex> vertexList) {
         listOfColumnsOfConsumptions = new ArrayList<>();
         listOfLinesOfEquations = new ArrayList<>();
@@ -24,7 +23,7 @@ public class Matrices {
 
         for (Vertex vertex : vertexList) {
             Element element = vertex.element;
-            if (element.getClass() == Heater.class) {
+            if (element instanceof Heater) {
                 Heater heater = (Heater) element;
                 if (heater.isSurfaceHeater()) {
                     i = i + 3;
@@ -45,7 +44,7 @@ public class Matrices {
                 }
             }
 
-            if (element.getClass() == Deaerator.class) {
+            if (element instanceof Deaerator) {
                 Deaerator deaerator = (Deaerator) element;
                 i = i + 2;
                 j = j + 2;
@@ -56,7 +55,7 @@ public class Matrices {
             }
 
 
-            if (element.getClass() == Superheater.class) {
+            if (element instanceof Superheater) {
                 Superheater superheater = (Superheater) element;
                 i = i + 3;
                 j = j + 3;
@@ -68,7 +67,7 @@ public class Matrices {
                 listOfLinesOfEquations.add(superheater.getHeatBalanceEquation());
             }
 
-            if (element.getClass() == Separator.class) {
+            if (element instanceof Separator) {
                 Separator separator = (Separator) element;
                 i = i + 2;
                 j = j + 3;
@@ -80,14 +79,14 @@ public class Matrices {
 
             }
 
-            if (element.getClass() == TurbineCylinder.class) {
+            if (element instanceof TurbineCylinder) {
                 TurbineCylinder turbineCylinder = (TurbineCylinder) element;
                 i = i + 1;
                 listOfLinesOfEquations.add(turbineCylinder.getMaterialBalanceEquation());
 
             }
 
-            if (element.getClass() == Condenser.class) {
+            if (element instanceof Condenser) {
                 Condenser condenser = (Condenser) element;
                 i = i + 1;
                 j = j + 2;
@@ -96,7 +95,7 @@ public class Matrices {
                 listOfLinesOfEquations.add(condenser.getMaterialBalanceEquation());
             }
 
-            if (element.getClass() == Pump.class) {
+            if (element instanceof Pump) {
                 Pump pump = (Pump) element;
                 i = i + 1;
                 j = j + 1;
@@ -104,7 +103,7 @@ public class Matrices {
                 listOfLinesOfEquations.add(pump.getMaterialBalanceEquation());
             }
 
-            if (element.getClass() == MainEjectorWithCooler.class) {
+            if (element instanceof MainEjectorWithCooler) {
                 MainEjectorWithCooler mainEjectorWithCooler = (MainEjectorWithCooler) element;
                 i = i + 1;
                 j = j + 1;
@@ -112,7 +111,7 @@ public class Matrices {
                 listOfLinesOfEquations.add(mainEjectorWithCooler.getMaterialBalanceEquation());
             }
 
-            if (element.getClass() == SealEjectorWithCooler.class) {
+            if (element instanceof SealEjectorWithCooler) {
                 SealEjectorWithCooler sealEjectorWithCooler = (SealEjectorWithCooler) element;
                 i = i + 1;
                 j = j + 1;
@@ -120,7 +119,7 @@ public class Matrices {
                 listOfLinesOfEquations.add(sealEjectorWithCooler.getMaterialBalanceEquation());
             }
 
-            if (element.getClass() == MixingPoint.class) {
+            if (element instanceof MixingPoint) {
                 MixingPoint mixingPoint = (MixingPoint) element;
                 i = i + 1;
                 j = j + 1;
@@ -166,8 +165,8 @@ public class Matrices {
         System.out.println();
         System.out.println();
         System.out.print('[');
-        for (int i = 0; i < freeMemoryMatrix.length; i++) {
-            System.out.print(freeMemoryMatrix[i] + ", ");
+        for (double memoryMatrix : freeMemoryMatrix) {
+            System.out.print(memoryMatrix + ", ");
         }
         System.out.println(']');
     }

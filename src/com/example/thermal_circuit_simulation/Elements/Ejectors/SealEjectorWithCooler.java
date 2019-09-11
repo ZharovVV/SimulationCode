@@ -51,7 +51,6 @@ public class SealEjectorWithCooler extends Element implements MatrixCompilation 
 
     @Override
     public void calculationOfInitialParameters(int v, Graph theGraph) {
-        // TODO: 10.09.2019 instanceof
         //--------------------------Инициализация-----------------------------------------------------------------------
         int nVerts = theGraph.getnVerts();
         Map<Integer, int[][]> adjMat = theGraph.getAdjMat();
@@ -128,7 +127,7 @@ public class SealEjectorWithCooler extends Element implements MatrixCompilation 
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Deaerator.class && relations == 1) {
+                if (element instanceof Deaerator && relations == 1) {
                     Deaerator deaerator = (Deaerator) element;
                     int materialBalanceEquation = matrices.getListOfLinesOfEquations().indexOf(deaerator.getMaterialBalanceEquationOnHeatedMediumLine());
                     int heatBalanceEquation = matrices.getListOfLinesOfEquations().indexOf(deaerator.getHeatBalanceEquation());
@@ -139,12 +138,12 @@ public class SealEjectorWithCooler extends Element implements MatrixCompilation 
                                     waterSteam.specificEnthalpySaturatedVapourP(deaerator.getPressureOfHeatedMedium());
                 }
 
-                if (element.getClass() == TurbineShaftSeals.class) {
+                if (element instanceof TurbineShaftSeals) {
                     TurbineShaftSeals turbineShaftSeal = (TurbineShaftSeals) element;
                     outputFlow += turbineShaftSeal.getElementContributionToSteamConsumptionInSeals().get(this);
                 }
 
-                if (element.getClass() == ValveStemSeals.class) {
+                if (element instanceof ValveStemSeals) {
                     ValveStemSeals valveStemSeal = (ValveStemSeals) element;
                     outputFlow += valveStemSeal.getElementContributionToSteamConsumptionInSeals().get(this);
                 }
@@ -159,7 +158,7 @@ public class SealEjectorWithCooler extends Element implements MatrixCompilation 
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Condenser.class) {
+                if (element instanceof Condenser) {
                     Condenser condenser = (Condenser) element;
                     int materialBalanceEquation = matrices.getListOfLinesOfEquations().indexOf(condenser.getMaterialBalanceEquation());
                     freeMemoryMatrix[materialBalanceEquation] += relations * outputFlow;
@@ -176,7 +175,7 @@ public class SealEjectorWithCooler extends Element implements MatrixCompilation 
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Pump.class) {
+                if (element instanceof Pump) {
                     if (relations == -1) {
                         coefficientMatrix[coolerMaterialBalanceEquationOnHeatedMediumLine][coolerIndexOfListConsumption] = relations;
                     } else {
@@ -187,7 +186,7 @@ public class SealEjectorWithCooler extends Element implements MatrixCompilation 
                     }
                 }
 
-                if (element.getClass() == MainEjectorWithCooler.class) {
+                if (element instanceof MainEjectorWithCooler) {
                     MainEjectorWithCooler mainEjectorWithCooler = (MainEjectorWithCooler) element;
                     // Получение номера столбца расхода воды охладителя пара эжектора
                     int indexOfListConsumption = listOfConsumptions.indexOf(mainEjectorWithCooler.getConsumptionOfWater());

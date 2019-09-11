@@ -58,7 +58,7 @@ public class Separator extends Element {
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == TurbineCylinder.class && relations == 1) {
+                if (element instanceof TurbineCylinder && relations == 1) {
                     TurbineCylinder turbineCylinder = (TurbineCylinder) element;
                     this.pressureOfHeatingSteam =
                             turbineCylinder.parametersInSelection(turbineCylinder.NUMBER_OF_SELECTIONS + 1).getPressure() - hydraulicResistanceFromCylinderToSeparator;
@@ -165,12 +165,12 @@ public class Separator extends Element {
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Superheater.class) {
+                if (element instanceof Superheater) {
                     coefficientMatrix[materialBalanceEquation][separatorIndexOfListConsumption] = relations;
                     coefficientMatrix[heatBalanceEquation][separatorIndexOfListConsumption] = relations * this.getEnthalpyOfHeatedMedium();
                 }
 
-                if (element.getClass() == TurbineCylinder.class) {
+                if (element instanceof TurbineCylinder) {
                     coefficientMatrix[materialBalanceEquation][separatorIndexOfListConsumption] = relations;
                     if (relations == 1) {
                         coefficientMatrix[heatBalanceEquation][separatorIndexOfListConsumption] = relations * this.getEnthalpyOfHeatingSteam();
@@ -188,7 +188,7 @@ public class Separator extends Element {
             int separatorIndexOfListConsumption = listOfConsumptions.indexOf(this.getConsumptionOfHeatingSteam());
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
-                if (element.getClass() == TurbineCylinder.class) {
+                if (element instanceof TurbineCylinder) {
                     coefficientMatrix[materialBalanceEquation][separatorIndexOfListConsumption] = relations;
                     if (relations == 1) {
                         coefficientMatrix[heatBalanceEquation][separatorIndexOfListConsumption] = relations * this.getEnthalpyOfHeatingSteam();
@@ -208,12 +208,12 @@ public class Separator extends Element {
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Heater.class) {
+                if (element instanceof Heater) {
                     coefficientMatrix[materialBalanceEquation][separatorIndexOfListConsumption] = relations;
                     coefficientMatrix[heatBalanceEquation][separatorIndexOfListConsumption] = relations * this.getEnthalpyOfSteamDrain();
                 }
 
-                if (element.getClass() == Deaerator.class) {
+                if (element instanceof Deaerator) {
                     coefficientMatrix[materialBalanceEquation][separatorIndexOfListConsumption] = relations;
                     coefficientMatrix[heatBalanceEquation][separatorIndexOfListConsumption] = relations * this.getEnthalpyOfSteamDrain();
                 }

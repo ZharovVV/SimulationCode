@@ -46,7 +46,7 @@ public class Condenser extends Element {
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == TurbineCylinder.class) {
+                if (element instanceof TurbineCylinder) {
                     TurbineCylinder turbineCylinder = (TurbineCylinder) element;
                     this.pressureOfHeatingSteam = turbineCylinder.parametersInSelection(turbineCylinder.NUMBER_OF_SELECTIONS + 1).getPressure();    // Давление в конденсаторе ( = давлению на выходе из цилиндра)
                     this.enthalpyOfHeatingSteam = turbineCylinder.parametersInSelection(turbineCylinder.NUMBER_OF_SELECTIONS + 1).getEnthalpy();    // Энтальпия пара на входе в конденсатор
@@ -84,7 +84,6 @@ public class Condenser extends Element {
         return materialBalanceEquation;
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
     public void matrixCompilation(int v, Matrices matrices, Graph theGraph) {
         //--------------------------Инициализация-----------------------------------------------------------------------
@@ -106,7 +105,7 @@ public class Condenser extends Element {
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == TurbineCylinder.class) {
+                if (element instanceof TurbineCylinder) {
                     coefficientMatrix[materialBalanceEquation][condenserIndexOfListConsumption] = relations;
                 }
             }
@@ -119,13 +118,13 @@ public class Condenser extends Element {
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Heater.class) {
+                if (element instanceof Heater) {
                     Heater heater = (Heater) element;
                     int indexOfListConsumption = listOfConsumptions.indexOf(heater.getConsumptionOfSteamDrain());
                     coefficientMatrix[materialBalanceEquation][indexOfListConsumption] = relations;
                 }
 
-                if (element.getClass() == TurboDrive.class) {
+                if (element instanceof TurboDrive) {
                     TurboDrive turboDrive = (TurboDrive) element;
                     freeMemoryMatrix[materialBalanceEquation] += (-1) * relations * turboDrive.getSteamConsumption();
                 }
@@ -141,7 +140,7 @@ public class Condenser extends Element {
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Pump.class) {
+                if (element instanceof Pump) {
                     coefficientMatrix[materialBalanceEquation][condenserIndexOfListConsumption] = relations;
                 }
             }

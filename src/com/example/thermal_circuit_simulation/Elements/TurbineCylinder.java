@@ -75,7 +75,6 @@ public class TurbineCylinder extends Element {
         return materialBalanceEquation;
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
     public void matrixCompilation(int v, Matrices matrices, Graph theGraph) {
         //--------------------------Инициализация-----------------------------------------------------------------------
@@ -96,33 +95,33 @@ public class TurbineCylinder extends Element {
 
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
-                if (element.getClass() == SteamGenerator.class) {
+                if (element instanceof SteamGenerator) {
                     SteamGenerator steamGenerator = (SteamGenerator) element;
                     freeMemoryMatrix[indexOfListOfEquation] += (-1) * relations * steamGenerator.getSteamConsumption();
                 }
 
-                if (element.getClass() == Superheater.class) {
+                if (element instanceof Superheater) {
                     Superheater superheater = (Superheater) element;
                     // Получение номера столбца
                     int indexOfListConsumption = listOfConsumptions.indexOf(superheater.getConsumptionOfHeatedMedium());
                     coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
                 }
 
-                if (element.getClass() == Heater.class) {
+                if (element instanceof Heater) {
                     Heater heater = (Heater) element;
                     // Получение номера столбца
                     int indexOfListConsumption = listOfConsumptions.indexOf(heater.getConsumptionOfHeatingSteam());
                     coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
                 }
 
-                if (element.getClass() == Deaerator.class) {
+                if (element instanceof Deaerator) {
                     Deaerator deaerator = (Deaerator) element;
                     // Получение номера столбца
                     int indexOfListConsumption = listOfConsumptions.indexOf(deaerator.getConsumptionOfHeatingSteam());
                     coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
                 }
 
-                if (element.getClass() == Separator.class) {
+                if (element instanceof Separator) {
                     if (relations == -1) {
                         Separator separator = (Separator) element;
                         // Получение номера столбца
@@ -131,7 +130,7 @@ public class TurbineCylinder extends Element {
                     }
                 }
 
-                if (element.getClass() == TurboDrive.class) {
+                if (element instanceof TurboDrive) {
                     TurboDrive turboDrive = (TurboDrive) element;
                     freeMemoryMatrix[indexOfListOfEquation] += (-1) * relations * turboDrive.getSteamConsumption();
                 }
@@ -143,47 +142,47 @@ public class TurbineCylinder extends Element {
 
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
-                if (element.getClass() == SteamGenerator.class) {
+                if (element instanceof SteamGenerator) {
                     SteamGenerator steamGenerator = (SteamGenerator) element;
                     freeMemoryMatrix[indexOfListOfEquation] += (-1) * relations * steamGenerator.getSteamConsumption();
                 }
 
-                if (element.getClass() == Superheater.class) {
+                if (element instanceof Superheater) {
                     Superheater superheater = (Superheater) element;
                     // Получение номера столбца
                     int indexOfListConsumption = listOfConsumptions.indexOf(superheater.getConsumptionOfHeatingSteam());
                     coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
                 }
 
-                if (element.getClass() == Heater.class) {
+                if (element instanceof Heater) {
                     Heater heater = (Heater) element;
                     // Получение номера столбца
                     int indexOfListConsumption = listOfConsumptions.indexOf(heater.getConsumptionOfHeatingSteam());
                     coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
                 }
 
-                if (element.getClass() == Deaerator.class) {
+                if (element instanceof Deaerator) {
                     Deaerator deaerator = (Deaerator) element;
                     // Получение номера столбца
                     int indexOfListConsumption = listOfConsumptions.indexOf(deaerator.getConsumptionOfHeatingSteam());
                     coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
                 }
 
-                if (element.getClass() == Separator.class) {
+                if (element instanceof Separator) {
                     Separator separator = (Separator) element;
                     // Получение номера столбца
                     int indexOfListConsumption = listOfConsumptions.indexOf(separator.getConsumptionOfHeatingSteam());
                     coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
                 }
 
-                if (element.getClass() == Condenser.class) {
+                if (element instanceof Condenser) {
                     Condenser condenser = (Condenser) element;
                     // Получение номера столбца
                     int indexOfListConsumption = listOfConsumptions.indexOf(condenser.getConsumptionOfHeatingSteam());
                     coefficientMatrix[indexOfListOfEquation][indexOfListConsumption] = relations;
                 }
 
-                if (element.getClass() == TurboDrive.class) {
+                if (element instanceof TurboDrive) {
                     TurboDrive turboDrive = (TurboDrive) element;
                     freeMemoryMatrix[indexOfListOfEquation] += (-1) * relations * turboDrive.getSteamConsumption();
                 }
@@ -191,7 +190,6 @@ public class TurbineCylinder extends Element {
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
     public void calculationOfThermalEfficiencyIndicators(int v, ThermalEfficiencyIndicators thermalEfficiencyIndicators, Graph theGraph) {
         //--------------------------Инициализация-----------------------------------------------------------------------
@@ -222,12 +220,12 @@ public class TurbineCylinder extends Element {
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Superheater.class) {
+                if (element instanceof Superheater) {
                     Superheater superheater = (Superheater) element;
                     listOfConsumptionThroughTheCompartmentOfThisTurbine.get(0).consumptionValue += relations * superheater.getConsumptionOfHeatedMedium().consumptionValue;
                 }
 
-                if (element.getClass() == TurboDrive.class) {
+                if (element instanceof TurboDrive) {
                     TurboDrive turboDrive = (TurboDrive) element;
                     listOfConsumptionThroughTheCompartmentOfThisTurbine.get(0).consumptionValue += relations * turboDrive.getSteamConsumption();
                 }
@@ -239,31 +237,31 @@ public class TurbineCylinder extends Element {
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == SteamGenerator.class) {
+                if (element instanceof SteamGenerator) {
                     SteamGenerator steamGenerator = (SteamGenerator) element;
                     listOfConsumptionThroughTheCompartmentOfThisTurbine.get(0).consumptionValue += relations * steamGenerator.getSteamConsumption();
                 }
 
-                if (element.getClass() == ValveStemSeals.class) {
+                if (element instanceof ValveStemSeals) {
                     ValveStemSeals valveStemSeal = (ValveStemSeals) element;
                     double sealConsumption = valveStemSeal.getElementContributionToSteamConsumptionInSeals().get(this);
                     listOfConsumptionThroughTheCompartmentOfThisTurbine.get(0).consumptionValue += relations * sealConsumption;
                 }
 
-                if (element.getClass() == TurboDrive.class) {
+                if (element instanceof TurboDrive) {
                     TurboDrive turboDrive = (TurboDrive) element;
                     int index = turboDrive.getSelectionNumber();
                     listOfConsumptionThroughTheCompartmentOfThisTurbine.get(index).consumptionValue += relations * turboDrive.getSteamConsumption();
                 }
 
-                if (element.getClass() == Superheater.class) {
+                if (element instanceof Superheater) {
                     Superheater superheater = (Superheater) element;
                     int selectionNumber = superheater.getSelectionNumber();
                     listOfConsumptionThroughTheCompartmentOfThisTurbine.get(selectionNumber).consumptionValue +=
                             relations * superheater.getConsumptionOfHeatingSteam().consumptionValue;
                 }
 
-                if (element.getClass() == Heater.class) {
+                if (element instanceof Heater) {
                     Heater heater = (Heater) element;
                     int selectionNumber = heater.getSelectionNumber();
                     if (selectionNumber < listOfConsumptionThroughTheCompartmentOfThisTurbine.size()) {
@@ -289,7 +287,7 @@ public class TurbineCylinder extends Element {
         private double degreeOfDryness;
         private double enthalpy;
 
-        public Parameters(double pressure, double temperatureOrDegreeOfDryness) {
+        Parameters(double pressure, double temperatureOrDegreeOfDryness) {
             this.pressure = pressure;
             IF97 waterSteam = new IF97(IF97.UnitSystem.DEFAULT);
             if (temperatureOrDegreeOfDryness > 1) {

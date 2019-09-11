@@ -37,10 +37,8 @@ public class Pump extends Element {
         this.isThePumpDriveElectric = isThePumpDriveElectric;
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
     public void calculationOfInitialParameters(int v, Graph theGraph) {
-        // TODO: 10.09.2019 instanceof
         //--------------------------Инициализация-----------------------------------------------------------------------
         int nVerts = theGraph.getnVerts();
         Map<Integer, int[][]> adjMat = theGraph.getAdjMat();
@@ -61,21 +59,21 @@ public class Pump extends Element {
                     this.inletEnthalpy = condenser.getEnthalpyOfSteamDrain();
                 }
 
-                if (element.getClass() == Heater.class) {
+                if (element instanceof Heater) {
                     Heater heater = (Heater) element;
                     this.inletTemperature = heater.getTemperatureOfHeatedMedium();
                     this.inletPressure = heater.getPressureOfHeatedMedium();
                     this.inletEnthalpy = heater.getEnthalpyOfHeatedMedium();
                 }
 
-                if (element.getClass() == Deaerator.class) {
+                if (element instanceof Deaerator) {
                     Deaerator deaerator = (Deaerator) element;
                     this.inletTemperature = deaerator.getTemperatureOfHeatedMedium();
                     this.inletPressure = deaerator.getPressureOfHeatedMedium();
                     this.inletEnthalpy = deaerator.getEnthalpyOfHeatedMedium();
                 }
 
-                if (element.getClass() == SealEjectorWithCooler.class) {
+                if (element instanceof SealEjectorWithCooler) {
                     SealEjectorWithCooler sealEjectorWithCooler = (SealEjectorWithCooler) element;
                     this.inletTemperature = sealEjectorWithCooler.getOutletTemperature();
                     this.inletPressure = sealEjectorWithCooler.getOutletPressure();
@@ -91,7 +89,7 @@ public class Pump extends Element {
             if (relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Heater.class) {
+                if (element instanceof Heater) {
                     Heater heater = (Heater) element;
                     this.inletTemperature = heater.getTemperatureOfSteamDrain();
                     this.inletPressure = heater.getPressureOfSteamDrain();
@@ -157,7 +155,6 @@ public class Pump extends Element {
         System.out.println();
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
     public void matrixCompilation(int v, Matrices matrices, Graph theGraph) {
         //--------------------------Инициализация-----------------------------------------------------------------------
@@ -179,14 +176,14 @@ public class Pump extends Element {
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Condenser.class) {
+                if (element instanceof Condenser) {
                     Condenser condenser = (Condenser) element;
                     // Получение номера столбца расхода дренажа пара конденсатора
                     int indexOfListConsumption = listOfConsumptions.indexOf(condenser.getConsumptionOfSteamDrain());
                     coefficientMatrix[materialBalanceEquation][indexOfListConsumption] = relations;
                 }
 
-                if (element.getClass() == Heater.class) {
+                if (element instanceof Heater) {
                     if (relations == -1) {
                         coefficientMatrix[materialBalanceEquation][pumpIndexOfListConsumption] = relations;
                     } else {
@@ -197,7 +194,7 @@ public class Pump extends Element {
                     }
                 }
 
-                if (element.getClass() == Deaerator.class) {
+                if (element instanceof Deaerator) {
                     if (relations == -1) {
                         coefficientMatrix[materialBalanceEquation][pumpIndexOfListConsumption] = relations;
                     } else {
@@ -208,11 +205,11 @@ public class Pump extends Element {
                     }
                 }
 
-                if (element.getClass() == MainEjectorWithCooler.class && relations == -1) {
+                if (element instanceof MainEjectorWithCooler && relations == -1) {
                     coefficientMatrix[materialBalanceEquation][pumpIndexOfListConsumption] = relations;
                 }
 
-                if (element.getClass() == SealEjectorWithCooler.class && relations == 1) {
+                if (element instanceof SealEjectorWithCooler && relations == 1) {
                     SealEjectorWithCooler ejector = (SealEjectorWithCooler) element;
                     // Получение номера столбца расхода воды охладителя
                     int indexOfListConsumption = listOfConsumptions.indexOf(ejector.getConsumptionOfWater());
@@ -230,7 +227,7 @@ public class Pump extends Element {
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Heater.class) {
+                if (element instanceof Heater) {
                     if (relations == -1) {
                         coefficientMatrix[materialBalanceEquation][pumpIndexOfListConsumption] = relations;
                     } else {
@@ -241,7 +238,7 @@ public class Pump extends Element {
                     }
                 }
 
-                if (element.getClass() == MixingPoint.class) {
+                if (element instanceof MixingPoint) {
                     if (relations == -1) {
                         coefficientMatrix[materialBalanceEquation][pumpIndexOfListConsumption] = relations;
                     }

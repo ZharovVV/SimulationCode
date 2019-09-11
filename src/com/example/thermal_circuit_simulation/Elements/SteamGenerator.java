@@ -47,7 +47,7 @@ public class SteamGenerator extends Element {
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == TurbineCylinder.class) {
+                if (element instanceof TurbineCylinder) {
                     TurbineCylinder turbineCylinder = (TurbineCylinder) element;
                     outletEnthalpy = turbineCylinder.parametersInSelection(0).getEnthalpy();
                 }
@@ -61,7 +61,7 @@ public class SteamGenerator extends Element {
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Heater.class) {
+                if (element instanceof Heater) {
                     Heater heater = (Heater) element;
                     inletEnthalpy = heater.getEnthalpyOfHeatedMedium();
                 }

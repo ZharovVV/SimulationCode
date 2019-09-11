@@ -80,25 +80,13 @@ public class Heater extends Element {
     //-----------------------------Конструктор для смешивающего подогревателя-------------------------------------------
     public Heater(
             String name,
-            double pressureInHeater,
-            int selectionNumber,
-            TurbineCylinder turbineCylinder
+            int heaterNumber
     ) {
         super(name);
+        this.heaterNumber = heaterNumber;
         this.isSurfaceHeater = false;
-        this.selectionNumber = selectionNumber;
-        this.pressureOfHeatingSteam = pressureInHeater;
-        IF97 waterSteam = new IF97(IF97.UnitSystem.DEFAULT);
-        this.temperatureOfHeatingSteam = waterSteam.saturationTemperatureP(pressureInHeater) - 273.15;
-        this.enthalpyOfHeatingSteam = turbineCylinder.parametersInSelection(selectionNumber).getEnthalpy();
-        this.pressureOfHeatedMedium = pressureInHeater;
-        this.temperatureOfHeatedMedium = temperatureOfHeatingSteam;
-        this.enthalpyOfHeatedMedium = waterSteam.specificEnthalpySaturatedLiquidP(pressureInHeater);
-        // TODO: 23.08.2019 Переделать конструктор для смешивающего подогревателя
-
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
     public void calculationOfInitialParameters(int v, Graph theGraph) {
         //--------------------------Инициализация-----------------------------------------------------------------------
@@ -107,7 +95,35 @@ public class Heater extends Element {
         ArrayList<Vertex> vertexList = theGraph.getVertexList();
         IF97 waterSteam = new IF97(IF97.UnitSystem.DEFAULT);
         if (!isSurfaceHeater) {
-            // TODO: 09.09.2019 Расчет начальных параметров для смешивающего подогревателя
+            //--------------------------------Связи с элементами по линии греющего пара---------------------------------
+            for (int j = 0; j < nVerts; j++) {
+                int relations = adjMat.get(HEATING_STEAM)[v][j];
+                if (relations == 1) {
+                    Element element = vertexList.get(j).element;
+
+                    if (element instanceof TurbineCylinder) {
+                        TurbineCylinder turbineCylinder = (TurbineCylinder) element;
+                        if (!(heaterNumber == 0)) {
+                            this.hydraulicResistanceFromSelectionToHeater =         // Считаем потери в труб-де от отбора до подогревателя
+                                    turbineCylinder.parametersInSelection(selectionNumber).getPressure() * (11 - heaterNumber) / 100;
+                        }
+
+                        this.pressureOfHeatingSteam =                           // Считаем давление в подогревателе
+                                turbineCylinder.parametersInSelection(selectionNumber).getPressure() - hydraulicResistanceFromSelectionToHeater;
+
+                        this.temperatureOfHeatingSteam =                        // Температура греющего пара
+                                waterSteam.saturationTemperatureP(pressureOfHeatingSteam) - 273.15;
+
+                        this.enthalpyOfHeatingSteam =                           // Энтальпия греющего пара
+                                turbineCylinder.parametersInSelection(selectionNumber).getEnthalpy();
+                        this.pressureOfHeatedMedium = pressureOfHeatingSteam;
+                        this.temperatureOfHeatedMedium = temperatureOfHeatingSteam;
+                        this.enthalpyOfHeatedMedium = waterSteam.specificEnthalpySaturatedLiquidP(pressureOfHeatingSteam);
+                    }
+                }
+            }
+            //----------------------------------------------------------------------------------------------------------
+
         } else {
             //--------------------------------Связи с элементами по линии греющего пара---------------------------------
             for (int j = 0; j < nVerts; j++) {
@@ -115,7 +131,7 @@ public class Heater extends Element {
                 if (relations == 1) {
                     Element element = vertexList.get(j).element;
 
-                    if (element.getClass() == TurbineCylinder.class) {
+                    if (element instanceof TurbineCylinder) {
                         TurbineCylinder turbineCylinder = (TurbineCylinder) element;
                         if (!(heaterNumber == 0)) {
                             this.hydraulicResistanceFromSelectionToHeater =         // Считаем потери в труб-де от отбора до подогревателя
@@ -142,7 +158,7 @@ public class Heater extends Element {
                 if (relations == 1) {
                     Element element = vertexList.get(j).element;
 
-                    if (element.getClass() == Pump.class) {
+                    if (element instanceof Pump) {
                         Pump pump = (Pump) element;
                         this.pressureOfHeatedMedium =                                           // Давление обогреваемой среды на выходе = давлению обогреваемой среды на выходе из насоса - потери в подогревателе
                                 pump.getOutletPressure() - hydraulicResistanceInHeater;
@@ -154,7 +170,7 @@ public class Heater extends Element {
                         }
                     }
 
-                    if (element.getClass() == Heater.class) {
+                    if (element instanceof Heater) {
                         Heater heater = (Heater) element;
                         this.pressureOfHeatedMedium =                                           // Давление обогреваемой среды на выходе = давлению обогреваемой среды на выходе из предыдущего элемента - потери в подогревателе
                                 heater.getPressureOfHeatedMedium() - hydraulicResistanceInHeater;
@@ -166,7 +182,7 @@ public class Heater extends Element {
                         }
                     }
 
-                    if (element.getClass() == MixingPoint.class) {
+                    if (element instanceof MixingPoint) {
                         MixingPoint mixingPoint = (MixingPoint) element;
                         this.pressureOfHeatedMedium =                                           // Давление обогреваемой среды на выходе = давлению обогреваемой среды на выходе из предыдущего элемента - потери в подогревателе
                                 mixingPoint.getPressureOfHeatedMedium() - hydraulicResistanceInHeater;
@@ -188,7 +204,7 @@ public class Heater extends Element {
                 if (relations == 1) {
                     Element element = vertexList.get(j).element;
 
-                    if (element.getClass() == Heater.class) {
+                    if (element instanceof Heater) {
                         Heater heater = (Heater) element;
                         this.pressureOfHeatedMedium =                                           // Давление обогреваемой среды на выходе = давлению обогреваемой среды на выходе из предыдущего элемента - потери в подогревателе
                                 heater.getPressureOfHeatedMedium() - hydraulicResistanceInHeater;
@@ -200,7 +216,7 @@ public class Heater extends Element {
                         }
                     }
 
-                    if (element.getClass() == HeatNetwork.class) {
+                    if (element instanceof HeatNetwork) {
                         HeatNetwork heatNetwork = (HeatNetwork) element;
                         this.pressureOfHeatedMedium =                                           // Давление обогреваемой среды на выходе = давлению обогреваемой среды на выходе из ТС - потери в подогревателе
                                 heatNetwork.getOutletPressure() - hydraulicResistanceInHeater;
@@ -293,7 +309,6 @@ public class Heater extends Element {
         return heatBalanceEquation;
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
     public void matrixCompilation(int v, Matrices matrices, Graph theGraph) {
         //--------------------------Инициализация-----------------------------------------------------------------------
@@ -305,7 +320,7 @@ public class Heater extends Element {
         ArrayList<Consumptions> listOfConsumptions = matrices.getListOfColumnsOfConsumptions();
 
         if (!isSurfaceHeater) {
-            // TODO: 23.08.2019 Переделать метод для смешивающего подогревателя
+            // TODO: 11.09.2019 Вроде норм
             //----------------------Продолжение инициализации для смешивающего подогревателя----------------------------
             // Получение номера строки в матрице, в которую записывается уравнение материального баланса по линии обогреваемой среды для Подогревателя
             int materialBalanceEquationOnHeatedMediumLine = matrices.getListOfLinesOfEquations().indexOf(this.getMaterialBalanceEquationOnHeatedMediumLine());
@@ -321,7 +336,7 @@ public class Heater extends Element {
                 if (relations == -1 || relations == 1) {
                     Element element = vertexList.get(j).element;
 
-                    if (element.getClass() == TurbineCylinder.class) {
+                    if (element instanceof TurbineCylinder) {
                         coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][heaterIndexOfListConsumption] = relations;
                         coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatingSteam();
                     }
@@ -335,7 +350,7 @@ public class Heater extends Element {
                 if (relations == 1) {
                     Element element = vertexList.get(j).element;
 
-                    if (element.getClass() == Separator.class) {
+                    if (element instanceof Separator) {
                         Separator separator = (Separator) element;
                         // Номер столбца расхода дренажа греющего пара Сепаратора
                         int indexOfListConsumption = listOfConsumptions.indexOf(separator.getConsumptionOfSteamDrain());
@@ -343,7 +358,7 @@ public class Heater extends Element {
                         coefficientMatrix[heatBalanceEquation][indexOfListConsumption] = relations * separator.getEnthalpyOfSteamDrain();
                     }
 
-                    if (element.getClass() == Superheater.class) {
+                    if (element instanceof Superheater) {
                         Superheater superheater = (Superheater) element;
                         // Номер столбца расхода дренажа греющего пара Пароперегревателя
                         int indexOfListConsumption = listOfConsumptions.indexOf(superheater.getConsumptionOfSteamDrain());
@@ -351,7 +366,7 @@ public class Heater extends Element {
                         coefficientMatrix[heatBalanceEquation][indexOfListConsumption] = relations * superheater.getEnthalpyOfSteamDrain();
                     }
 
-                    if (element.getClass() == Heater.class) {
+                    if (element instanceof Heater) {
                         Heater heater = (Heater) element;
                         // Номер столбца расхода дренажа греющего пара Подогревателя
                         int indexOfListConsumption = listOfConsumptions.indexOf(heater.getConsumptionOfSteamDrain());
@@ -370,7 +385,7 @@ public class Heater extends Element {
                 if (relations == 1 || relations == -1) {
                     Element element = vertexList.get(j).element;
 
-                    if (element.getClass() == Pump.class) {
+                    if (element instanceof Pump) {
                         if (relations == -1) {
                             coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][heaterIndexOfListConsumption] = relations;
                             coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatedMedium();
@@ -383,7 +398,7 @@ public class Heater extends Element {
                         }
                     }
 
-                    if (element.getClass() == Heater.class) {
+                    if (element instanceof Heater) {
                         if (relations == -1) {
                             coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][heaterIndexOfListConsumption] = relations;
                             coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatedMedium();
@@ -418,7 +433,7 @@ public class Heater extends Element {
                 if (relations == -1 || relations == 1) {
                     Element element = vertexList.get(j).element;
 
-                    if (element.getClass() == TurbineCylinder.class) {
+                    if (element instanceof TurbineCylinder) {
                         coefficientMatrix[materialBalanceEquationOnSteamDrainLine][heaterIndexOfListConsumption] = relations;
                         coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatingSteam();
                     }
@@ -434,7 +449,7 @@ public class Heater extends Element {
                 if (relations == -1 || relations == 1) {
                     Element element = vertexList.get(j).element;
 
-                    if (element.getClass() == Separator.class) {
+                    if (element instanceof Separator) {
                         Separator separator = (Separator) element;
                         // Номер столбца расхода дренажа Сепаратора
                         int indexOfListConsumption = listOfConsumptions.indexOf(separator.getConsumptionOfSteamDrain());
@@ -442,7 +457,7 @@ public class Heater extends Element {
                         coefficientMatrix[heatBalanceEquation][indexOfListConsumption] = relations * separator.getEnthalpyOfSteamDrain() * this.coefficient;
                     }
 
-                    if (element.getClass() == Superheater.class) {
+                    if (element instanceof Superheater) {
                         Superheater superheater = (Superheater) element;
                         // Номер столбца расхода дренажа Пароперегревателя
                         int indexOfListConsumption = listOfConsumptions.indexOf(superheater.getConsumptionOfSteamDrain());
@@ -450,7 +465,7 @@ public class Heater extends Element {
                         coefficientMatrix[heatBalanceEquation][indexOfListConsumption] = relations * superheater.getEnthalpyOfSteamDrain() * this.coefficient;
                     }
 
-                    if (element.getClass() == Heater.class) {
+                    if (element instanceof Heater) {
                         if (relations == -1) {
                             coefficientMatrix[materialBalanceEquationOnSteamDrainLine][heaterIndexOfListConsumption] = relations;
                             coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfSteamDrain() * this.coefficient;
@@ -463,19 +478,19 @@ public class Heater extends Element {
                         }
                     }
 
-                    if (element.getClass() == Deaerator.class) {
+                    if (element instanceof Deaerator) {
                         if (relations == -1) {
                             coefficientMatrix[materialBalanceEquationOnSteamDrainLine][heaterIndexOfListConsumption] = relations;
                             coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfSteamDrain() * this.coefficient;
                         }
                     }
 
-                    if (element.getClass() == Condenser.class) {
+                    if (element instanceof Condenser) {
                         coefficientMatrix[materialBalanceEquationOnSteamDrainLine][heaterIndexOfListConsumption] = relations;
                         coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfSteamDrain() * this.coefficient;
                     }
 
-                    if (element.getClass() == Pump.class) {
+                    if (element instanceof Pump) {
                         coefficientMatrix[materialBalanceEquationOnSteamDrainLine][heaterIndexOfListConsumption] = relations;
                         coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfSteamDrain() * this.coefficient;
                     }
@@ -491,7 +506,7 @@ public class Heater extends Element {
                 if (relations == -1 || relations == 1) {
                     Element element = vertexList.get(j).element;
 
-                    if (element.getClass() == Pump.class) {
+                    if (element instanceof Pump) {
                         if (relations == -1) {
                             coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][heaterIndexOfListConsumption] = relations;
                             coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatedMedium();
@@ -503,7 +518,7 @@ public class Heater extends Element {
                         }
                     }
 
-                    if (element.getClass() == Heater.class) {
+                    if (element instanceof Heater) {
                         if (relations == -1) {
                             coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][heaterIndexOfListConsumption] = relations;
                             coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatedMedium();
@@ -515,7 +530,7 @@ public class Heater extends Element {
                         }
                     }
 
-                    if (element.getClass() == Deaerator.class) {
+                    if (element instanceof Deaerator) {
                         if (relations == -1) {
                             coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][heaterIndexOfListConsumption] = relations;
                             coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatedMedium();
@@ -527,12 +542,12 @@ public class Heater extends Element {
                         }
                     }
 
-                    if (element.getClass() == SteamGenerator.class) {
+                    if (element instanceof SteamGenerator) {
                         coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][heaterIndexOfListConsumption] = relations;
                         coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatedMedium();
                     }
 
-                    if (element.getClass() == MixingPoint.class) {
+                    if (element instanceof MixingPoint) {
                         if (relations == -1) {
                             coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][heaterIndexOfListConsumption] = relations;
                             coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatedMedium();
@@ -555,7 +570,7 @@ public class Heater extends Element {
                 if (relations == -1 || relations == 1) {
                     Element element = vertexList.get(j).element;
 
-                    if (element.getClass() == Heater.class) {
+                    if (element instanceof Heater) {
                         if (relations == -1) {
                             coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][heaterIndexOfListConsumption] = relations;
                             coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatedMedium();
@@ -568,7 +583,7 @@ public class Heater extends Element {
                         }
                     }
 
-                    if (element.getClass() == HeatNetwork.class) {
+                    if (element instanceof HeatNetwork) {
                         if (relations == -1) {
                             coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][heaterIndexOfListConsumption] = relations;
                             coefficientMatrix[heatBalanceEquation][heaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatedMedium();
@@ -595,7 +610,7 @@ public class Heater extends Element {
         if (isSurfaceHeater) {
             System.out.println("поверхностный");
         } else {
-            System.out.println("смеешивающий");
+            System.out.println("смешивающий");
         }
         System.out.println("Гидравлическое сопротивление от отбора до подогревателя: " + hydraulicResistanceFromSelectionToHeater + " ,МПа");
         System.out.println("Гидравлическое сопротивление в подогревателе: " + hydraulicResistanceInHeater + " ,МПа");

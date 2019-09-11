@@ -71,7 +71,7 @@ public class Superheater extends Element {
             if (relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == TurbineCylinder.class) {
+                if (element instanceof TurbineCylinder) {
                     TurbineCylinder turbineCylinder = (TurbineCylinder) element;
                     this.pressureOfHeatingSteam =                           // Считаем давление в подогревателе
                             turbineCylinder.parametersInSelection(selectionNumber).getPressure() - hydraulicResistanceFromSelectionToHeater;
@@ -184,8 +184,6 @@ public class Superheater extends Element {
         return heatBalanceEquation;
     }
 
-
-    @SuppressWarnings("ConstantConditions")
     @Override
     public void matrixCompilation(int v, Matrices matrices, Graph theGraph) {
         //--------------------------Инициализация-----------------------------------------------------------------------
@@ -212,7 +210,7 @@ public class Superheater extends Element {
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Superheater.class) {
+                if (element instanceof Superheater) {
                     Superheater superheater2 = (Superheater) element;
                     int indexOfListConsumption = listOfConsumptions.indexOf(superheater2.getConsumptionOfHeatedMedium());
                     if (relations == -1) {
@@ -224,7 +222,7 @@ public class Superheater extends Element {
                     }
                 }
 
-                if (element.getClass() == TurbineCylinder.class) {
+                if (element instanceof TurbineCylinder) {
                     TurbineCylinder turbineCylinder = (TurbineCylinder) element;
                     coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][superheaterIndexOfListConsumption] = relations;
                     if (relations == 1) {
@@ -235,7 +233,7 @@ public class Superheater extends Element {
                     }
                 }
 
-                if (element.getClass() == Separator.class) {
+                if (element instanceof Separator) {
                     Separator separator = (Separator) element;
                     int indexOfListConsumption = listOfConsumptions.indexOf(separator.getConsumptionOfHeatedMedium());
                     coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][indexOfListConsumption] = relations;
@@ -252,7 +250,7 @@ public class Superheater extends Element {
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == TurbineCylinder.class) {
+                if (element instanceof TurbineCylinder) {
                     coefficientMatrix[materialBalanceEquationOnSteamDrainLine][superheaterIndexOfListConsumption] = relations;
                     coefficientMatrix[heatBalanceEquation][superheaterIndexOfListConsumption] = relations * this.getEnthalpyOfHeatingSteam() * this.getCoefficient();
                 }
@@ -267,12 +265,12 @@ public class Superheater extends Element {
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Heater.class) {
+                if (element instanceof Heater) {
                     coefficientMatrix[materialBalanceEquationOnSteamDrainLine][superheaterIndexOfListConsumption] = relations;
                     coefficientMatrix[heatBalanceEquation][superheaterIndexOfListConsumption] = relations * this.getEnthalpyOfSteamDrain() * this.getCoefficient();
                 }
 
-                if (element.getClass() == Deaerator.class) {
+                if (element instanceof Deaerator) {
                     coefficientMatrix[materialBalanceEquationOnSteamDrainLine][superheaterIndexOfListConsumption] = relations;
                     coefficientMatrix[heatBalanceEquation][superheaterIndexOfListConsumption] = relations * this.getEnthalpyOfSteamDrain() * this.getCoefficient();
                 }

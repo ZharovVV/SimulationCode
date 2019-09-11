@@ -41,10 +41,9 @@ public class MainEjectorWithCooler extends Element implements MatrixCompilation 
         this.outputFlow = highPressureFlow;
     }
 
-    @SuppressWarnings("ConstantConditions")
+
     @Override
     public void calculationOfInitialParameters(int v, Graph theGraph) {
-        // TODO: 10.09.2019 instanceof
         //--------------------------Инициализация-----------------------------------------------------------------------
         int nVerts = theGraph.getnVerts();
         Map<Integer, int[][]> adjMat = theGraph.getAdjMat();
@@ -65,7 +64,7 @@ public class MainEjectorWithCooler extends Element implements MatrixCompilation 
                     this.inletEnthalpy = pump.getOutletEnthalpy();
                 }
 
-                if (element.getClass() == SealEjectorWithCooler.class) {
+                if (element instanceof SealEjectorWithCooler) {
                     SealEjectorWithCooler sealEjectorWithCooler = (SealEjectorWithCooler) element;
                     this.inletTemperature = sealEjectorWithCooler.getOutletTemperature();
                     this.inletPressure = sealEjectorWithCooler.getOutletPressure();
@@ -110,7 +109,7 @@ public class MainEjectorWithCooler extends Element implements MatrixCompilation 
         double[] freeMemoryMatrix = matrices.freeMemoryMatrix;
         ArrayList<Consumptions> listOfConsumptions = matrices.getListOfColumnsOfConsumptions();
         // Получение номера строки в матрице, в которую записывается уравнение материального баланса для охладителя пара эжектора на линии воды
-        int coolerMaterialBalanceEquationOnHeatedMediumLine = matrices.getListOfLinesOfEquations().indexOf(this.getMaterialBalanceEquation());
+        int coolerMaterialBalanceEquationOnHeatedMediumLine = matrices.getListOfLinesOfEquations().indexOf(getMaterialBalanceEquation());
         //--------------------------------------------------------------------------------------------------------------
 
         //--------------------------------Связи с элементами по линии греющего пара-------------------------------------
@@ -119,7 +118,7 @@ public class MainEjectorWithCooler extends Element implements MatrixCompilation 
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Deaerator.class && relations == 1) {
+                if (element instanceof Deaerator && relations == 1) {
                     Deaerator deaerator = (Deaerator) element;
                     int materialBalanceEquation = matrices.getListOfLinesOfEquations().indexOf(deaerator.getMaterialBalanceEquationOnHeatedMediumLine());
                     int heatBalanceEquation = matrices.getListOfLinesOfEquations().indexOf(deaerator.getHeatBalanceEquation());
@@ -140,7 +139,7 @@ public class MainEjectorWithCooler extends Element implements MatrixCompilation 
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Condenser.class) {
+                if (element instanceof Condenser) {
                     Condenser condenser = (Condenser) element;
                     int materialBalanceEquation = matrices.getListOfLinesOfEquations().indexOf(condenser.getMaterialBalanceEquation());
                     freeMemoryMatrix[materialBalanceEquation] += relations * outputFlow;
@@ -157,7 +156,7 @@ public class MainEjectorWithCooler extends Element implements MatrixCompilation 
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Pump.class) {
+                if (element instanceof Pump) {
                     if (relations == -1) {
                        coefficientMatrix[coolerMaterialBalanceEquationOnHeatedMediumLine][coolerIndexOfListConsumption] = relations;
                     } else {
@@ -168,7 +167,7 @@ public class MainEjectorWithCooler extends Element implements MatrixCompilation 
                     }
                 }
 
-                if (element.getClass() == SealEjectorWithCooler.class) {
+                if (element instanceof SealEjectorWithCooler) {
                     coefficientMatrix[coolerMaterialBalanceEquationOnHeatedMediumLine][coolerIndexOfListConsumption] = relations;
                 }
             }

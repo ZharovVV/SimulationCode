@@ -70,7 +70,7 @@ public class TurboDrive extends Element {
             if (relations == -1 || relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == TurbineCylinder.class) {
+                if (element instanceof TurbineCylinder) {
                     TurbineCylinder turbineCylinder = (TurbineCylinder) element;
                     TurbineCylinder.Parameters parameters = turbineCylinder.parametersInSelection(selectionNumber);
                     this.inletEnthalpy = parameters.getEnthalpy();

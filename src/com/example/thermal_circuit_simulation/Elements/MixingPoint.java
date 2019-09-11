@@ -33,7 +33,7 @@ public class MixingPoint extends Element {
             int relations = adjMat.get(FEED_WATER)[v][j];
             if (relations == 1) {
                 Element element = vertexList.get(j).element;
-                if (element.getClass() == Heater.class) {
+                if (element instanceof Heater) {
                     Heater previousHeaterOnFeedWaterLine = (Heater) element;
                     this.previousHeaterOnFeedWaterLine = previousHeaterOnFeedWaterLine;
                     pressureOfHeatedMedium = previousHeaterOnFeedWaterLine.getPressureOfHeatedMedium();
@@ -84,7 +84,7 @@ public class MixingPoint extends Element {
             if (relations == 1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Pump.class) {
+                if (element instanceof Pump) {
                     Pump pump = (Pump) element;
                     int indexOfListConsumption = listOfConsumptions.indexOf(pump.getConsumptionOfWater());
                     coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][indexOfListConsumption] = relations;
@@ -107,7 +107,7 @@ public class MixingPoint extends Element {
             if (relations == 1 || relations == -1) {
                 Element element = vertexList.get(j).element;
 
-                if (element.getClass() == Heater.class) {
+                if (element instanceof Heater) {
                     if (relations == -1) {
                         coefficientMatrix[materialBalanceEquationOnHeatedMediumLine][mixingPointIndexOfListConsumption] = relations;
                     } else {
