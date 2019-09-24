@@ -3,15 +3,11 @@ package com.example.thermal_circuit_simulation.Graph;
 import com.example.thermal_circuit_simulation.Elements.*;
 import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Matrices;
 import com.example.thermal_circuit_simulation.ThermalEfficiencyIndicators.ThermalEfficiencyIndicators;
-
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Graph {
     private final int MAX_VERTS = 100;
-    private ArrayList<Vertex> vertexList;
+    private List<Vertex> vertexList;
     public static final int FEED_WATER = 1;
     public static final int NETWORK_WATER = 2;
     public static final int HEATING_STEAM = 3;
@@ -212,7 +208,7 @@ public class Graph {
         return adjMat;
     }
 
-    public ArrayList<Vertex> getVertexList() {
+    public List<Vertex> getVertexList() {
         return vertexList;
     }
 

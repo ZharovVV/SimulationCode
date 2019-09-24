@@ -1,15 +1,11 @@
 package com.example.thermal_circuit_simulation.Elements.Seals;
 
 import com.example.thermal_circuit_simulation.Elements.*;
-import com.example.thermal_circuit_simulation.Graph.Graph;
-import com.example.thermal_circuit_simulation.Graph.Vertex;
-import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Consumptions;
-import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Matrices;
-import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.MatrixCompilation;
+import com.example.thermal_circuit_simulation.Graph.*;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.*;
 import com.hummeling.if97.IF97;
-
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.example.thermal_circuit_simulation.Graph.Graph.HEATING_STEAM;
@@ -41,10 +37,10 @@ public class TurbineShaftSeals extends Element implements MatrixCompilation {
         //--------------------------Инициализация-----------------------------------------------------------------------
         int nVerts = theGraph.getnVerts();
         Map<Integer, int[][]> adjMat = theGraph.getAdjMat();
-        ArrayList<Vertex> vertexList = theGraph.getVertexList();
+        List<Vertex> vertexList = theGraph.getVertexList();
         double[][] coefficientMatrix = matrices.coefficientMatrix;
         double[] freeMemoryMatrix = matrices.freeMemoryMatrix;
-        ArrayList<Consumptions> listOfConsumptions = matrices.getListOfColumnsOfConsumptions();
+        List<Consumptions> listOfConsumptions = matrices.getListOfColumnsOfConsumptions();
 
         //--------------------------------Связи с элементами по линии греющего пара-------------------------------------
         for (int j = 0; j < nVerts; j++) {

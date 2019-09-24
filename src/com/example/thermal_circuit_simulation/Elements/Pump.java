@@ -1,14 +1,11 @@
 package com.example.thermal_circuit_simulation.Elements;
 
-import com.example.thermal_circuit_simulation.Elements.Ejectors.MainEjectorWithCooler;
-import com.example.thermal_circuit_simulation.Elements.Ejectors.SealEjectorWithCooler;
-import com.example.thermal_circuit_simulation.Graph.Graph;
+import com.example.thermal_circuit_simulation.Elements.Ejectors.*;
+import com.example.thermal_circuit_simulation.Graph.*;
 import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.*;
-import com.example.thermal_circuit_simulation.Graph.Vertex;
 import com.example.thermal_circuit_simulation.ThermalEfficiencyIndicators.ThermalEfficiencyIndicators;
 import com.hummeling.if97.IF97;
-
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static com.example.thermal_circuit_simulation.Graph.Graph.*;
@@ -42,7 +39,7 @@ public class Pump extends Element {
         //--------------------------Инициализация-----------------------------------------------------------------------
         int nVerts = theGraph.getnVerts();
         Map<Integer, int[][]> adjMat = theGraph.getAdjMat();
-        ArrayList<Vertex> vertexList = theGraph.getVertexList();
+        List<Vertex> vertexList = theGraph.getVertexList();
         IF97 waterSteam = new IF97(IF97.UnitSystem.DEFAULT);
         //--------------------------------------------------------------------------------------------------------------
 
@@ -160,10 +157,10 @@ public class Pump extends Element {
         //--------------------------Инициализация-----------------------------------------------------------------------
         int nVerts = theGraph.getnVerts();
         Map<Integer, int[][]> adjMat = theGraph.getAdjMat();
-        ArrayList<Vertex> vertexList = theGraph.getVertexList();
+        List<Vertex> vertexList = theGraph.getVertexList();
         double[][] coefficientMatrix = matrices.coefficientMatrix;
         double[] freeMemoryMatrix = matrices.freeMemoryMatrix;
-        ArrayList<Consumptions> listOfConsumptions = matrices.getListOfColumnsOfConsumptions();
+        List<Consumptions> listOfConsumptions = matrices.getListOfColumnsOfConsumptions();
         // Получение номера строки в матрице, в которую записывается уравнение материального баланса для Насоса
         int materialBalanceEquation = matrices.getListOfLinesOfEquations().indexOf(this.getMaterialBalanceEquation());
         //--------------------------------------------------------------------------------------------------------------

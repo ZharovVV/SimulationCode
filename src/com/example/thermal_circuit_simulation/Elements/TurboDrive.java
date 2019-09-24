@@ -1,15 +1,11 @@
 package com.example.thermal_circuit_simulation.Elements;
 
-import com.example.thermal_circuit_simulation.Graph.Graph;
-import com.example.thermal_circuit_simulation.Graph.Vertex;
+import com.example.thermal_circuit_simulation.Graph.*;
 import com.example.thermal_circuit_simulation.ThermalEfficiencyIndicators.ThermalEfficiencyIndicators;
 import com.hummeling.if97.IF97;
-
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-
-import static com.example.thermal_circuit_simulation.Graph.Graph.HEATING_STEAM;
-import static com.example.thermal_circuit_simulation.Graph.Graph.MECHANICAL_COMMUNICATION;
+import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 
 public class TurboDrive extends Element {
     private double mechanicalEfficiency;        //Механический КПД Турбопривода
@@ -60,7 +56,7 @@ public class TurboDrive extends Element {
         //--------------------------Инициализация-----------------------------------------------------------------------
         int nVerts = theGraph.getnVerts();
         Map<Integer, int[][]> adjMat = theGraph.getAdjMat();
-        ArrayList<Vertex> vertexList = theGraph.getVertexList();
+        List<Vertex> vertexList = theGraph.getVertexList();
         IF97 waterSteam = new IF97(IF97.UnitSystem.DEFAULT);
         //--------------------------------------------------------------------------------------------------------------
 

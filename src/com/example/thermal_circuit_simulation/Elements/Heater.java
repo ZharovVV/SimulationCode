@@ -1,17 +1,10 @@
 package com.example.thermal_circuit_simulation.Elements;
 
-import com.example.thermal_circuit_simulation.Graph.Graph;
-import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Consumptions;
-import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Equation;
-import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.MatrixCompilation;
-import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Matrices;
-import com.example.thermal_circuit_simulation.Graph.Vertex;
+import com.example.thermal_circuit_simulation.Graph.*;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.*;
 import com.hummeling.if97.IF97;
-import sun.rmi.runtime.Log;
-
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-
 import static com.example.thermal_circuit_simulation.Graph.Graph.*;
 
 public class Heater extends Element {
@@ -92,7 +85,7 @@ public class Heater extends Element {
         //--------------------------Инициализация-----------------------------------------------------------------------
         int nVerts = theGraph.getnVerts();
         Map<Integer, int[][]> adjMat = theGraph.getAdjMat();
-        ArrayList<Vertex> vertexList = theGraph.getVertexList();
+        List<Vertex> vertexList = theGraph.getVertexList();
         IF97 waterSteam = new IF97(IF97.UnitSystem.DEFAULT);
         if (!isSurfaceHeater) {
             //--------------------------------Связи с элементами по линии греющего пара---------------------------------
@@ -314,10 +307,10 @@ public class Heater extends Element {
         //--------------------------Инициализация-----------------------------------------------------------------------
         int nVerts = theGraph.getnVerts();
         Map<Integer, int[][]> adjMat = theGraph.getAdjMat();
-        ArrayList<Vertex> vertexList = theGraph.getVertexList();
+        List<Vertex> vertexList = theGraph.getVertexList();
         double[][] coefficientMatrix = matrices.coefficientMatrix;
         double[] freeMemoryMatrix = matrices.freeMemoryMatrix;
-        ArrayList<Consumptions> listOfConsumptions = matrices.getListOfColumnsOfConsumptions();
+        List<Consumptions> listOfConsumptions = matrices.getListOfColumnsOfConsumptions();
 
         if (!isSurfaceHeater) {
             // TODO: 11.09.2019 Вроде норм

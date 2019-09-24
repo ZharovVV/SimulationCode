@@ -1,21 +1,20 @@
 package com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces;
 
 import com.example.thermal_circuit_simulation.Elements.*;
-import com.example.thermal_circuit_simulation.Elements.Ejectors.MainEjectorWithCooler;
-import com.example.thermal_circuit_simulation.Elements.Ejectors.SealEjectorWithCooler;
+import com.example.thermal_circuit_simulation.Elements.Ejectors.*;
 import com.example.thermal_circuit_simulation.Graph.Vertex;
 import org.apache.commons.math3.linear.*;
-
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class Matrices {
     public double[][] coefficientMatrix;
     public double[] freeMemoryMatrix;
-    private ArrayList<Consumptions> listOfColumnsOfConsumptions;
-    private ArrayList<Equation> listOfLinesOfEquations;
+    private List<Consumptions> listOfColumnsOfConsumptions;
+    private List<Equation> listOfLinesOfEquations;
 
-    public Matrices(ArrayList<Vertex> vertexList) {
+    public Matrices(List<Vertex> vertexList) {
         listOfColumnsOfConsumptions = new ArrayList<>();
         listOfLinesOfEquations = new ArrayList<>();
         int i = 0;
@@ -132,11 +131,11 @@ public class Matrices {
         freeMemoryMatrix = new double[i];
     }
 
-    public ArrayList<Consumptions> getListOfColumnsOfConsumptions() {
+    public List<Consumptions> getListOfColumnsOfConsumptions() {
         return listOfColumnsOfConsumptions;
     }
 
-    public ArrayList<Equation> getListOfLinesOfEquations() {
+    public List<Equation> getListOfLinesOfEquations() {
         return listOfLinesOfEquations;
     }
 

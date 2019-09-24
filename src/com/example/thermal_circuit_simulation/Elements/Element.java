@@ -1,15 +1,11 @@
 package com.example.thermal_circuit_simulation.Elements;
 
 import com.example.thermal_circuit_simulation.Graph.Graph;
-import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Calculation;
-import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Describable;
-import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.Matrices;
-import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.MatrixCompilation;
+import com.example.thermal_circuit_simulation.HelperСlassesAndInterfaces.*;
 import com.example.thermal_circuit_simulation.ThermalEfficiencyIndicators.ThermalEfficiencyIndicators;
 
 public abstract class Element implements Describable, Calculation, MatrixCompilation {
     public final String NAME;
-
     public Element(String name) {
         this.NAME = name;
     }
